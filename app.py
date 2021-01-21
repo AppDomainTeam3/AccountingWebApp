@@ -5,12 +5,13 @@ from scripts.User import User
 
 app = Flask(__name__, static_folder='static')
 
-api_url = 'http://127.0.0.2:5000'
+app_url = 'https://appdomainteam3.azurewebsites.net'
+api_url = 'https://appdomainteam3api.azurewebsites.net'
 
 @app.route("/")
 def index():
     user1 = User('regular_user', 'User1')
-    return f"Hello, {user1.name}"
+    return f"<button onclick=\"window.location.href='users'\">Click me</button> <p>Hello, {user1.name}</p>"
 
 @app.route("/users")
 def DisplayAllUsers():
