@@ -26,5 +26,28 @@ def DisplayAllUsers():
         userList += f"<p>{username}: {firstName}, {lastName}<p>"
     return f"Users: {userList}"
 
+@app.route("/add-user", methods=['GET', 'POST'])
+def CreateUser():
+    return """<html>
+                <head>
+                    <title>Create User</title>
+                </head>
+                
+                <body>
+                    <form method='POST' action='/add-user' enctype="multipart/form-data">
+                        <input type='text' placeholder='username' name='username'></input>
+                        <select name="user type" id="usertype">
+                            <option value="regular_user">Basic</option>
+                            <option value="manager">Manager</option>
+                            <option value="administrator">Admin</option>
+                        </select>
+                        <input type='text' placeholder='first name' name='firstname'></input>
+                        <input type='text' placeholder='last name' name='lastname'></input>
+                        <input type='text' placeholder='avatar link' name='avatarlink'></input>
+                        <button class='submit' name='upload' type='submit'>Submit</button>
+                    </form>
+                </body>
+            </html>"""
+
 if __name__ == "__main__":
     app.run(debug=False)
