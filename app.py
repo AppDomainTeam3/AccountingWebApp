@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import requests
 
 from scripts.User import User
@@ -10,21 +10,16 @@ api_url = 'https://appdomainteam3api.azurewebsites.net'
 
 @app.route("/")
 def index():
-    user1 = User('regular_user', 'User1')
-    return f"<button onclick=\"window.location.href='users'\">Click me</button> <p>Hello, {user1.name}</p>"
+    user = {'username': 'user'}
+    return render_template('index.html', title='Home', user=user)
 
 @app.route("/users")
 def DisplayAllUsers():
     response = requests.get(f"{api_url}/users")
-    userList = ''
+    userList = []
     for user in response.json():
-        username = user['username']
-        firstName = user['firstname']
-        lastName = user['lastname']
-        avatarLink = user['avatarlink']
-
-        userList += f"<p>{username}: {firstName}, {lastName}<p>"
-    return f"Users: {userList}"
+        userList.append(user)
+    return render_template('users.html', title='All Users', userdata=userList)
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
