@@ -41,11 +41,13 @@
                 $.ajax({
                     crossDomain: true,
                     url: 'https://appdomainteam3api.azurewebsites.net/users/create-user',
-                    contentType: 'application/json',
-                    dataType: 'json',
                     type: 'post',
-                    async: false,
-                    data:$('#UserCreationForm').serialize()
+                    "headers": {
+                        "accept": "application/json",
+                        "Access-Control-Allow-Origin":"*"
+                    },
+                    data:$('#UserCreationForm').serialize(),
+                    success: 
                 });
             });
         </script>
