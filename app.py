@@ -26,9 +26,6 @@ def DisplayAllUsers():
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
     form = UserCreationForm()
-    if (form.validate_on_submit()):
-        response = requests.post(f"{api_url}/users/create-user")
-        return redirect('/users')
     return render_template('create_user.html', title='Create User', form=form)
 
 if __name__ == "__main__":
