@@ -8,7 +8,7 @@ app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'secret_key'
 
 app_url = 'https://appdomainteam3.azurewebsites.net'
-api_url = 'https://appdomainteam3api.azurewebsites.net'
+api_url = 'https://127.0.0.2:5000'
 
 @app.route("/")
 def index():
