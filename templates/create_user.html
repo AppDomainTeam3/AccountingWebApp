@@ -39,6 +39,7 @@
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
+                    crossDomain: true,
                     url: 'https://appdomainteam3api.azurewebsites.net/users/create-user',
                     type: 'post',
                     data:$('#UserCreationForm').serialize(),
