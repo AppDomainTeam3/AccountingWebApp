@@ -4,8 +4,13 @@
     </head>
     
     <body>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/users">Users</a>
+            <a href="/add-user">Create User</a>
+          </div>
         <h1>Enter new user data:</h1>
-        <form action="http://127.0.0.2:5000/users/create-user" method="POST" novalidate>
+        <form id="UserCreationForm" action="" method="POST" novalidate>
             <p>
                 {{ form.username.label }}<br>
                 {{ form.username(size=16) }}<br>
@@ -28,8 +33,18 @@
             </p>
             <p>{{ form.submit() }}</p>
         </form>
-        <script type=text/javascript src="../static/jquery-3.5.1.js">
-            window.location.assign("http://127.0.0.1:5000/users");
+
+        <script type=text/javascript src="../static/jquery-3.5.1.js"></script>
+        <script>
+            $('#UserCreationForm').submit(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: 'https://appdomainteam3api.azurewebsites.net/users/create-user',
+                    type: 'post',
+                    data:$('#UserCreationForm').serialize(),
+                    success: window.location.href = "https://appdomainteam3.azurewebsites.net/"
+                });
+            });
         </script>
     </body>
 </html>
