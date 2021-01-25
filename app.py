@@ -1,9 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 import requests
 
 from scripts.User import User
+from scripts.CreateUser import UserCreationForm
 
 app = Flask(__name__, static_folder='static')
+app.config['SECRET_KEY'] = 'secret_key'
 
 app_url = 'https://appdomainteam3.azurewebsites.net'
 api_url = 'https://appdomainteam3api.azurewebsites.net'
@@ -23,26 +25,11 @@ def DisplayAllUsers():
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
-    return """<html>
-                <head>
-                    <title>Create User</title>
-                </head>
-                
-                <body>
-                    <form method='POST' action='/add-user' enctype="multipart/form-data">
-                        <input type='text' placeholder='username' name='username'></input>
-                        <select name="user type" id="usertype">
-                            <option value="regular_user">Basic</option>
-                            <option value="manager">Manager</option>
-                            <option value="administrator">Admin</option>
-                        </select>
-                        <input type='text' placeholder='first name' name='firstname'></input>
-                        <input type='text' placeholder='last name' name='lastname'></input>
-                        <input type='text' placeholder='avatar link' name='avatarlink'></input>
-                        <button class='submit' name='upload' type='submit'>Submit</button>
-                    </form>
-                </body>
-            </html>"""
+    form = UserCreationForm()
+    if (form.validate_on_submit()):
+        response = requests.post(f"{api_url}/users/create-user")
+        return redirect('/users')
+    return render_template('create_user.html', title='Create User', form=form)
 
 if __name__ == "__main__":
     app.run(debug=False)
