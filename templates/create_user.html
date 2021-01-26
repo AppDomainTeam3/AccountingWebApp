@@ -39,15 +39,10 @@
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
-                    crossDomain: true,
                     url: 'https://appdomainteam3api.azurewebsites.net/users/create-user',
                     type: 'post',
-                    "headers": {
-                        "accept": "application/json",
-                        "Access-Control-Allow-Origin":"*"
-                    },
                     data:$('#UserCreationForm').serialize(),
-                    success: function(data) {}
+                    success: function(data) { console.log("Success!!"); }
                 });
             });
         </script>
