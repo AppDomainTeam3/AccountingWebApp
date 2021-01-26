@@ -34,15 +34,20 @@
             <p>{{ form.submit() }}</p>
         </form>
 
-        <script type=text/javascript src="../static/jquery-3.5.1.js"></script>
+        <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
+                    crossDomain: true,
                     url: 'https://appdomainteam3api.azurewebsites.net/users/create-user',
                     type: 'post',
+                    "headers": {
+                        "accept": "application/json",
+                        "Access-Control-Allow-Origin":"*"
+                    },
                     data:$('#UserCreationForm').serialize(),
-                    success: window.location.href = "https://appdomainteam3.azurewebsites.net/"
+                    success: function(data) {}
                 });
             });
         </script>
