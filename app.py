@@ -7,8 +7,8 @@ from scripts.CreateUser import UserCreationForm
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'secret_key'
 
-app_url = 'https://appdomainteam3.azurewebsites.net'
-api_url = 'https://appdomainteam3api.azurewebsites.net'
+app_url = 'https://appdomainteam3.herokuapp.com'
+api_url = 'https://appdomainteam3api.herokuapp.com'
 
 @app.route("/")
 def index():
@@ -26,9 +26,6 @@ def DisplayAllUsers():
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
     form = UserCreationForm()
-    if (form.validate_on_submit()):
-        response = requests.post(f"{api_url}/users/create-user")
-        return redirect('/users')
     return render_template('create_user.html', title='Create User', form=form)
 
 if __name__ == "__main__":
