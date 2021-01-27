@@ -39,7 +39,7 @@
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
-                    url: form.api_url,
+                    url: api + '/users/create-user',
                     type: 'post',
                     data:$('#UserCreationForm').serialize(),
                     success: function(data) { console.log("Success!!"); }
