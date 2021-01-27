@@ -7,8 +7,8 @@ from scripts.CreateUser import UserCreationForm
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'secret_key'
 
-app_url = 'https://appdomainteam3.azurewebsites.net'
-api_url = 'https://appdomainteam3api.azurewebsites.net'
+app_url = 'https://appdomainteam3.herokuapp.com'
+api_url = 'https://appdomainteam3api.herokuapp.com'
 
 @app.route("/")
 def index():
