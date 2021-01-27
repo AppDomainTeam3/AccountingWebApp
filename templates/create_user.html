@@ -39,7 +39,7 @@
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
-                    url: 'https://appdomainteam3api.herokuapp.com/users/create-user',
+                    url: form.api_url,
                     type: 'post',
                     data:$('#UserCreationForm').serialize(),
                     success: function(data) { console.log("Success!!"); }

@@ -92,7 +92,7 @@ def DisplayAllUsers():
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
-    form = UserCreationForm()
+    form = UserCreationForm(api_url)
     return render_template('create_user.html', title='Create User', form=form)
 
 if __name__ == "__main__":
