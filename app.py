@@ -1,7 +1,14 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, request, redirect, url_for,session,flash,g
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 from scripts.User import User
 from scripts.CreateUser import UserCreationForm
+from scripts.LoginUser import UserLoginForm
+import re
+import json
+import flask_login
+import flask
 
 
 app = Flask(__name__, static_folder='static')
@@ -72,8 +79,7 @@ def sign_out():
 @app.route("/")
 def index():
     if 'user_id' in session:
-        return f'''<h1>Hello, {g.user.username}</h2>
-                   <a href={url_for('home')}> home page</a>'''
+        return render_template('index.html',title='home')
     return 'You are not signed in!'
 
 @app.route("/users")
