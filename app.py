@@ -110,7 +110,7 @@ def UserProfile(user_id):
     avatarlink = response[0]['avatarlink']
     return render_template('profile.html', title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, user=g.user)
 
-@app.route("/users/<int:user_id>/edit")
+@app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
     response = requests.get(f"{api_url}/users/{user_id}").json()
     username = response[0]['username']
@@ -119,7 +119,7 @@ def EditUserProfile(user_id):
     lastname = response[0]['lastname']
     avatarlink = response[0]['avatarlink']
     form = UserCreationForm()
-    return render_template('edit_user.html', title=username, form=form, id=user_id, username=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, user=g.user)
+    return render_template('edit_user.html', title=username, form=form, id=user_id, username=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, api=api_url, user=g.user)
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
