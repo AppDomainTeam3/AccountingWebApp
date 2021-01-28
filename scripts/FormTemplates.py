@@ -9,3 +9,7 @@ class UserCreationForm(FlaskForm):
     lastname = StringField('Last Name', validators=[DataRequired()])
     avatarlink = StringField('Avatar Link')
     submit = SubmitField('Submit')
+
+class UserUpdateUsertypeForm(FlaskForm):
+    usertype = SelectField('User Type', choices=[('regular_user', 'Basic'), ('manager', 'Manager'), ('administrator', 'Admin')], validators=[DataRequired()])
+    submit = SubmitField('Submit')
