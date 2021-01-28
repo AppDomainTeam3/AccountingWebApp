@@ -9,7 +9,10 @@
         <a href="/users">Users</a>
         <a href="/add-user">Create User</a>
     </div>
-    <h1>{{ title }}'s Profile</h1>
+    <h1>{{ title }}'s Profile</h1> 
+    {% if user.usertype == 'administrator' %}
+        <a href="{{ url }}/users/{{ id }}/edit">Edit Profile as Admin</a></p>
+    {% endif %}
     <p><img src={{ avatarlink }} width="128" height="128"></p>  <!--This should be rewritten with CSS later-->
     <p>{{ firstname }} {{ lastname }}</p>
     <p>{{ usertype }}</p>
