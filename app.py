@@ -14,7 +14,7 @@ import flask
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'secret_key'
 
-app_url = 'https://appdomainteam3.azurewebsites.net'
+app_url = 'https://appdomainteam3.herokuapp.com'
 api_url = 'http://127.0.0.2:5000'
 
 response = requests.get(f"{api_url}/users")
@@ -47,7 +47,6 @@ def before_request():
 #starts the session/checks for auth
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = UserLoginForm()
     if request.method == 'POST':
         session.pop('user_id',None)
         username = request.form['username']
@@ -60,13 +59,13 @@ def login():
             session['user_id'] = user.id
             return redirect(url_for('index'))
         return redirect(url_for('login'))
-    return render_template('login.html',title = 'Login')
+    return render_template('login.html', title='Login')
 
 #random page ~ home
 @app.route('/home')
 def home():
     if not g.user:
-        return '<h1> You are not logged in </h1>'
+        return '<h1> You are not logged in TEST HOME/extra PAGE IGNORE</h1>'
     else:
         return f'''<h1> Welcome: {g.user.username} </h1>
                    <a href="{url_for('sign_out')}"> Sign Out </a>'''
@@ -79,9 +78,9 @@ def sign_out():
 @app.route("/")
 def index():
     if 'user_id' in session:
-        return f'''<h1>Hello, {g.user.username}</h2>
-                   <a href={url_for('home')}> home page</a>'''
-    return 'You are not signed in!'
+        return render_template('index.html',title='home')
+    return """<h1> You are not signed in! </h1>
+              <a href = /login> Login </a>"""
 
 @app.route("/users")
 def DisplayAllUsers():

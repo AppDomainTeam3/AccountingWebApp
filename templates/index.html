@@ -3,6 +3,12 @@
         <title>{{ title }} - AppDomain</title>
     </head>
     <body>
-        <h1>Hello, {{ user.username }}!</h1>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/users">Users</a>
+            <a href="/add-user">Create User</a>
+            <a href="/sign_out">Sign Out</a>
+          </div>
+        <h1>Hello, {{ g.user.username }}!</h1>
     </body>
 </html>
