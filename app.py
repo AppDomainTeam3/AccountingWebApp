@@ -20,9 +20,13 @@ api_url = 'https://appdomainteam3api.herokuapp.com'
 response = requests.get(f"{api_url}/users")
 
 class User(UserMixin):
-    def __init__(self,id,username,password):
+    def __init__(self, id, username, usertype, firstname, lastname, avatarlink, password):
         self.id = id
         self.username = username
+        self.usertype = usertype
+        self.firstname = firstname
+        self.lastname = lastname
+        self.avatarlink = avatarlink
         self.password = password
     def __repr__(self): 
         return f'<User: {self.username}>'
@@ -33,7 +37,13 @@ users = []
 def update_user_list():
     for x in range(len(dataList)):
         dataDict = dataList[x]
-        users.append(User(id=dataDict['id'],username = dataDict['username'],password=dataDict['hashed_password']))
+        users.append(User(id=dataDict['id'], 
+                          username = dataDict['username'],
+                          usertype = dataDict['usertype'],
+                          firstname = dataDict['firstname'],
+                          lastname = dataDict['lastname'],
+                          avatarlink = dataDict['avatarlink'],
+                          password = dataDict['hashed_password']))
 update_user_list()
 
 #checks if user is logged in
@@ -60,7 +70,7 @@ def login():
             session['user_id'] = user.id
             return redirect(url_for('index'))
         return redirect(url_for('login'))
-    return render_template('login.html',title = 'Login')
+    return render_template('login.html',title = 'Login', url=app_url)
 
 #random page ~ home
 @app.route('/home')
@@ -98,7 +108,18 @@ def UserProfile(user_id):
     firstname = response[0]['firstname']
     lastname = response[0]['lastname']
     avatarlink = response[0]['avatarlink']
-    return render_template('profile.html', title=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink)
+    return render_template('profile.html', title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, user=g.user)
+
+@app.route("/users/<int:user_id>/edit")
+def EditUserProfile(user_id):
+    response = requests.get(f"{api_url}/users/{user_id}").json()
+    username = response[0]['username']
+    usertype = response[0]['usertype']
+    firstname = response[0]['firstname']
+    lastname = response[0]['lastname']
+    avatarlink = response[0]['avatarlink']
+    form = UserCreationForm()
+    return render_template('edit_user.html', title=username, form=form, id=user_id, username=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, user=g.user)
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
