@@ -3,7 +3,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 from scripts.User import User
-from scripts.CreateUser import UserCreationForm
+from scripts.FormTemplates import UserCreationForm, UserUpdateUsertypeForm
 from scripts.LoginUser import UserLoginForm
 import re
 import json
@@ -89,6 +89,16 @@ def DisplayAllUsers():
     for user in response.json():
         userList.append(user)
     return render_template('users.html', title='All Users', userdata=userList)
+
+@app.route("/users/<int:user_id>")
+def UserProfile(user_id):
+    response = requests.get(f"{api_url}/users/{user_id}").json()
+    username = response[0]['username']
+    usertype = response[0]['usertype']
+    firstname = response[0]['firstname']
+    lastname = response[0]['lastname']
+    avatarlink = response[0]['avatarlink']
+    return render_template('profile.html', title=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink)
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
