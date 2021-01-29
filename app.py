@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for,session,flash,g
 from flask_login import UserMixin
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 from scripts.User import User
@@ -12,10 +13,13 @@ import flask
 
 
 app = Flask(__name__, static_folder='static')
-app.config['SECRET_KEY'] = 'secret_key'
+app.config.from_object("config.DevelopementConfig")
 
 app_url = 'https://appdomainteam3.herokuapp.com'
 api_url = 'https://appdomainteam3api.herokuapp.com'
+
+mail = Mail(app)
+
 
 response = requests.get(f"{api_url}/users")
 
@@ -28,6 +32,7 @@ class User(UserMixin):
         self.lastname = lastname
         self.avatarlink = avatarlink
         self.password = password
+        self.usertype = usertype
     def __repr__(self): 
         return f'<User: {self.username}>'
 
@@ -80,6 +85,17 @@ def home():
     else:
         return f'''<h1> Welcome: {g.user.username} </h1>
                    <a href="{url_for('sign_out')}"> Sign Out </a>'''
+@app.route('/mail')
+def test_mail():
+    if g.user.usertype == 'administrator':
+        msg = Message('Hello, you have clicked on the link', recipients=['netim11829@alicdh.com'])
+        msg.body = f"Hello {g.user.username}, you are the choosen one"
+        mail.send(msg)   
+        return """<h1>message has been sent</h1>
+            <a href='/'> Back To Main Page</a>"""   
+    else:
+        return '''<h1>You do not have access</h1>
+                  <a href='/'> Back To Main Page</a>'''  
 
 @app.route('/sign_out')
 def sign_out():
