@@ -5,11 +5,15 @@
     <body>
         <div class="topnav">
             <a href="/">Home</a>
+            <a href="/users/{{ user.id }}">Profile</a>
             <a href="/users">Users</a>
             <a href="/add-user">Create User</a>
-          </div>
-        {% for user in userdata %}
-        <div><p>{{ user.username }}: {{ user.firstname }} {{ user.lastname }}</b></p></div>
+            <a href="/login">Sign-in</a>
+            <a href="/sign_out">Sign-Out</a>
+            <a href="/mail"> Send Test Email</a>
+        </div>
+        {% for user_ in userdata %}
+        <div><p>{{ user_.username }}: {{ user_.firstname }} {{ user_.lastname }}</b></p></div>
         {% endfor %}
     </body>
 </html>
