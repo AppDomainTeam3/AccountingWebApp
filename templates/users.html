@@ -13,7 +13,9 @@
             <a href="/mail"> Send Test Email</a>
         </div>
         {% for user_ in userdata %}
-        <div><p>{{ user_.username }}: {{ user_.firstname }} {{ user_.lastname }}</b></p></div>
+        <div>
+            <p><a href="/users/{{ user_.id }}"><img src={{ user_.avatarlink }} width="32" height="32"> Username: {{ user_.username }} | Email: {{ user_.email }} | Usertype: {{ user_.usertype }} | Firstname: {{ user_.firstname }} | Lastname: {{ user_.lastname }}</a></b></p>
+        </div>
         {% endfor %}
     </body>
 </html>

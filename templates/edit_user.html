@@ -15,10 +15,14 @@
             <a href="/mail"> Send Test Email</a>
         </div>
         <h1>Edit data for {{ username }}:</h1>
-        <form id="UserCreationForm" action="" method="POST" novalidate>
+        <form id="UserCreationForm" action="" method="POST">
             <p>
                 {{ form.username.label }}<br>
                 {{ form.username(size=16, value=username) }}<br>
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=16, value=email) }}<br>
             </p>
             <p>
                 {{ form.usertype.label }}<br>
@@ -34,9 +38,9 @@
             </p>
             <p>
                 {{ form.avatarlink.label }}<br>
-                {{ form.avatarlink(size=16, avatarlink=avatarlink) }}<br>
+                {{ form.avatarlink(size=16, value=avatarlink) }}<br>
             </p>
-            <p>{{ form.submit() }} <button onclick="window.location.href='{{ url }}/users/{{ id }}'">Cancel</button></p>
+            <p>{{ form.submit() }}</p>
         </form>
         <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script id = "UserCreationScript" data-search={{ api }}>
@@ -48,7 +52,10 @@
                     url: api_url + '/users/{{ id }}/edit',
                     type: 'post',
                     data:$('#UserCreationForm').serialize(),
-                    success: function(data) { console.log("Success!!"); }
+                    success: window.setTimeout(function(){
+                        alert('User updated!')
+                        window.location.href = "{{ url }}/users/{{ id }}";
+                    })
                 });
             });
         </script>
