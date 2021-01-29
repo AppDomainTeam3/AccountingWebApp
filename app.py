@@ -137,6 +137,7 @@ def UserProfile(user_id):
     avatarlink = response[0]['avatarlink']
     updataUserSessionData()
     return render_template('profile.html', title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, canEdit=canEdit)
+    return render_template('profile.html', user=g.user, title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
