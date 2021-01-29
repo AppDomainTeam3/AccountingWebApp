@@ -20,9 +20,6 @@ api_url = 'https://appdomainteam3api.herokuapp.com'
 
 mail = Mail(app)
 
-
-response = requests.get(f"{api_url}/users")
-
 class User(UserMixin):
     def __init__(self, id, username, usertype, firstname, lastname, avatarlink, password):
         self.id = id
@@ -36,20 +33,30 @@ class User(UserMixin):
     def __repr__(self): 
         return f'<User: {self.username}>'
 
-dataList = response.json()
+userList = []
 users = []
 #adds id, username, and hashed_password to list for user tracking and authentication
 def update_user_list():
-    for x in range(len(dataList)):
-        dataDict = dataList[x]
-        users.append(User(id=dataDict['id'], 
-                          username = dataDict['username'],
-                          usertype = dataDict['usertype'],              ######This needs to be updated every time session values are changed
-                          firstname = dataDict['firstname'],
-                          lastname = dataDict['lastname'],
-                          avatarlink = dataDict['avatarlink'],
-                          password = dataDict['hashed_password']))
+    response = requests.get(f"{api_url}/users")
+    userList = response.json()
+    users.clear()
+    for x in range(len(userList)):
+        userDict = userList[x]
+        users.append(User(id=userDict['id'], 
+                          username = userDict['username'],
+                          usertype = userDict['usertype'],              ######This needs to be updated every time session values are changed
+                          firstname = userDict['firstname'],
+                          lastname = userDict['lastname'],
+                          avatarlink = userDict['avatarlink'],
+                          password = userDict['hashed_password']))
 update_user_list()
+print(users)
+
+def updataUserSessionData():
+    update_user_list()
+    for userIndex in range(len(users)):
+        if g.user.id == users[userIndex].id:
+            g.user = users[userIndex]
 
 #checks if user is logged in
 @app.before_request
@@ -128,7 +135,8 @@ def UserProfile(user_id):
     firstname = response[0]['firstname']
     lastname = response[0]['lastname']
     avatarlink = response[0]['avatarlink']
-    return render_template('profile.html', title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, canEdit=canEdit)
+    updataUserSessionData()
+    return render_template('profile.html', user=g.user, title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
