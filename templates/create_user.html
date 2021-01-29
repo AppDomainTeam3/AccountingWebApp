@@ -14,10 +14,14 @@
             <a href="/mail"> Send Test Email</a>
         </div>
         <h1>Enter new user data:</h1>
-        <form id="UserCreationForm" action="" method="POST" novalidate>
+        <form id="UserCreationForm" action="" method="POST">
             <p>
                 {{ form.username.label }}<br>
                 {{ form.username(size=16) }}<br>
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=16) }}<br>
             </p>
             <p>
                 {{ form.usertype.label }}<br>
@@ -47,7 +51,10 @@
                     url: api_url + '/users/create-user',
                     type: 'post',
                     data:$('#UserCreationForm').serialize(),
-                    success: function(data) { console.log("Success!!"); }
+                    success: window.setTimeout(function(){
+                        alert('User Created!')
+                        window.location.href = "{{ url }}/users";
+                    })
                 });
             });
         </script>

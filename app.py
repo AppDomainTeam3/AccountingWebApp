@@ -1,16 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for,session,flash,g
-from flask_login import UserMixin
+from flask import Flask, render_template, request, redirect, url_for, session, g
 from flask_mail import Mail, Message
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 import requests
 from scripts.User import User
-from scripts.FormTemplates import UserCreationForm, UserUpdateUsertypeForm
+from scripts.FormTemplates import UserCreationForm
 from scripts.LoginUser import UserLoginForm
-import re
-import json
-import flask_login
-import flask
-
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -20,22 +14,9 @@ api_url = 'https://appdomainteam3api.herokuapp.com'
 
 mail = Mail(app)
 
-class User(UserMixin):
-    def __init__(self, id, username, usertype, firstname, lastname, avatarlink, password):
-        self.id = id
-        self.username = username
-        self.usertype = usertype
-        self.firstname = firstname
-        self.lastname = lastname
-        self.avatarlink = avatarlink
-        self.password = password
-        self.usertype = usertype
-    def __repr__(self): 
-        return f'<User: {self.username}>'
-
 userList = []
 users = []
-#adds id, username, and hashed_password to list for user tracking and authentication
+#adds userdata to list for user tracking and authentication
 def update_user_list():
     response = requests.get(f"{api_url}/users")
     userList = response.json()
@@ -44,13 +25,13 @@ def update_user_list():
         userDict = userList[x]
         users.append(User(id=userDict['id'], 
                           username = userDict['username'],
-                          usertype = userDict['usertype'],              ######This needs to be updated every time session values are changed
+                          email = userDict['email'],
+                          usertype = userDict['usertype'],
                           firstname = userDict['firstname'],
                           lastname = userDict['lastname'],
                           avatarlink = userDict['avatarlink'],
                           password = userDict['hashed_password']))
 update_user_list()
-print(users)
 
 def updataUserSessionData():
     update_user_list()
@@ -126,7 +107,6 @@ def UserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
     canEdit = False
-    print(f"g.user.usertype={g.user.usertype}")
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
     response = requests.get(f"{api_url}/users/{user_id}").json()
@@ -143,13 +123,14 @@ def EditUserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
     response = requests.get(f"{api_url}/users/{user_id}").json()
+    email = response[0]['email']
     username = response[0]['username']
     usertype = response[0]['usertype']
     firstname = response[0]['firstname']
     lastname = response[0]['lastname']
     avatarlink = response[0]['avatarlink']
     form = UserCreationForm()
-    return render_template('edit_user.html', title=username, form=form, id=user_id, username=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, api=api_url, user=g.user)
+    return render_template('edit_user.html', title=username, form=form, id=user_id, email=email, username=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, api=api_url, user=g.user)
 
 @app.route("/add-user", methods=['GET', 'POST'])
 def CreateUser():
