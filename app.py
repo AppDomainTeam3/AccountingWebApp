@@ -31,7 +31,8 @@ def update_user_list():
                           lastname = userDict['lastname'],
                           avatarlink = userDict['avatarlink'],
                           password = userDict['hashed_password'],
-                          isactive = userDict['isActive']))
+                          isactive = userDict['isActive'],
+                          ispasswordexpired = userDict['ispasswordexpired']))
 update_user_list()
 
 def updataUserSessionData():
