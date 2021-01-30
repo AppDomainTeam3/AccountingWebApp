@@ -110,9 +110,7 @@ def DisplayAllUsersWithExpiredPasswords():
         return render_template('login.html')
     update_user_list()
     expiredUsers = []
-    print(users)
     for user_ in users:
-        print(user_.ispasswordexpired)
         if users[user_.id].ispasswordexpired == 'True':
             expiredUsers.append(user_)
     return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, user=g.user, url=app_url)
