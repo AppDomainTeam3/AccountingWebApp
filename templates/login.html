@@ -2,19 +2,28 @@
 <html>
   <head>
     <title>{{ title }} - AppDomain</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
   </head>
-  <body>
-  <form action="http://127.0.0.1:5000/login/" method="post">
   
-    <div class="container">
-      <label for="username"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="username" required>
-  
-      <label for="password"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="password" required>
-  
-      <button type="submit">Login</button>
+    <div id = logo>
+      <img src="{{ url_for('static', filename='logoBlackBar.png') }}" />
     </div>
-  </form>
-  </body>
+
+    <body>
+    <form action="{{ url }}/login/" method="post">
+      <div class="container" >
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" required>
+    
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="password" required>
+    
+        <button type="submit">Login</button>
+      </div>
+    </form>
+    <p>
+      <a href="/login">Forgot Password? | </a>
+      <a href="/login">Register</a>
+    </p>
+    </body>
 </html>

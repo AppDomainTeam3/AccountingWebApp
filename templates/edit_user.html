@@ -1,0 +1,73 @@
+{% if user.usertype == 'administrator' or id == user.id %}
+<html>
+    <head>
+        <title>{{ title }} - AppDomain</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
+    </head>
+    
+    <div class = profilePic>
+        <img src="{{ g.user.avatarlink }}" />
+        <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
+    </div>
+    
+    <body>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/users/{{ user.id }}">Profile</a>
+            <a href="/users">Users</a>
+            <a href="/add-user">Create User</a>
+            <a href="/login">Sign-in</a>
+            <a href="/sign_out">Sign-Out</a>
+            <a href="/mail"> Send Test Email</a>
+        </div>
+        <h1>Edit data for {{ username }}:</h1>
+        <form id="UserCreationForm" action="" method="POST">
+            <p>
+                {{ form.username.label }}<br>
+                {{ form.username(size=16, value=username) }}<br>
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=16, value=email) }}<br>
+            </p>
+            <p>
+                {{ form.usertype.label }}<br>
+                {{ form.usertype }}<br>
+            </p>
+            <p>
+                {{ form.firstname.label }}<br>
+                {{ form.firstname(size=16, value=firstname) }}<br>
+            </p>
+            <p>
+                {{ form.lastname.label }}<br>
+                {{ form.lastname(size=16, value=lastname) }}<br>
+            </p>
+            <p>
+                {{ form.avatarlink.label }}<br>
+                {{ form.avatarlink(size=16, value=avatarlink) }}<br>
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+        <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script id = "UserCreationScript" data-search={{ api }}>
+            var script_tag = document.getElementById("UserCreationScript")
+            var api_url = script_tag.getAttribute("data-search")
+            $('#UserCreationForm').submit(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: api_url + '/users/{{ id }}/edit',
+                    type: 'post',
+                    data:$('#UserCreationForm').serialize(),
+                    success: window.setTimeout(function(){
+                        alert('User updated!')
+                        window.location.href = "{{ url }}/users/{{ id }}";
+                    })
+                });
+            });
+        </script>
+    </body>
+</html>
+{% else %}
+    <html>You are not authorized to edit this user.</html>
+{% endif %}
+

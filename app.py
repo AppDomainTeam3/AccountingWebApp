@@ -14,8 +14,8 @@ import flask
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'secret_key'
 
-app_url = 'https://appdomainteam3.herokuapp.com'
-api_url = 'http://127.0.0.2:5000'
+app_url = 'http://127.0.0.1:5000/'
+api_url = 'http://127.0.0.2:5000/'
 
 response = requests.get(f"{api_url}/users")
 

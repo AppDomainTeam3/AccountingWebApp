@@ -1,8 +1,14 @@
 <html>
     <head>
         <title>{{ title }} - AppDomain</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
     </head>
-    
+
+    <div class = profilePic>
+        <img src="{{ g.user.avatarlink }}" />
+        <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
+    </div>
+
     <body>
         <h1>Enter new user data:</h1>
         <form action="http://127.0.0.2:5000/users/create-user" method="POST" novalidate>
