@@ -99,4 +99,4 @@ def CreateUser():
     return render_template('create_user.html', title='Create User', form=form)
       
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

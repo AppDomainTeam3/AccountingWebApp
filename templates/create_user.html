@@ -10,6 +10,15 @@
     </div>
 
     <body>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/users/{{ user.id }}">Profile</a>
+            <a href="/users">Users</a>
+            <a href="/add-user">Create User</a>
+            <a href="/login">Sign-in</a>
+            <a href="/sign_out">Sign-Out</a>
+            <a href="/mail"> Send Test Email</a>
+        </div>
         <h1>Enter new user data:</h1>
         <form action="http://127.0.0.2:5000/users/create-user" method="POST" novalidate>
             <p>
