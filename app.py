@@ -30,7 +30,9 @@ def update_user_list():
                           firstname = userDict['firstname'],
                           lastname = userDict['lastname'],
                           avatarlink = userDict['avatarlink'],
-                          password = userDict['hashed_password']))
+                          password = userDict['hashed_password'],
+                          isactive = userDict['isActive'],
+                          ispasswordexpired = userDict['ispasswordexpired']))
 update_user_list()
 
 def updataUserSessionData():
@@ -101,6 +103,17 @@ def DisplayAllUsers():
     for user in response.json():
         userList.append(user)
     return render_template('users.html', title='All Users', userdata=userList, user=g.user, url=app_url)
+
+@app.route("/users/expired_passwords")
+def DisplayAllUsersWithExpiredPasswords():
+    if g.user == None:
+        return render_template('login.html')
+    update_user_list()
+    expiredUsers = []
+    for user_ in users:
+        if users[user_.id].ispasswordexpired == 'True':
+            expiredUsers.append(user_)
+    return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, user=g.user, url=app_url)
 
 @app.route("/users/<int:user_id>")
 def UserProfile(user_id):
