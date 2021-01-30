@@ -104,6 +104,19 @@ def DisplayAllUsers():
         userList.append(user)
     return render_template('users.html', title='All Users', userdata=userList, user=g.user, url=app_url)
 
+@app.route("/users/expired_passwords")
+def DisplayAllUsersWithExpiredPasswords():
+    if g.user == None:
+        return render_template('login.html')
+    update_user_list()
+    expiredUsers = []
+    print(users)
+    for user_ in users:
+        print(user_.ispasswordexpired)
+        if users[user_.id].ispasswordexpired == 'True':
+            expiredUsers.append(user_)
+    return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, user=g.user, url=app_url)
+
 @app.route("/users/<int:user_id>")
 def UserProfile(user_id):
     if g.user == None:
