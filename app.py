@@ -31,8 +31,8 @@ def update_user_list():
                           lastname = userDict['lastname'],
                           avatarlink = userDict['avatarlink'],
                           password = userDict['hashed_password'],
-                          isactive = userDict['isActive'],
-                          ispasswordexpired = userDict['ispasswordexpired']))
+                          isActive = userDict['is_active'],
+                          isPasswordExpired = userDict['is_password_expired']))
 update_user_list()
 
 def updataUserSessionData():
@@ -108,7 +108,7 @@ def DisplayAllUsersWithExpiredPasswords():
     update_user_list()
     expiredUsers = []
     for user_ in users:
-        if users[user_.id].ispasswordexpired == 'True':
+        if users[user_.id].isPasswordExpired == 'True':
             expiredUsers.append(user_)
     return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, user=g.user, url=app_url)
 
@@ -123,7 +123,7 @@ def UserProfile(user_id):
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    activeStatus = users[user_id].isactive
+    activeStatus = users[user_id].isActive
     active = int(activeStatus == 'True')
     return render_template('profile.html', user=g.user, active=active, userData=users[user_id], url=app_url, canEdit=canEdit)
 
