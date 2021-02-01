@@ -119,10 +119,13 @@ def DisplayAllUsersWithExpiredPasswords():
 def UserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    response = requests.get(f"{api_url}/users/{user_id}").json()
+    response = response.json()
     username = response[0]['username']
     usertype = response[0]['usertype']
     firstname = response[0]['firstname']
