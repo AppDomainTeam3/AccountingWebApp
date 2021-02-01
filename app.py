@@ -99,10 +99,7 @@ def DisplayAllUsers():
     if g.user == None:
         return render_template('login.html')
     response = requests.get(f"{api_url}/users")
-    userList = []
-    for user in response.json():
-        userList.append(user)
-    return render_template('users.html', title='All Users', userdata=userList, user=g.user, url=app_url)
+    return render_template('users.html', title='All Users', userdata=users, user=g.user, url=app_url)
 
 @app.route("/users/expired_passwords")
 def DisplayAllUsersWithExpiredPasswords():
@@ -119,20 +116,16 @@ def DisplayAllUsersWithExpiredPasswords():
 def UserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
+    updataUserSessionData()
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    response = response.json()
-    username = response[0]['username']
-    usertype = response[0]['usertype']
-    firstname = response[0]['firstname']
-    lastname = response[0]['lastname']
-    avatarlink = response[0]['avatarlink']
-    updataUserSessionData()
-    return render_template('profile.html', user=g.user, title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, canEdit=canEdit)
+    activeStatus = users[user_id].isactive
+    active = int(activeStatus == 'True')
+    return render_template('profile.html', user=g.user, active=active, userData=users[user_id], url=app_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
