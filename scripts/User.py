@@ -14,4 +14,6 @@ class User(UserMixin):
         self.isPasswordExpired = isPasswordExpired
         self.reactivateUserDate = reactivateUserDate
     def __repr__(self): 
-        return f'<User: {self.username}>'
+        return f"""<id: {self.id}, username: {self.username}, email: {self.email}, usertype: {self.usertype}, 
+                    firstname: {self.firstname}, lastname: {self.lastname}, isActive: {self.isActive}, 
+                    isPasswordExpired: {self.isPasswordExpired}, reactivateUserDate: {self.reactivateUserDate}>"""

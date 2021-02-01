@@ -1,4 +1,4 @@
-{% if user.usertype == 'administrator' or id == user.id %}
+{% if sessionUser.usertype == 'administrator' or user.id == sessionUser.id %}
 <html>
     <head>
         <title>{{ title }} - AppDomain</title>
@@ -7,22 +7,26 @@
     <body>
         <div class="topnav">
             <a href="/">Home</a>
-            <a href="/users/{{ user.id }}">Profile</a>
+            <a href="/users/{{ sessionUser.id }}">Profile</a>
             <a href="/users">Users</a>
             <a href="/users/expired_passwords">Expired Passwords</a>
             <a href="/add-user">Create User</a>
             <a href="/sign_out">Sign-Out</a>
             <a href="/mail"> Send Test Email</a>
         </div>
-        <h1>Edit data for {{ username }}:</h1>
+        <h1>Edit data for {{ user.username }}:</h1>
         <form id="UserCreationForm" action="" method="POST">
             <p>
+                {{ form.deactivate.label }}<br>
+                {{ form.deactivate }}<br>
+            </p>
+            <p>
                 {{ form.username.label }}<br>
-                {{ form.username(size=16, value=username) }}<br>
+                {{ form.username(size=16, value=user.username) }}<br>
             </p>
             <p>
                 {{ form.email.label }}<br>
-                {{ form.email(size=16, value=email) }}<br>
+                {{ form.email(size=16, value=user.email) }}<br>
             </p>
             <p>
                 {{ form.usertype.label }}<br>
@@ -30,15 +34,15 @@
             </p>
             <p>
                 {{ form.firstname.label }}<br>
-                {{ form.firstname(size=16, value=firstname) }}<br>
+                {{ form.firstname(size=16, value=user.firstname) }}<br>
             </p>
             <p>
                 {{ form.lastname.label }}<br>
-                {{ form.lastname(size=16, value=lastname) }}<br>
+                {{ form.lastname(size=16, value=user.lastname) }}<br>
             </p>
             <p>
                 {{ form.avatarlink.label }}<br>
-                {{ form.avatarlink(size=16, value=avatarlink) }}<br>
+                {{ form.avatarlink(size=16, value=user.avatarlink) }}<br>
             </p>
             <p>{{ form.submit() }}</p>
         </form>
@@ -49,12 +53,12 @@
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
-                    url: api_url + '/users/{{ id }}/edit',
+                    url: api_url + '/users/{{ user.id }}/edit',
                     type: 'post',
                     data:$('#UserCreationForm').serialize(),
                     success: window.setTimeout(function(){
                         alert('User updated!')
-                        window.location.href = "{{ url }}/users/{{ id }}";
+                        window.location.href = "{{ url }}/users/{{ user.id }}";
                     })
                 });
             });

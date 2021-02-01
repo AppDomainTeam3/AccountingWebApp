@@ -17,9 +17,9 @@
         <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
     {% endif %}
     <p><img src={{ userData.avatarlink }} width="128" height="128"></p>  <!--This should be rewritten with CSS later-->
-    {% if active %}
+    {% if userData.isActive.lower() == 'true' %}
       <p>Status: Active</p>
-    {% else -%}
+    {% elif userData.isActive.lower() == 'false' %}
       <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
     {% endif %}
     <p>{{ userData.firstname }} {{ userData.lastname }}</p>
