@@ -99,7 +99,7 @@ def index():
 def DisplayAllUsers():
     if g.user == None:
         return render_template('login.html')
-    response = requests.get(f"{api_url}/users")
+    update_user_list()
     return render_template('users.html', title='All Users', userdata=users, user=g.user, url=app_url)
 
 @app.route("/users/expired_passwords")
