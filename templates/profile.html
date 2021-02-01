@@ -20,7 +20,7 @@
     {% if active %}
       <p>Status: Active</p>
     {% else -%}
-      <p>Status: Inactive</p>
+      <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
     {% endif %}
     <p>{{ userData.firstname }} {{ userData.lastname }}</p>
     <p>{{ userData.email }}</p>
