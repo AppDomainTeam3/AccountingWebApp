@@ -56,7 +56,7 @@ def login():
     form = UserLoginForm()
     if request.method == 'POST':
         session.pop('user_id',None)
-        username = request.form['username']
+        username = request.form['username'].lower()
         password = request.form['password']
         try:
             user = [x for x in users if x.username == username][0]
