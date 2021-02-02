@@ -12,12 +12,18 @@
       <a href="/sign_out">Sign-Out</a>
       <a href="/mail"> Send Test Email</a>
   </div>
-    <h1>{{ title }}'s Profile</h1> 
+    <h1>{{ userData.username }}'s Profile</h1> 
     {% if canEdit %}
-        <a href="{{ url }}/users/{{ id }}/edit">Edit Profile</a></p>
+        <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
     {% endif %}
-    <p><img src={{ avatarlink }} width="128" height="128"></p>  <!--This should be rewritten with CSS later-->
-    <p>{{ firstname }} {{ lastname }}</p>
-    <p>{{ usertype }}</p>
+    <p><img src={{ userData.avatarlink }} width="128" height="128"></p>  <!--This should be rewritten with CSS later-->
+    {% if userData.isActive.lower() == 'true' %}
+      <p>Status: Active</p>
+    {% elif userData.isActive.lower() == 'false' %}
+      <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
+    {% endif %}
+    <p>{{ userData.firstname }} {{ userData.lastname }}</p>
+    <p>{{ userData.email }}</p>
+    <p>{{ userData.usertype }}</p>
   </body>
 </html>
