@@ -115,13 +115,13 @@ def DisplayAllUsersWithExpiredPasswords():
 
 @app.route("/users/<int:user_id>")
 def UserProfile(user_id):
-    user = users[user_id]
     if g.user == None:
         return render_template('login.html')
     updataUserSessionData()
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
+    user = users[user_id]
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
@@ -129,13 +129,13 @@ def UserProfile(user_id):
 
 @app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
-    user = users[user_id]
     if g.user == None:
         return render_template('login.html')
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
     update_user_list()
+    user = users[user_id]
     form = UserCreationForm()
     return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
