@@ -53,7 +53,7 @@ def before_request():
 #starts the session/checks for auth
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = UserLoginForm()
+    update_user_list()
     if request.method == 'POST':
         session.pop('user_id',None)
         username = request.form['username'].lower()
@@ -68,7 +68,9 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html',title = 'Login', url=app_url)
 
-@app.route('/mail')
+
+
+@app.route('/mail/')
 def test_mail():
     if g.user == None:
         return render_template('login.html')
@@ -82,7 +84,7 @@ def test_mail():
         return '''<h1>You do not have access</h1>
                   <a href='/'> Back To Main Page</a>'''  
 
-@app.route('/sign_out')
+@app.route('/sign_out/')
 def sign_out():
     if g.user == None:
         return render_template('login.html')
@@ -95,14 +97,14 @@ def index():
         return render_template('login.html')
     return render_template('index.html', title='home', user=g.user)
 
-@app.route("/users")
+@app.route("/users/")
 def DisplayAllUsers():
     if g.user == None:
         return render_template('login.html')
     update_user_list()
     return render_template('users.html', title='All Users', userdata=users, user=g.user, url=app_url)
 
-@app.route("/users/expired_passwords")
+@app.route("/users/expired_passwords/")
 def DisplayAllUsersWithExpiredPasswords():
     if g.user == None:
         return render_template('login.html')
@@ -113,7 +115,7 @@ def DisplayAllUsersWithExpiredPasswords():
             expiredUsers.append(user_)
     return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, user=g.user, url=app_url)
 
-@app.route("/users/<int:user_id>")
+@app.route("/users/<int:user_id>/")
 def UserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
@@ -127,7 +129,7 @@ def UserProfile(user_id):
         canEdit = True
     return render_template('profile.html', user=g.user, userData=users[user_id], url=app_url, canEdit=canEdit)
 
-@app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
+@app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
@@ -139,12 +141,17 @@ def EditUserProfile(user_id):
     form = UserCreationForm()
     return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
-@app.route("/add-user", methods=['GET', 'POST'])
+@app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
     if g.user == None:
         return render_template('login.html')
     form = UserCreationForm()
     return render_template('create_user.html', title='Create User', form=form, api=api_url, user=g.user)
+
+@app.route("/new_account/", methods=['GET', 'POST'])
+def NewAccount():
+    form = UserCreationForm()
+    return render_template('new_account.html', title='New Account', form=form, api=api_url)
 
 if __name__ == "__main__":
     app.run(debug=False)

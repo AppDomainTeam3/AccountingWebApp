@@ -1,4 +1,3 @@
-{% if user.usertype == 'administrator' %}
 <html>
     <head>
         <title>{{ title }} - AppDomain</title>
@@ -6,27 +5,13 @@
     
     <body>
         <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/users/{{ user.id }}">Profile</a>
-            <a href="/users">Users</a>
-            <a href="/sign_out">Sign-Out</a>
-            <a href="/mail"> Send Test Email</a>&emsp;
-
-            {% if user.usertype == 'administrator' %}
-            Admin: 
-            <a href="/users/expired_passwords">Expired Passwords</a>
-            <a href="/add-user">Create User</a>
-            {% endif %}
+            <a href="/login">Login</a>
         </div>
         <h1>Enter new user data:</h1>
         <form id="UserCreationForm" action="" method="POST">
             <p>
                 {{ form.email.label }}<br>
                 {{ form.email(size=16) }}<br>
-            </p>
-            <p>
-                {{ form.usertype.label }}<br>
-                {{ form.usertype }}<br>
             </p>
             <p>
                 {{ form.firstname.label }}<br>
@@ -40,27 +25,45 @@
                 {{ form.avatarlink.label }}<br>
                 {{ form.avatarlink(size=16) }}<br>
             </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(size=16) }}<br>
+            </p>
             <p>{{ form.submit() }}</p>
         </form>
         <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type=text/javascript src="../static/js/CheckPassword.js"></script>
         <script id = "UserCreationScript" data-search={{ api }}>
             var script_tag = document.getElementById("UserCreationScript")
             var api_url = script_tag.getAttribute("data-search")
+
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
-                $.ajax({
-                    url: api_url + '/users/create-user',
-                    type: 'post',
-                    data:$('#UserCreationForm').serialize(),
-                    success: window.setTimeout(function(){
-                        alert('User Created!')
-                        window.location.href = "{{ url }}/users";
-                    })
-                });
+                var form_tag = document.getElementById("UserCreationForm")
+                var password = document.getElementById("password").value;
+                var error_message = CheckPassword(password)
+                if (error_message !== "")
+                {
+                    alert(error_message)
+                }
+                else
+                {
+                    $.ajax({
+                        url: api_url + '/users/new-account',
+                        type: 'post',
+                        data:$('#UserCreationForm').serialize(),
+                        success: window.setTimeout(
+                            function(){
+                                alert('User Created!')
+                                window.location.href = "{{ url }}/login";
+                            })
+                    });
+                }
             });
+
+            function isLetter(str) {
+                return str.length === 1 && str.match(/[a-z]/i);
+            }
         </script>
     </body>
 </html>
-{% else %}
-    <html>You are not authorized to create a user.</html>
-{% endif %}

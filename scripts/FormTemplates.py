@@ -11,4 +11,5 @@ class UserCreationForm(FlaskForm):
     firstname = StringField('First Name', validators=[DataRequired('field is required.')])
     lastname = StringField('Last Name', validators=[DataRequired('field is required.')])
     avatarlink = StringField('Avatar Link')
+    password = StringField('Password', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
