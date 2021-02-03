@@ -32,62 +32,17 @@
             <p>{{ form.submit() }}</p>
         </form>
         <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type=text/javascript src="../static/js/CheckPassword.js"></script>
         <script id = "UserCreationScript" data-search={{ api }}>
             var script_tag = document.getElementById("UserCreationScript")
             var api_url = script_tag.getAttribute("data-search")
-            var special_characters = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-            var passwordLengthRequirement = 8
+
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
                 var form_tag = document.getElementById("UserCreationForm")
-                var password = document.getElementById("password").value
-                var passwordMinLength = 8
-                error_message = ""
-                contains_number = false
-                contains_special = false
-                if (password.length < 8)
-                {
-                    error_message += "Password must be at least 8 characters in length!\n"
-                }
-                if (!isLetter(password[0]))
-                {
-                    error_message += "Password must begin with a letter!\n"
-                }
-                for (i = 0; i < password.length; i++)
-                {
-                    if (Number.isInteger(parseInt(password[i])))
-                    {
-                        contains_number = true
-                        break
-                    }
-                }
-                for (i = 0; i < password.length; i++)
-                {
-                    if ($.trim(password[i]) == '')
-                    {
-                        error_message += "Password cannot contain spaces!\n"
-                        break
-                    }
-                }
-                
-                if (!contains_number)
-                {
-                    error_message += "Password must contain a number!\n"
-                }
-                for (i = 0; i < special_characters.length; i++)
-                {   
-                    if (password.includes(special_characters[i]))
-                    {
-                        contains_special = true
-                        break
-                    }
-                }
-                if (!contains_special)
-                {
-                    error_message += "Password must contain a special character!\n"
-                }
-
-                if (error_message != "")
+                var password = document.getElementById("password").value;
+                var error_message = CheckPassword(password)
+                if (error_message !== "")
                 {
                     alert(error_message)
                 }
