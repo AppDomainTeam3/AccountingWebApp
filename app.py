@@ -53,7 +53,7 @@ def before_request():
 #starts the session/checks for auth
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = UserLoginForm()
+    update_user_list()
     if request.method == 'POST':
         session.pop('user_id',None)
         username = request.form['username'].lower()
