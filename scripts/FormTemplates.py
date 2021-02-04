@@ -15,6 +15,12 @@ class UserCreationForm(FlaskForm):
     password = StringField('Password', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
+class UserPasswordChangeForm(FlaskForm):
+    currentPassword = StringField('Current Password', validators=[DataRequired('field is required.')])
+    newPassword = StringField('New Password', validators=[DataRequired('field is required.')])
+    newPasswordVerification = StringField('Verify New Password', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
 class AdminEmailForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired('field is required.')])
     subject = StringField('Subject', validators=[DataRequired('field is required.')])

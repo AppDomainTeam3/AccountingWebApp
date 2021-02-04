@@ -1,4 +1,4 @@
-{% if sessionUser.usertype == 'administrator' or user.id == sessionUser.id %}
+{% if sessionUser.usertype == 'administrator' or g.user.usertype == 'manager' or user.id == sessionUser.id %}
 <html>
     <head>
         <title>{{ title }} - AppDomain</title>
@@ -25,18 +25,21 @@
             {% endif %}
         </div>
         <h1>Edit data for {{ user.username }}:</h1>
+        <button onclick="location.href = '/users/{{ user.id }}/update_password';">Update Password</button>
         <form id="UserCreationForm" action="" method="POST">
+            {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
             <p>
                 {{ form.deactivate.label }}<br>
                 {{ form.deactivate }}<br>
             </p>
             <p>
-                {{ form.email.label }}<br>
-                {{ form.email(size=16, value=user.email) }}<br>
-            </p>
-            <p>
                 {{ form.usertype.label }}<br>
                 {{ form.usertype }}<br>
+            </p>
+            {% endif %}
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=16, value=user.email) }}<br>
             </p>
             <p>
                 {{ form.firstname.label }}<br>
@@ -56,8 +59,11 @@
         <script id = "UserCreationScript" data-search={{ api }}>
             var script_tag = document.getElementById("UserCreationScript")
             var api_url = script_tag.getAttribute("data-search")
+            var usertype = document.getElementById("usertype")
+            usertype.value = "{{ user.usertype }}"
             $('#UserCreationForm').submit(function(e){
                 e.preventDefault();
+                
                 $.ajax({
                     url: api_url + '/users/{{ user.id }}/edit',
                     type: 'post',
