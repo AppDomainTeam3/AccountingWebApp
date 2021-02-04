@@ -19,6 +19,7 @@
             {% endif %}
         </div>
         <h1>Edit data for {{ user.username }}:</h1>
+        <button onclick="location.href = '/users/{{ user.id }}/update_password';">Update Password</button>
         <form id="UserCreationForm" action="" method="POST">
             {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
             <p>
@@ -49,7 +50,6 @@
             <p>{{ form.submit() }}</p>
         </form>
         <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script type=text/javascript src="../../../static/js/CheckPassword.js"></script>
         <script id = "UserCreationScript" data-search={{ api }}>
             var script_tag = document.getElementById("UserCreationScript")
             var api_url = script_tag.getAttribute("data-search")

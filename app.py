@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash
 import requests
 from scripts.User import User
 from scripts.FormTemplates import UserCreationForm
-from scripts.LoginUser import UserLoginForm
+from scripts.FormTemplates import UserPasswordChangeForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -138,6 +138,18 @@ def EditUserProfile(user_id):
     user = users[user_id]
     form = UserCreationForm()
     return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+
+@app.route("/users/<int:user_id>/update_password", methods=['GET', 'POST'])
+def UpdatePassword(user_id):
+    if g.user == None:
+        return render_template('login.html')
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    update_user_list()
+    user = users[user_id]
+    form = UserPasswordChangeForm()
+    return render_template('update_password.html', title=f"Update Password, {user}" + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
 @app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
