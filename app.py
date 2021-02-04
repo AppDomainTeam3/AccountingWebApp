@@ -6,6 +6,7 @@ from scripts.User import User
 from scripts.FormTemplates import UserCreationForm
 from scripts.FormTemplates import UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm
+from scripts.FormTemplates import ForgotPasswordForm
 from scripts.LoginUser import UserLoginForm
 
 app = Flask(__name__, static_folder='static')
@@ -189,6 +190,11 @@ def CreateUser():
 def NewAccount():
     form = UserCreationForm()
     return render_template('new_account.html', title='New Account', form=form, api=api_url)
+
+@app.route("/forgot_password/", methods=['GET', 'POST'])
+def ForgotPassword():
+    form = ForgotPasswordForm()
+    return render_template('forgot_password.html', title='Forgot Password', form=form, api=api_url)
 
 if __name__ == "__main__":
     app.run(debug=False)

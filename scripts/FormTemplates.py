@@ -26,3 +26,8 @@ class AdminEmailForm(FlaskForm):
     subject = StringField('Subject', validators=[DataRequired('field is required.')])
     message = TextAreaField('Message', validators=[DataRequired('field is required.')])
     submit = SubmitField('Send Message')
+
+class ForgotPasswordForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired('field is required.')])
+    email = StringField('Email', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
