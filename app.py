@@ -31,8 +31,9 @@ def update_user_list():
                           lastname = userDict['lastname'],
                           avatarlink = userDict['avatarlink'],
                           password = userDict['hashed_password'],
-                          isactive = userDict['isActive'],
-                          ispasswordexpired = userDict['ispasswordexpired']))
+                          isActive = userDict['is_active'],
+                          isPasswordExpired = userDict['is_password_expired'],
+                          reactivateUserDate = userDict['reactivate_user_date']))
 update_user_list()
 
 def updataUserSessionData():
@@ -52,10 +53,10 @@ def before_request():
 #starts the session/checks for auth
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = UserLoginForm()
+    update_user_list()
     if request.method == 'POST':
         session.pop('user_id',None)
-        username = request.form['username']
+        username = request.form['username'].lower()
         password = request.form['password']
         try:
             user = [x for x in users if x.username == username][0]
@@ -67,7 +68,9 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html',title = 'Login', url=app_url)
 
-@app.route('/mail')
+
+
+@app.route('/mail/')
 def test_mail():
     if g.user == None:
         return render_template('login.html')
@@ -81,7 +84,7 @@ def test_mail():
         return '''<h1>You do not have access</h1>
                   <a href='/'> Back To Main Page</a>'''  
 
-@app.route('/sign_out')
+@app.route('/sign_out/')
 def sign_out():
     if g.user == None:
         return render_template('login.html')
@@ -94,63 +97,61 @@ def index():
         return render_template('login.html')
     return render_template('index.html', title='home', user=g.user)
 
-@app.route("/users")
+@app.route("/users/")
 def DisplayAllUsers():
     if g.user == None:
         return render_template('login.html')
-    response = requests.get(f"{api_url}/users")
-    userList = []
-    for user in response.json():
-        userList.append(user)
-    return render_template('users.html', title='All Users', userdata=userList, user=g.user, url=app_url)
+    update_user_list()
+    return render_template('users.html', title='All Users', userdata=users, user=g.user, url=app_url)
 
-@app.route("/users/expired_passwords")
+@app.route("/users/expired_passwords/")
 def DisplayAllUsersWithExpiredPasswords():
     if g.user == None:
         return render_template('login.html')
     update_user_list()
     expiredUsers = []
     for user_ in users:
-        if users[user_.id].ispasswordexpired == 'True':
+        if users[user_.id].isPasswordExpired == 'True':
             expiredUsers.append(user_)
     return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, user=g.user, url=app_url)
 
-@app.route("/users/<int:user_id>")
+@app.route("/users/<int:user_id>/")
 def UserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
+    updataUserSessionData()
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    user = users[user_id]
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    response = requests.get(f"{api_url}/users/{user_id}").json()
-    username = response[0]['username']
-    usertype = response[0]['usertype']
-    firstname = response[0]['firstname']
-    lastname = response[0]['lastname']
-    avatarlink = response[0]['avatarlink']
-    updataUserSessionData()
-    return render_template('profile.html', user=g.user, title=username, usertype=usertype, id=user_id, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, canEdit=canEdit)
+    return render_template('profile.html', user=g.user, userData=users[user_id], url=app_url, canEdit=canEdit)
 
-@app.route("/users/<int:user_id>/edit", methods=['GET', 'POST'])
+@app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
-    response = requests.get(f"{api_url}/users/{user_id}").json()
-    email = response[0]['email']
-    username = response[0]['username']
-    usertype = response[0]['usertype']
-    firstname = response[0]['firstname']
-    lastname = response[0]['lastname']
-    avatarlink = response[0]['avatarlink']
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    update_user_list()
+    user = users[user_id]
     form = UserCreationForm()
-    return render_template('edit_user.html', title=username, form=form, id=user_id, email=email, username=username, usertype=usertype, firstname=firstname, lastname=lastname, avatarlink=avatarlink, url=app_url, api=api_url, user=g.user)
+    return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
-@app.route("/add-user", methods=['GET', 'POST'])
+@app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
     if g.user == None:
         return render_template('login.html')
     form = UserCreationForm()
     return render_template('create_user.html', title='Create User', form=form, api=api_url, user=g.user)
+
+@app.route("/new_account/", methods=['GET', 'POST'])
+def NewAccount():
+    form = UserCreationForm()
+    return render_template('new_account.html', title='New Account', form=form, api=api_url)
 
 if __name__ == "__main__":
     app.run(debug=False)

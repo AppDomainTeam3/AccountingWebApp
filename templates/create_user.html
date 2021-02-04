@@ -1,3 +1,4 @@
+{% if user.usertype == 'administrator' %}
 <html>
     <head>
         <title>{{ title }} - AppDomain</title>
@@ -14,16 +15,20 @@
             <a href="/">Home</a>
             <a href="/users/{{ user.id }}">Profile</a>
             <a href="/users">Users</a>
-            <a href="/add-user">Create User</a>
-            <a href="/login">Sign-in</a>
             <a href="/sign_out">Sign-Out</a>
-            <a href="/mail"> Send Test Email</a>
+            <a href="/mail"> Send Test Email</a>&emsp;
+
+            {% if user.usertype == 'administrator' %}
+            Admin: 
+            <a href="/users/expired_passwords">Expired Passwords</a>
+            <a href="/add-user">Create User</a>
+            {% endif %}
         </div>
         <h1>Enter new user data:</h1>
-        <form action="http://127.0.0.2:5000/users/create-user" method="POST" novalidate>
+        <form id="UserCreationForm" action="" method="POST">
             <p>
-                {{ form.username.label }}<br>
-                {{ form.username(size=16) }}<br>
+                {{ form.email.label }}<br>
+                {{ form.email(size=16) }}<br>
             </p>
             <p>
                 {{ form.usertype.label }}<br>
@@ -43,8 +48,25 @@
             </p>
             <p>{{ form.submit() }}</p>
         </form>
-        <script type=text/javascript src="../static/jquery-3.5.1.js">
-            window.location.assign("http://127.0.0.1:5000/users");
+        <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script id = "UserCreationScript" data-search={{ api }}>
+            var script_tag = document.getElementById("UserCreationScript")
+            var api_url = script_tag.getAttribute("data-search")
+            $('#UserCreationForm').submit(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: api_url + '/users/create-user',
+                    type: 'post',
+                    data:$('#UserCreationForm').serialize(),
+                    success: window.setTimeout(function(){
+                        alert('User Created!')
+                        window.location.href = "{{ url }}/users";
+                    })
+                });
+            });
         </script>
     </body>
 </html>
+{% else %}
+    <html>You are not authorized to create a user.</html>
+{% endif %}

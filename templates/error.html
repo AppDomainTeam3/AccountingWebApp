@@ -1,4 +1,3 @@
-{% if user.usertype == 'administrator' %}
 <html>
     <head>
         <title>{{ title }} - AppDomain</title>
@@ -17,13 +16,6 @@
             <a href="/add-user">Create User</a>
             {% endif %}
         </div>
-        {% for user_ in userdata %}
-            <div>
-                <p><a href="/users/{{ user_.id }}"><img src={{ user_.avatarlink }} width="32" height="32"> Username: {{ user_.username }} | Email: {{ user_.email }} | Usertype: {{ user_.usertype }} | Firstname: {{ user_.firstname }} | Lastname: {{ user_.lastname }}</a></b></p>
-            </div>
-        {% endfor %}
+        <h1>404 not found</h1>
     </body>
 </html>
-{% else %}
-    <html>You are not authorized to view this page.</html>
-{% endif %}

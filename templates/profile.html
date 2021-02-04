@@ -1,30 +1,34 @@
 <html>
   <head>
     <title>{{ title }} - AppDomain</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}"/>
   </head>
-  
-  <div class = profilePic>
-    <img src="{{ g.user.avatarlink }}" />
-    <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
-  </div>
-
   <body>
     <div class="topnav">
       <a href="/">Home</a>
       <a href="/users/{{ user.id }}">Profile</a>
       <a href="/users">Users</a>
-      <a href="/add-user">Create User</a>
-      <a href="/login">Sign-in</a>
       <a href="/sign_out">Sign-Out</a>
-      <a href="/mail"> Send Test Email</a>
+      <a href="/mail"> Send Test Email</a>&emsp;
+
+      {% if user.usertype == 'administrator' %}
+      Admin: 
+      <a href="/users/expired_passwords">Expired Passwords</a>
+      <a href="/add-user">Create User</a>
+      {% endif %}
     </div>
-    <h1>{{ title }}'s Profile</h1> 
+    
+    <h1>{{ userData.username }}'s Profile</h1> 
     {% if canEdit %}
-        <a href="{{ url }}/users/{{ id }}/edit">Edit Profile</a></p>
+        <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
     {% endif %}
-    <p><img src={{ avatarlink }} width="128" height="128"></p>  <!--This should be rewritten with CSS later-->
-    <p>{{ firstname }} {{ lastname }}</p>
-    <p>{{ usertype }}</p>
+    <p><img src={{ userData.avatarlink }} width="128" height="128"></p>  <!--This should be rewritten with CSS later-->
+    {% if userData.isActive.lower() == 'true' %}
+      <p>Status: Active</p>
+    {% elif userData.isActive.lower() == 'false' %}
+      <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
+    {% endif %}
+    <p>{{ userData.firstname }} {{ userData.lastname }}</p>
+    <p>{{ userData.email }}</p>
+    <p>{{ userData.usertype }}</p>
   </body>
 </html>
