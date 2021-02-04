@@ -68,8 +68,6 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html',title = 'Login', url=app_url)
 
-
-
 @app.route('/mail/')
 def test_mail():
     if g.user == None:
@@ -125,7 +123,7 @@ def UserProfile(user_id):
         return render_template('error.html', user=g.user)
     user = users[user_id]
     canEdit = False
-    if g.user.usertype == 'administrator' or g.user.id == user_id:
+    if g.user.usertype == 'administrator' or g.user.usertype == 'manager' or g.user.id == user_id:
         canEdit = True
     return render_template('profile.html', user=g.user, userData=users[user_id], url=app_url, canEdit=canEdit)
 
