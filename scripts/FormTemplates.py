@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SubmitField
+from wtforms.fields.simple import TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 
@@ -13,3 +14,9 @@ class UserCreationForm(FlaskForm):
     avatarlink = StringField('Avatar Link')
     password = StringField('Password', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
+
+class AdminEmailForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired('field is required.')])
+    subject = StringField('Subject', validators=[DataRequired('field is required.')])
+    message = TextAreaField('Message', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Send Message')

@@ -25,3 +25,10 @@
     padding-bottom: 10;
     padding-left: 10;
 }
+p > img{
+    margin-right: 50px;
+}
+.profileAvatar img{
+    width: 128;
+    height: 128;
+}

@@ -8,16 +8,20 @@
         <img src="{{ g.user.avatarlink }}" />
         <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
     </div>
-
+    
     <body>
         <div class="topnav">
             <a href="/">Home</a>
             <a href="/users/{{ user.id }}">Profile</a>
             <a href="/users">Users</a>
+            <a href="/sign_out">Sign-Out</a>&emsp;
+
+            {% if user.usertype == 'administrator' %}
+            Admin: 
+            <a href="/users/expired_passwords">Expired Passwords</a>
             <a href="/add-user">Create User</a>
-            <a href="/login">Sign-in</a>
-            <a href="/sign_out">Sign-Out</a>
-            <a href="/mail"> Send Test Email</a>
+            <a href="/user-mail">Admin Mail</a>
+            {% endif %}
         </div>
         {% for user_ in userdata %}
         <div>
