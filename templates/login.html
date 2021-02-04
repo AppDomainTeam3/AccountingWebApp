@@ -1,22 +1,32 @@
 <html>
   <head>
     <title>{{ title }} - AppDomain</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
+    <script src="https://kit.fontawesome.com/1e2d487faa.js" crossorigin="anonymous"></script>
   </head>
+  
+    <div id = logo>
+      <img src="{{ url_for('static', filename='logoBlackBar.png') }}" />
+    </div>
   <body>
     <div class="topnav">
-      <p><a href="/new_account">Create an Account</a></p>
     </div>
   <form action="{{ url }}/login/" method="post">
   
     <div class="container">
-      <label for="username"><b>Username</b></label>
+      <label for="username"><i class="fas fa-user"></i></label>
       <input type="text" placeholder="Enter Username" name="username" required>
   
-      <label for="password"><b>Password</b></label>
+      <label for="password"><i class="fas fa-key"></i></label>
       <input type="password" placeholder="Enter Password" name="password" required>
   
       <button type="submit">Login</button>
     </div>
   </form>
+  <div>
+    <a href = "/sign_out">Forgot Password? | </a>
+    <a href = "/new_account/">Create An Account</a>
+  </div>
+
   </body>
 </html>
