@@ -1,15 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session, g
 from flask_mail import Mail, Message
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import requests
 from scripts.User import User
 from scripts.FormTemplates import UserCreationForm
+from scripts.FormTemplates import UserPasswordChangeForm
+from scripts.FormTemplates import AdminEmailForm
 from scripts.LoginUser import UserLoginForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
 
-app_url = 'https://appdomainteam3.herokuapp.com'
+app_url = 'http://127.0.0.1:5000/'
 api_url = 'https://appdomainteam3api.herokuapp.com'
 
 mail = Mail(app)
@@ -51,7 +53,7 @@ def before_request():
         g.user = user
 
 #starts the session/checks for auth
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route("/login/", methods=['GET', 'POST'])
 def login():
     update_user_list()
     if request.method == 'POST':
@@ -68,23 +70,46 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html',title = 'Login', url=app_url)
 
-
-
-@app.route('/mail/')
-def test_mail():
+@app.route("/user-mail", methods=['GET', 'POST'])
+def userMail():
+    update_user_list()
+    form = AdminEmailForm()
     if g.user == None:
         return render_template('login.html')
-    if g.user.usertype == 'administrator':
-        msg = Message('Hello, you have clicked on the link', recipients=['netim11829@alicdh.com'])
-        msg.body = f"Hello {g.user.username}, you are the choosen one"
-        mail.send(msg)   
-        return """<h1>message has been sent</h1>
-            <a href='/'> Back To Main Page</a>"""   
+    elif g.user.usertype == 'administrator':
+        #username = 'cheese'
+        return render_template('userMail.html',user=g.user,title = 'Admin Email', form=form)
     else:
-        return '''<h1>You do not have access</h1>
-                  <a href='/'> Back To Main Page</a>'''  
+        return """ <h1>You don't have access to this page</h1>
+                   <a href = "/">Return Home</a> """
 
-@app.route('/sign_out/')
+@app.route("/send_message", methods=['GET','POST'])
+def send_message():
+    if request.method == "POST":
+        username = request.form['username']
+        subject = request.form['subject']
+        msg = request.form['message']
+        eList = []
+        if username.lower() == 'all':
+            for userIndex in range(len(users)):
+                eList.append(users[userIndex].email)
+        
+        for userIndex in range(len(users)):
+            if users[userIndex].username == username:
+                username = users[userIndex].email 
+                eList.append(username)
+        try:
+            message = Message(subject = subject, recipients = eList)
+            message.body = msg
+            mail.send(message)
+            return """<h1>Message has been sent</h1>
+                  <a href = "/">Return home</a>
+                  <a href = "/user-mail">Send Another Message</a>"""
+        except Exception:
+            return """<h1>user does not exist</h1>
+                      <a href = "/user-mail">Send Another Message</a>"""
+
+@app.route("/sign_out/")
 def sign_out():
     if g.user == None:
         return render_template('login.html')
@@ -125,9 +150,9 @@ def UserProfile(user_id):
         return render_template('error.html', user=g.user)
     user = users[user_id]
     canEdit = False
-    if g.user.usertype == 'administrator' or g.user.id == user_id:
+    if g.user.usertype == 'administrator' or g.user.usertype == 'manager' or g.user.id == user_id:
         canEdit = True
-    return render_template('profile.html', user=g.user, userData=users[user_id], url=app_url, canEdit=canEdit)
+    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], url=app_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
@@ -140,6 +165,18 @@ def EditUserProfile(user_id):
     user = users[user_id]
     form = UserCreationForm()
     return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+
+@app.route("/users/<int:user_id>/update_password", methods=['GET', 'POST'])
+def UpdatePassword(user_id):
+    if g.user == None:
+        return render_template('login.html')
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    update_user_list()
+    user = users[user_id]
+    form = UserPasswordChangeForm()
+    return render_template('update_password.html', title=f"Update Password, {user}" + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
 @app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
