@@ -13,7 +13,7 @@ from scripts.LoginUser import UserLoginForm
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
 
-app_url = 'http://127.0.0.1:5000/'
+app_url = 'https://appdomainteam3.herokuapp.com'
 api_url = 'https://appdomainteam3api.herokuapp.com'
 
 mail = Mail(app)
