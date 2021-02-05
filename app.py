@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, g
+from flask import Flask, render_template, request, redirect, url_for, session, g, flash
 from flask_mail import Mail, Message
 from werkzeug.security import check_password_hash, generate_password_hash
 import requests
@@ -36,7 +36,8 @@ def update_user_list():
                           password = userDict['hashed_password'],
                           isActive = userDict['is_active'],
                           isPasswordExpired = userDict['is_password_expired'],
-                          reactivateUserDate = userDict['reactivate_user_date']))
+                          reactivateUserDate = userDict['reactivate_user_date'],
+                          failedLoginAttempts = userDict['failed_login_attempts']))
 update_user_list()
 
 def updataUserSessionData():
@@ -61,14 +62,22 @@ def login():
         session.pop('user_id',None)
         username = request.form['username'].lower()
         password = request.form['password']
-        try:
-            user = [x for x in users if x.username == username][0]
-        except Exception:
-            return redirect(url_for('login'))
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            return redirect(url_for('index'))
-        return redirect(url_for('login'))
+        _user = None
+        for user in users:
+            if user.username.lower() == username:
+                _user = user
+                break
+        if _user != None and check_password_hash(_user.password, password):
+            if _user.isActive == 'True':
+                session['user_id'] = _user.id
+                print(g.user)
+                return redirect(url_for('index'))
+            else:
+                flash(f"{_user.username} is disabled until {_user.reactivateUserDate}")
+                return redirect(url_for('login'))
+        else:
+            response = requests.post(f"{api_url}/users/{_user.id}/failed_login")
+            return render_template('login.html',title = 'Login', url=app_url)
     return render_template('login.html',title = 'Login', url=app_url)
 
 @app.route("/user-mail", methods=['GET', 'POST'])
