@@ -23,6 +23,18 @@
             <a href="/user-mail">Admin Mail</a>
             {% endif %}
         </div>
-        <h1>Hello, {{ g.user.username }}!</h1>
+            <h1>Hello, {{ g.user.username }}!</h1>
+
+            <div class="flash" >
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                     {% for message in messages %}
+                        <div>
+                            <span>{{ message }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
     </body>
 </html>

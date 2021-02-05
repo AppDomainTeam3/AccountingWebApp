@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 
 class User(UserMixin):
-    def __init__(self, id, username, email, usertype, firstname, lastname, avatarlink, password, isActive, isPasswordExpired, reactivateUserDate, failedLoginAttempts):
+    def __init__(self, id, username, email, usertype, firstname, lastname, avatarlink, password, isActive, isPasswordExpired, reactivateUserDate, failedLoginAttempts, passwordExpirationDate):
         self.id = id
         self.username = username
         self.email = email
@@ -14,6 +14,7 @@ class User(UserMixin):
         self.isPasswordExpired = isPasswordExpired
         self.reactivateUserDate = reactivateUserDate
         self.failedLoginAttempts = failedLoginAttempts
+        self.passwordExpirationDate = passwordExpirationDate
     def __repr__(self): 
         return f"""<id: {self.id}, username: {self.username}, email: {self.email}, usertype: {self.usertype}, 
                     firstname: {self.firstname}, lastname: {self.lastname}, isActive: {self.isActive}, 
