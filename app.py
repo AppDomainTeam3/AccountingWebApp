@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session, g
+from flask import Flask, render_template, request, redirect, url_for, session, g,flash
 from flask_mail import Mail, Message
+from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 import requests
 from scripts.User import User
@@ -36,9 +37,36 @@ def update_user_list():
                           password = userDict['hashed_password'],
                           isActive = userDict['is_active'],
                           isPasswordExpired = userDict['is_password_expired'],
-                          reactivateUserDate = userDict['reactivate_user_date']))
+                          reactivateUserDate = userDict['reactivate_user_date'],
+                          passwordExpirationDate = userDict['password_expiration_date']))
 update_user_list()
 
+def passwordExEmail(user):
+    
+    expirDateDateTime = datetime.strptime(user.passwordExpirationDate, '%Y-%m-%d')
+    
+    curTimePlusThreeDay = datetime.now() + timedelta(days=3)
+    currentTime = datetime.now() 
+    currentTime.strftime('%Y-%m-%d')
+    curTimePlusThreeDay.strftime('%Y-%m-%d')
+
+    if expirDateDateTime < curTimePlusThreeDay:
+        timeLeft =expirDateDateTime - currentTime
+
+        msg = Message('Hello from appdomainteam3!', recipients=[user.email])
+        if timeLeft.days > 0:
+            flash(f"Your password is expiring in {timeLeft.days} day(s)")
+            msg.body = f"Your password is expiring in {timeLeft.days} day(s)"
+            mail.send(msg)
+        elif timeLeft.days == -1: 
+            flash(f"Your password is expiring at 12:00 A.M. (EST)")
+            msg.body = f"Your password is expiring at 12:00 A.M. (EST)" 
+            mail.send(msg)
+        elif timeLeft.days < -1: 
+            flash(f"Your password has been expired")
+            msg.body = f"Your password has been expired" 
+            mail.send(msg)
+        
 def updataUserSessionData():
     update_user_list()
     for userIndex in range(len(users)):
@@ -67,6 +95,8 @@ def login():
             return redirect(url_for('login'))
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
+            #notification for password expiration
+            passwordExEmail(user)
             return redirect(url_for('index'))
         return redirect(url_for('login'))
     return render_template('login.html',title = 'Login', url=app_url)
