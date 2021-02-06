@@ -40,12 +40,7 @@ def update_user_list():
                           reactivateUserDate = userDict['reactivate_user_date'],
                           failedLoginAttempts = userDict['failed_login_attempts'],
                           passwordExpirationDate = userDict['password_expiration_date']))
-
-def updataUserSessionData():
-    update_user_list()
-    for userIndex in range(len(users)):
-        if g.user.id == users[userIndex].id:
-            g.user = users[userIndex]
+update_user_list()
 
 def passwordExEmail(user):
     
@@ -72,6 +67,12 @@ def passwordExEmail(user):
             flash(f"Your password has been expired")
             msg.body = f"Your password has been expired" 
             mail.send(msg)
+        
+def updataUserSessionData():
+    update_user_list()
+    for userIndex in range(len(users)):
+        if g.user.id == users[userIndex].id:
+            g.user = users[userIndex]
 
 #checks if user is logged in
 @app.before_request
@@ -84,8 +85,8 @@ def before_request():
 #starts the session/checks for auth
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
+    update_user_list()
     if request.method == 'POST':
-        update_user_list()
         session.pop('user_id',None)
         username = request.form['username'].lower()
         password = request.form['password']
