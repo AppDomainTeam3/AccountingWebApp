@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>{{ title }} - AppDomain</title>
+    </head>
+    <body>
+        <div class="topnav">
+            <a href="/">Home</a>
+            <a href="/users/{{ user.id }}">Profile</a>
+            <a href="/users">Users</a>
+            <a href="/sign_out">Sign-Out</a>&emsp;
+            
+            {% if user.usertype == 'administrator' %}
+            Admin: 
+            <a href="/users/expired_passwords">Expired Passwords</a>
+            <a href="/add-user">Create User</a>
+            <a href="/user-mail">Admin Email</a>
+            {% endif %}
+        </div>
+        <h1>404 not found</h1>
+    </body>
+</html>

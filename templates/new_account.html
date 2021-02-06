@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <title>{{ title }} - AppDomain</title>
+    </head>
+    
+    <body>
+        <div class="topnav">
+            <a href="/login">Login</a>
+        </div>
+        <h1>Enter new user data:</h1>
+        <form id="UserCreationForm" action="" method="POST">
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=16) }}<br>
+            </p>
+            <p>
+                {{ form.firstname.label }}<br>
+                {{ form.firstname(size=16) }}<br>
+            </p>
+            <p>
+                {{ form.lastname.label }}<br>
+                {{ form.lastname(size=16) }}<br>
+            </p>
+            <p>
+                {{ form.avatarlink.label }}<br>
+                {{ form.avatarlink(size=16) }}<br>
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(size=16) }}<br>
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+        <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type=text/javascript src="../static/js/CheckPassword.js"></script>
+        <script id = "UserCreationScript" data-search={{ api }}>
+            var script_tag = document.getElementById("UserCreationScript")
+            var api_url = script_tag.getAttribute("data-search")
+
+            $('#UserCreationForm').submit(function(e){
+                e.preventDefault();
+                var form_tag = document.getElementById("UserCreationForm")
+                var password = document.getElementById("password").value;
+                var error_message = CheckPassword(password)
+                if (error_message !== "")
+                {
+                    alert(error_message)
+                }
+                else
+                {
+                    $.ajax({
+                        url: api_url + '/users/new-account',
+                        type: 'post',
+                        data:$('#UserCreationForm').serialize(),
+                        success: window.setTimeout(
+                            function(){
+                                alert('User Created!')
+                                window.location.href = "{{ url }}/login";
+                            })
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>
