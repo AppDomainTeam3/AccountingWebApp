@@ -15,6 +15,14 @@ class UserCreationForm(FlaskForm):
     password = StringField('Password', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
+class AccountCreationForm(FlaskForm):
+    accountHolderUsername = StringField('Username', validators=[DataRequired('field is required.')])
+    accountName = StringField('Account Name', validators=[DataRequired('field is required.')])
+    accountDesc = StringField('Description', validators=[DataRequired('field is required.')])
+    normalSide = StringField('Normal Side', validators=[DataRequired('field is required.')])
+    category = SelectField('Category', choices=[('Checking', 'Checking'), ('Savings', 'Savings')], validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
 class UserPasswordChangeForm(FlaskForm):
     currentPassword = StringField('Current Password', validators=[DataRequired('field is required.')])
     newPassword = StringField('New Password', validators=[DataRequired('field is required.')])

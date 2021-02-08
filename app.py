@@ -1,14 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, g, flash
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 import requests
+
 from scripts.User import User
-from scripts.FormTemplates import UserCreationForm
-from scripts.FormTemplates import UserPasswordChangeForm
-from scripts.FormTemplates import AdminEmailForm
-from scripts.FormTemplates import ForgotPasswordForm
-from scripts.LoginUser import UserLoginForm
+from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm, AdminEmailForm, ForgotPasswordForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -229,6 +226,13 @@ def CreateUser():
 def NewAccount():
     form = UserCreationForm()
     return render_template('new_account.html', title='New Account', form=form, api=api_url)
+
+@app.route("/accounts/create", methods=['GET', 'POST'])
+def CreateAccount():
+    if g.user == None:
+        return render_template('login.html')
+    form = AccountCreationForm()
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
