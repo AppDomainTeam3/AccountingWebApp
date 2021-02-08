@@ -186,10 +186,14 @@ def UserProfile(user_id):
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
     user = users[user_id]
+    response = requests.get(f"{api_url}/accounts/{user_id}")
+    accounts = []
+    for entry in response.json():
+        accounts.append(entry)
     canEdit = False
-    if g.user.usertype == 'administrator' or g.user.usertype == 'manager' or g.user.id == user_id:
+    if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], url=app_url, canEdit=canEdit)
+    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
