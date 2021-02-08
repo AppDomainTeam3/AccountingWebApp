@@ -14,13 +14,14 @@
             <a href="/">Home</a>
             <a href="/users/{{ user.id }}">Profile</a>
             <a href="/users">Users</a>
+            <a href="/accounts/create">Open Account</a>
             <a href="/sign_out">Sign-Out</a>&emsp;
-            
+
             {% if user.usertype == 'administrator' %}
             Admin: 
             <a href="/users/expired_passwords">Expired Passwords</a>
             <a href="/add-user">Create User</a>
-            <a href="/user-mail">Admin Mail</a>
+            <a href="/user-mail"> Admin Mail</a>
             {% endif %}
         </div>
             <h1>Hello, {{ g.user.username }}!</h1>
