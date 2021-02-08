@@ -95,18 +95,19 @@ def login():
             if user.username.lower() == username:
                 _user = user
                 break
-        if _user != None and check_password_hash(_user.password, password):
-            if _user.isActive == 'True':
-                session['user_id'] = _user.id
-                passwordExEmail(user)
-                print(g.user)
-                return redirect(url_for('index'))
+        if _user != None:
+            if check_password_hash(_user.password, password):
+                if _user.isActive == 'True':
+                    session['user_id'] = _user.id
+                    passwordExEmail(_user)
+                    print(g.user)
+                    return redirect(url_for('index'))
+                else:
+                    flash(f"{_user.username} is disabled until {_user.reactivateUserDate}")
+                    return redirect(url_for('login'))
             else:
-                flash(f"{_user.username} is disabled until {_user.reactivateUserDate}")
-                return redirect(url_for('login'))
-        else:
-            response = requests.post(f"{api_url}/users/{_user.id}/failed_login")
-            return render_template('login.html',title = 'Login', url=app_url)
+                response = requests.post(f"{api_url}/users/{_user.id}/failed_login")
+                return render_template('login.html',title = 'Login', url=app_url)
     return render_template('login.html',title = 'Login', url=app_url)
 
 @app.route("/user-mail", methods=['GET', 'POST'])
