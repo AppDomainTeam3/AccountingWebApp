@@ -20,10 +20,10 @@
         <p>{{ userData.firstname }} {{ userData.lastname }} <span> </span><a href="/user-mail"><i class="fas fa-envelope"></i></a></p>
         <p>{{ userData.email }}</p>
         <p>{{ userData.usertype }}</p>
-    <p>Accounts:</p>
-    {% for account in accounts %}
-      <p>{{ account.AccountName }}</p>
-    {% endfor %}
+        <p>Accounts:</p>
+        {% for account in accounts %}
+          <p>{{ account.AccountName }}</p>
+        {% endfor %}
       </div>
 
     {%endblock%}
