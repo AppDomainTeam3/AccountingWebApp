@@ -1,41 +1,22 @@
-<html>
-    <head>
-        <title>{{ title }} - AppDomain</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}"/>
-    </head>
-    
-    <div class = profilePic>
-      <img src="{{ g.user.avatarlink }}" />
-      <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
-    </div>
-    
-    <body>
-        <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/users/{{ user.id }}">Profile</a>
-            <a href="/users">Users</a>
-            <a href="/accounts/create">Open Account</a>
-            <a href="/sign_out">Sign-Out</a>&emsp;
+{% extends 'base.html' %}
 
-            {% if user.usertype == 'administrator' %}
-            Admin: 
-            <a href="/users/expired_passwords">Expired Passwords</a>
-            <a href="/add-user">Create User</a>
-            <a href="/user-mail"> Admin Mail</a>
-            {% endif %}
-        </div>
-            <h1>Hello, {{ g.user.username }}!</h1>
+    {%block title%} {{title}} {%endblock%}
+    
 
-            <div class="flash" >
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                     {% for message in messages %}
+    {%block content%}
+
+        <h1>Hello, {{ g.user.username }}!</h1>
+        
+        <div class="flash" >
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
                         <div>
                             <span>{{ message }}</span>
                         </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
-    </body>
-</html>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+{% endblock %}

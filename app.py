@@ -156,7 +156,7 @@ def sign_out():
 @app.route("/")
 def index():
     if g.user == None:
-        return render_template('login.html')
+        return render_template('login.html',title='login')
     return render_template('index.html', title='home', user=g.user)
 
 @app.route("/users/")

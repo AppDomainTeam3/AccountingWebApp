@@ -1,13 +1,17 @@
-<html>
-    <head>
-        <title>{{ title }} - AppDomain</title>
-    </head>
+{% extends 'altBase.html' %}
+
+    {%block title%} {{title}} {%endblock%}
     
-    <body>
-        <div class="topnav">
-            <a href="/login">Login</a>
-        </div>
-        <h1>Enter new user data:</h1>
+
+    {%block content%}
+
+        <nav class="navbar navbar-dark bg-primary">
+            <a class="navbar-brand" href="/login">Back to Login</a>
+        </nav>
+
+
+        <div class= "container float-left">
+        <h2>Enter new user data:</h2>
         <form id="UserCreationForm" action="" method="POST">
             <p>
                 {{ form.email.label }}<br>
@@ -61,5 +65,4 @@
                 }
             });
         </script>
-    </body>
-</html>
+    {%endblock%}
