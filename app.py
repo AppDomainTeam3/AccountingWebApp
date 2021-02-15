@@ -156,7 +156,7 @@ def sign_out():
 @app.route("/")
 def index():
     if g.user == None:
-        return render_template('login.html')
+        return render_template('login.html',title='login')
     return render_template('index.html', title='home', user=g.user)
 
 @app.route("/users/")
@@ -236,7 +236,7 @@ def CreateAccount():
     if g.user == None:
         return render_template('login.html')
     form = AccountCreationForm()
-    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user)
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url,user=g.user, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
