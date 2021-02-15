@@ -1,70 +1,63 @@
-<html>
-    <head>
-        <title>{{ title }} - AppDomain</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
-    </head>
+{% extends 'base.html' %}
 
-    <body>
-        <div class = profilePic>
-            <img src="{{ g.user.avatarlink }}" />
-            <a href = "/users/{{ sessionUser.id }}">{{g.user.username}}</a>
-        </div>
-        <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/users/{{ sessionUser.id }}">Profile</a>
-            <a href="/users">Users</a>
-            <a href="/accounts/create">Open Account</a>
-            <a href="/sign_out">Sign-Out</a>&emsp;
+  {%block title%} {{title}} {%endblock%}
 
-            {% if sessionUser.usertype == 'administrator' %}
-            Admin: 
-            <a href="/users/expired_passwords">Expired Passwords</a>
-            <a href="/add-user">Create User</a>
-            <a href="/user-mail"> Admin Mail</a>
-            {% endif %}
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1>Open Account</h1>
+            <form id="AccountCreationForm" action="" method="POST">
+                {% if sessionUser.usertype == 'administrator' %}
+                <p>
+                    {{ form.accountHolderUsername.label }}<br>
+                    {{ form.accountHolderUsername(size=16) }}<br>
+                </p>
+                {% endif %}
+                <p>
+                    {{ form.accountName.label }}<br>
+                    {{ form.accountName(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.accountDesc.label }}<br>
+                    {{ form.accountDesc(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.normalSide.label }}<br>
+                    {{ form.normalSide(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.category.label }}<br>
+                    {{ form.category }}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
         </div>
-        <h1>Open Account</h1>
-        <form id="AccountCreationForm" action="" method="POST">
-            {% if sessionUser.usertype == 'administrator' %}
-            <p>
-                {{ form.accountHolderUsername.label }}<br>
-                {{ form.accountHolderUsername(size=16) }}<br>
-            </p>
-            {% endif %}
-            <p>
-                {{ form.accountName.label }}<br>
-                {{ form.accountName(size=16) }}<br>
-            </p>
-            <p>
-                {{ form.accountDesc.label }}<br>
-                {{ form.accountDesc(size=16) }}<br>
-            </p>
-            <p>
-                {{ form.normalSide.label }}<br>
-                {{ form.normalSide(size=16) }}<br>
-            </p>
-            <p>
-                {{ form.category.label }}<br>
-                {{ form.category }}<br>
-            </p>
-            <p>{{ form.submit() }}</p>
-        </form>
-        <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script id = "AccountCreationForm">
-            $('#AccountCreationForm').submit(function(e){
-                e.preventDefault();
-                var form_tag = document.getElementById("AccountCreationForm")
-                $.ajax({
-                    url: '{{ api }}/accounts/create/{{ sessionUser.username }}',
-                    type: 'post',
-                    data:$('#AccountCreationForm').serialize(),
-                    success: window.setTimeout(
-                        function(){
-                            alert('Account Created!')
-                            window.location.href = "/";
-                        })
-                });
-            });
-        </script>
-    </body>
-</html>
+    
+<!--open account script-->
+
+{%endblock%}
+
+{%block script%}
+    <!-- Account Creation Script-->>
+    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script id = "AccountCreationForm">
+    $('#AccountCreationForm').submit(function(e){
+        e.preventDefault();
+        var form_tag = document.getElementById("AccountCreationForm")
+        $.ajax({
+            url: '{{ api }}/accounts/create/{{ sessionUser.username }}',
+            type: 'post',
+            data:$('#AccountCreationForm').serialize(),
+            success: window.setTimeout(
+                function(){
+                    alert('Account Created!')
+                    window.location.href = "/";
+                })
+        });
+    });
+    </script>
+{%endblock%}
+
+ 
+ 
+ 

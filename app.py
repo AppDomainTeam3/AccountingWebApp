@@ -236,7 +236,7 @@ def CreateAccount():
     if g.user == None:
         return render_template('login.html')
     form = AccountCreationForm()
-    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user)
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url,user=g.user, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
