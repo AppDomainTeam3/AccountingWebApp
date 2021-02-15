@@ -22,7 +22,7 @@
         <p>{{ userData.usertype }}</p>
         <p>Accounts:</p>
         {% for account in accounts %}
-          <p>{{ account.AccountName }}</p>
+          <p>{{ account.AccountName }}: {{ 'Active' if account.IsActive == 'True' else 'Deactivated' }}</p>
         {% endfor %}
       </div>
 

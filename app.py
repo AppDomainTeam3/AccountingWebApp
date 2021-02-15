@@ -186,10 +186,11 @@ def UserProfile(user_id):
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
     user = users[user_id]
-    response = requests.get(f"{api_url}/accounts/{user_id}")
+    response = requests.get(f"{api_url}/users/{user_id}/accounts")
     accounts = []
-    for entry in response.json():
-        accounts.append(entry)
+    if response.status_code != 404:
+        for entry in response.json():
+            accounts.append(entry)
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
