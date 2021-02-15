@@ -194,7 +194,7 @@ def UserProfile(user_id):
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, canEdit=canEdit)
+    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, api=api_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
