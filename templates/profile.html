@@ -23,13 +23,15 @@
         <p>Accounts:</p>
         {% for account in accounts %}
           <p id="{{ account.AccountNumber }}">{{ account.AccountName }}: {{ "Active" if account.IsActive == "True" else "Deactivated" }}
-            <button id="{{ account.AccountNumber }}" onclick="myFunction({{ account.AccountNumber }})">{{ "Deactivate" if account.IsActive == "True" else "Activate" }}</button>
+            {% if canEdit %}
+            <button id="{{ account.AccountNumber }}" onclick="ToggleAccountStatus({{ account.AccountNumber }})">{{ "Deactivate" if account.IsActive == "True" else "Activate" }}</button>
+            {% endif %}
           </p>
         {% endfor %}
       </div>
       <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script>
-        function myFunction(accountNumber) {
+        function ToggleAccountStatus(accountNumber) {
           fetch('{{ api }}/accounts/' + accountNumber + '/toggle', { method: 'POST' });
           alert('Account ' + accountNumber + ' status changed!')
           window.location.href = "{{ url }}/users/{{ userData.id }}";
