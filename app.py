@@ -243,5 +243,9 @@ def ForgotPassword():
     form = ForgotPasswordForm()
     return render_template('forgot_password.html', title='Forgot Password', form=form, api=api_url)
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('error.html', user=g.user), 404
+
 if __name__ == "__main__":
     app.run(debug=False)
