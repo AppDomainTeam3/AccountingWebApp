@@ -48,11 +48,13 @@
             url: '{{ api }}/accounts/create/{{ sessionUser.username }}',
             type: 'post',
             data:$('#AccountCreationForm').serialize(),
-            success: window.setTimeout(
-                function(){
-                    alert('Account Created!')
-                    window.location.href = "/";
-                })
+        })
+        .done(function(response){
+            if (response['status'] !== 404){
+                alert(response['message'])
+                window.location.href = "/";
+            }
+            else { alert(response['message']) }
         });
     });
     </script>
