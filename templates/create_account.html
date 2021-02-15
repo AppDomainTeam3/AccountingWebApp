@@ -5,7 +5,7 @@
     {%block content%}
 
         <div class= "container float-left">
-            <h1>Open Account</h1>
+            <h1 class="pt-2">Open Account</h1>
             <form id="AccountCreationForm" action="" method="POST">
                 {% if sessionUser.usertype == 'administrator' %}
                 <p>
@@ -38,7 +38,7 @@
 {%endblock%}
 
 {%block script%}
-    <!-- Account Creation Script-->>
+    <!-- Account Creation Script-->
     <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script id = "AccountCreationForm">
     $('#AccountCreationForm').submit(function(e){
