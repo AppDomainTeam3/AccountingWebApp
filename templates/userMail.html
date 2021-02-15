@@ -1,48 +1,31 @@
 {% if user.usertype == 'administrator' %}
-<html>
-    <head>
-        <title>{{ title }} - AppDomain</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
-    </head>
-    
-    <div class = profilePic>
-        <img src="{{ g.user.avatarlink }}" />
-        <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
-    </div>
-    
-    <body>
-        <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/users/{{ user.id }}">Profile</a>
-            <a href="/users">Users</a>
-            <a href="/accounts/create">Open Account</a>
-            <a href="/sign_out">Sign-Out</a>&emsp;
+{% extends 'base.html' %}
 
-            {% if user.usertype == 'administrator' %}
-            Admin: 
-            <a href="/users/expired_passwords">Expired Passwords</a>
-            <a href="/add-user">Create User</a>
-            <a href="/user-mail"> Admin Mail</a>
-            {% endif %}
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1 class="pt-2"> Admin Email System </h1>
+            <form id ="AdminEmailForm" action="{{url_for('send_message')}}" method="POST">
+                <p>
+                    {{ form.username.label }}<br>
+                    {{ form.username(size=16, value=username) }}<span> Type 'all' for all users<br>
+                </p>
+                <p>
+                    {{ form.subject.label }}<br>
+                    {{ form.subject(size=16, value=subject) }}<br>
+                </p>
+                <p>
+                    {{ form.message.label }}<br>
+                    {{ form.message(cols='45', rows = '15', value = message)}}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
         </div>
-        <h1> Admin Email System </h1>
-        <form id ="AdminEmailForm" action="{{url_for('send_message')}}" method="POST">
-            <p>
-                {{ form.username.label }}<br>
-                {{ form.username(size=16, value=username) }}<span> Type 'all' for all users<br>
-            </p>
-            <p>
-                {{ form.subject.label }}<br>
-                {{ form.subject(size=16, value=subject) }}<br>
-            </p>
-            <p>
-                {{ form.message.label }}<br>
-                {{ form.message(cols='45', rows = '15', value = message)}}<br>
-            </p>
-            <p>{{ form.submit() }}</p>
-        </form>
-    </body>
-</html>
+
+    {%endblock%}
+
 {% else %}
     <html>You are not authorized to edit this user.</html>
 {% endif %}

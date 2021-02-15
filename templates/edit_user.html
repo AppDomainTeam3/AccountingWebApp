@@ -1,61 +1,47 @@
 {% if sessionUser.usertype == 'administrator' or g.user.usertype == 'manager' or user.id == sessionUser.id %}
-<html>
-    <head>
-        <title>{{ title }} - AppDomain</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}" />
-    </head>
-    
-    <div class = profilePic>
-        <img src="{{ g.user.avatarlink }}" />
-        <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
-    </div>
-    
-    <body>
-        <div class="topnav">
-            <a href="/">Home</a>
-            <a href="/users/{{ sessionUser.id }}">Profile</a>
-            <a href="/users">Users</a>
-            <a href="/accounts/create">Open Account</a>
-            <a href="/sign_out">Sign-Out</a>&emsp;
 
-            {% if sessionUser.usertype == 'administrator' %}
-            Admin: 
-            <a href="/users/expired_passwords">Expired Passwords</a>
-            <a href="/add-user">Create User</a>
-            <a href="/user-mail"> Admin Mail</a>
-            {% endif %}
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1>Edit data for {{ user.username }}:</h1>
+            <button onclick="location.href = '/users/{{ user.id }}/update_password';">Update Password</button>
+            <form id="UserCreationForm" action="" method="POST">
+                {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
+                <p>
+                    {{ form.deactivate.label }}<br>
+                    {{ form.deactivate }}<br>
+                </p>
+                <p>
+                    {{ form.usertype.label }}<br>
+                    {{ form.usertype }}<br>
+                </p>
+                {% endif %}
+                <p>
+                    {{ form.email.label }}<br>
+                    {{ form.email(size=16, value=user.email) }}<br>
+                </p>
+                <p>
+                    {{ form.firstname.label }}<br>
+                    {{ form.firstname(size=16, value=user.firstname) }}<br>
+                </p>
+                <p>
+                    {{ form.lastname.label }}<br>
+                    {{ form.lastname(size=16, value=user.lastname) }}<br>
+                </p>
+                <p>
+                    {{ form.avatarlink.label }}<br>
+                    {{ form.avatarlink(size=16, value=user.avatarlink) }}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
         </div>
-        <h1>Edit data for {{ user.username }}:</h1>
-        <button onclick="location.href = '/users/{{ user.id }}/update_password';">Update Password</button>
-        <form id="UserCreationForm" action="" method="POST">
-            {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
-            <p>
-                {{ form.deactivate.label }}<br>
-                {{ form.deactivate }}<br>
-            </p>
-            <p>
-                {{ form.usertype.label }}<br>
-                {{ form.usertype }}<br>
-            </p>
-            {% endif %}
-            <p>
-                {{ form.email.label }}<br>
-                {{ form.email(size=16, value=user.email) }}<br>
-            </p>
-            <p>
-                {{ form.firstname.label }}<br>
-                {{ form.firstname(size=16, value=user.firstname) }}<br>
-            </p>
-            <p>
-                {{ form.lastname.label }}<br>
-                {{ form.lastname(size=16, value=user.lastname) }}<br>
-            </p>
-            <p>
-                {{ form.avatarlink.label }}<br>
-                {{ form.avatarlink(size=16, value=user.avatarlink) }}<br>
-            </p>
-            <p>{{ form.submit() }}</p>
-        </form>
+{%endblock%}
+
+    {%block script%}
         <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script id = "UserCreationScript" data-search={{ api }}>
             var script_tag = document.getElementById("UserCreationScript")
@@ -76,8 +62,7 @@
                 });
             });
         </script>
-    </body>
-</html>
+    {%endblock%}
 {% else %}
     <html>You are not authorized to edit this user.</html>
 {% endif %}

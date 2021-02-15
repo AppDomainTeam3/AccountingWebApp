@@ -1,13 +1,21 @@
-<html>
-    <head>
-        <title>{{ title }} - AppDomain</title>
-    </head>
+{% extends 'altBase.html' %}
+
+    {%block title%} {{title}} {%endblock%}
     
-    <body>
-        <div class="topnav">
-            <a href="/login">Login</a>
-        </div>
-        <h1>Enter new user data:</h1>
+
+    {%block content%}
+
+        <nav class="navbar navbar-dark bg-primary">
+            <a class="navbar-brand-alt" href="/" style="color:white">
+                <img src="{{ url_for('static', filename='logoBlack.png') }}" alt="User Logo" height="80px"/>
+                <a  href="/" style="color:white;">Back to Login</a>
+            </a>
+        </nav>
+
+
+
+        <div class= "container float-left">
+        <h2>Enter new user data:</h2>
         <form id="UserCreationForm" action="" method="POST">
             <p>
                 {{ form.email.label }}<br>
@@ -31,35 +39,36 @@
             </p>
             <p>{{ form.submit() }}</p>
         </form>
-        <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script type=text/javascript src="../static/js/CheckPassword.js"></script>
-        <script id = "UserCreationScript" data-search={{ api }}>
-            var script_tag = document.getElementById("UserCreationScript")
-            var api_url = script_tag.getAttribute("data-search")
+{%endblock%}
+   {%block script%}
+    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script type=text/javascript src="../static/js/CheckPassword.js"></script>
+            <script id = "UserCreationScript" data-search={{ api }}>
+                var script_tag = document.getElementById("UserCreationScript")
+                var api_url = script_tag.getAttribute("data-search")
 
-            $('#UserCreationForm').submit(function(e){
-                e.preventDefault();
-                var form_tag = document.getElementById("UserCreationForm")
-                var password = document.getElementById("password").value;
-                var error_message = CheckPassword(password)
-                if (error_message !== "")
-                {
-                    alert(error_message)
-                }
-                else
-                {
-                    $.ajax({
-                        url: api_url + '/users/create-user',
-                        type: 'post',
-                        data:$('#UserCreationForm').serialize(),
-                        success: window.setTimeout(
-                            function(){
-                                alert('User Created!')
-                                window.location.href = "{{ url }}/login";
-                            })
-                    });
-                }
-            });
-        </script>
-    </body>
-</html>
+                $('#UserCreationForm').submit(function(e){
+                    e.preventDefault();
+                    var form_tag = document.getElementById("UserCreationForm")
+                    var password = document.getElementById("password").value;
+                    var error_message = CheckPassword(password)
+                    if (error_message !== "")
+                    {
+                        alert(error_message)
+                    }
+                    else
+                    {
+                        $.ajax({
+                            url: api_url + '/users/create-user',
+                            type: 'post',
+                            data:$('#UserCreationForm').serialize(),
+                            success: window.setTimeout(
+                                function(){
+                                    alert('User Created!')
+                                    window.location.href = "{{ url }}/login";
+                                })
+                        });
+                    }
+                });
+            </script>
+    {%endblock%}
