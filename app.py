@@ -5,7 +5,9 @@ from werkzeug.security import check_password_hash
 import requests
 
 from scripts.User import User
-from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm, AdminEmailForm, ForgotPasswordForm
+from scripts.Account import Account
+from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
+from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -97,7 +99,6 @@ def login():
                 if _user.isActive == 'True':
                     session['user_id'] = _user.id
                     passwordExEmail(_user)
-                    print(g.user)
                     return redirect(url_for('index'))
                 else:
                     flash(f"{_user.username} is disabled until {_user.reactivateUserDate}")
@@ -208,8 +209,8 @@ def EditUserProfile(user_id):
     form = UserCreationForm()
     return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
-@app.route("/users/<int:user_id>/update_password", methods=['GET', 'POST'])
-def UpdatePassword(user_id):
+@app.route("/users/<int:user_id>/edit_password", methods=['GET', 'POST'])
+def EditPassword(user_id):
     if g.user == None:
         return render_template('login.html')
     response = requests.get(f"{api_url}/users/{user_id}")
@@ -218,7 +219,7 @@ def UpdatePassword(user_id):
     update_user_list()
     user = users[user_id]
     form = UserPasswordChangeForm()
-    return render_template('update_password.html', title=f"Update Password, {user}" + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+    return render_template('edit_password.html', title=f"Update Password, {user.username}", form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
 @app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
@@ -237,7 +238,32 @@ def CreateAccount():
     if g.user == None:
         return render_template('login.html')
     form = AccountCreationForm()
-    return render_template('create_account.html', title='Open Account', form=form, api=api_url,user=g.user, sessionUser=g.user)
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url, user=g.user, sessionUser=g.user)
+
+@app.route("/accounts/<int:account_number>/edit", methods=['GET', 'POST'])
+def EditAccount(account_number):
+    if g.user == None:
+        return render_template('login.html')
+    response = requests.get(f"{api_url}/accounts/{account_number}")
+    accountDict = response.json()
+    #print(accountDict['id'])
+    account = Account(id=accountDict['id'],
+                      accountName=accountDict['AccountName'],
+                      accountNumber=accountDict['AccountNumber'],
+                      accountDesc=accountDict['AccountDesc'],
+                      normalSide=accountDict['NormalSide'],
+                      category=accountDict['Category'],
+                      subcategory=accountDict['Subcategory'],
+                      balance=accountDict['Balance'],
+                      accountCreationDate=accountDict['AccountCreationDate'],
+                      accountOrder=accountDict['AccountOrder'],
+                      statement=accountDict['Statement'],
+                      comment=accountDict['Comment'],
+                      isActive=accountDict['IsActive'])
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    form = AccountEditForm()
+    return render_template('edit_account.html', title='Edit Account', form=form, api=api_url, account=account, user=g.user, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
