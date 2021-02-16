@@ -24,7 +24,7 @@
         {% for account in accounts %}
           <p id="{{ account.AccountNumber }}">{{ account.AccountName }}: {{ "Active" if account.IsActive == "True" else "Deactivated" }}
             {% if canEdit %}
-            <button id="{{ account.AccountNumber }}" onclick="ToggleAccountStatus({{ account.AccountNumber }})">{{ "Deactivate" if account.IsActive == "True" else "Activate" }}</button>
+            <button id="{{ account.AccountNumber }}" onclick="ToggleAccountStatus('{{ account.AccountNumber }}')">{{ "Deactivate" if account.IsActive == "True" else "Activate" }}</button>
             {% endif %}
           </p>
         {% endfor %}
