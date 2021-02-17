@@ -4,9 +4,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
-from scripts.Helper import populateAccountsListByUserID
-from scripts.User import User
-from scripts.Account import Account
+from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
 
@@ -18,29 +16,9 @@ api_url = 'https://appdomainteam3api.herokuapp.com'
 
 mail = Mail(app)
 
-userList = []
-users = []
 #adds userdata to list for user tracking and authentication
-def update_user_list():
-    response = requests.get(f"{api_url}/users")
-    userList = response.json()
-    users.clear()
-    for x in range(len(userList)):
-        userDict = userList[x]
-        users.append(User(id=userDict['id'], 
-                          username = userDict['username'],
-                          email = userDict['email'],
-                          usertype = userDict['usertype'],
-                          firstname = userDict['firstname'],
-                          lastname = userDict['lastname'],
-                          avatarlink = userDict['avatarlink'],
-                          password = userDict['hashed_password'],
-                          isActive = userDict['is_active'],
-                          isPasswordExpired = userDict['is_password_expired'],
-                          reactivateUserDate = userDict['reactivate_user_date'],
-                          failedLoginAttempts = userDict['failed_login_attempts'],
-                          passwordExpirationDate = userDict['password_expiration_date']))
-update_user_list()
+users = []
+users = updateUserList(users, api_url)
 
 def passwordExEmail(user):
     
@@ -69,7 +47,8 @@ def passwordExEmail(user):
             mail.send(msg)
         
 def updataUserSessionData():
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     for userIndex in range(len(users)):
         if g.user.id == users[userIndex].id:
             g.user = users[userIndex]
@@ -85,7 +64,8 @@ def before_request():
 #starts the session/checks for auth
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     if request.method == 'POST':
         session.pop('user_id',None)
         username = request.form['username'].lower()
@@ -111,7 +91,8 @@ def login():
 
 @app.route("/user-mail", methods=['GET', 'POST'])
 def userMail():
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     form = AdminEmailForm()
     if g.user == None:
         return render_template('login.html')
@@ -165,14 +146,16 @@ def index():
 def DisplayAllUsers():
     if g.user == None:
         return render_template('login.html')
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     return render_template('users.html', title='All Users', userdata=users, user=g.user, url=app_url)
 
 @app.route("/users/expired_passwords/")
 def DisplayAllUsersWithExpiredPasswords():
     if g.user == None:
         return render_template('login.html')
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     expiredUsers = []
     for user_ in users:
         if users[user_.id].isPasswordExpired == 'True':
@@ -205,7 +188,8 @@ def EditUserProfile(user_id):
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
 
     accounts = populateAccountsListByUserID(user_id, api_url)
     user = users[user_id]
@@ -222,7 +206,8 @@ def UserAccountsEditView(user_id):
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     user = users[user_id]
     accounts = populateAccountsListByUserID(user_id, api_url)
     canEdit = False
@@ -237,7 +222,8 @@ def EditPassword(user_id):
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     user = users[user_id]
     form = UserPasswordChangeForm()
     return render_template('edit_password.html', title=f"Update Password, {user.username}", form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
@@ -265,23 +251,7 @@ def CreateAccount():
 def EditAccount(account_number):
     if g.user == None:
         return render_template('login.html')
-    response = requests.get(f"{api_url}/accounts/{account_number}")
-    accountDict = response.json()
-    account = Account(id=accountDict['id'],
-                      accountName=accountDict['AccountName'],
-                      accountNumber=accountDict['AccountNumber'],
-                      accountDesc=accountDict['AccountDesc'],
-                      normalSide=accountDict['NormalSide'],
-                      category=accountDict['Category'],
-                      subcategory=accountDict['Subcategory'],
-                      balance=accountDict['Balance'],
-                      accountCreationDate=accountDict['AccountCreationDate'],
-                      accountOrder=accountDict['AccountOrder'],
-                      statement=accountDict['Statement'],
-                      comment=accountDict['Comment'],
-                      isActive=accountDict['IsActive'])
-    if response.status_code == 404:
-        return render_template('error.html', user=g.user)
+    account = populateAccountByAccountNumber(account_number, api_url)
     form = AccountEditForm()
     return render_template('edit_account.html', title='Edit Account', form=form, api=api_url, account=account, user=g.user, sessionUser=g.user)
 
