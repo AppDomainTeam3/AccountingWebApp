@@ -9,7 +9,8 @@
         <div class= "container float-left">
             <h1 class="pt-2">Edit data for {{ user.username }}:</h1>
             <p><button onclick="location.href = '/users/{{ user.id }}/edit_password';">Edit Password</button></p>
-            <p><button onclick="location.href = '/users/{{ user.id }}/edit_account';">Edit Accounts</button></p>
+            
+            <p><button onclick="location.href = '/users/{{ user.id }}/accounts/edit';">Edit Accounts</button></p>
             <form id="UserCreationForm" action="" method="POST">
                 {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
                 <p>

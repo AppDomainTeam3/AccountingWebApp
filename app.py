@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
+from scripts.Helper import populateAccountsListByUserID
 from scripts.User import User
 from scripts.Account import Account
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
@@ -205,9 +206,26 @@ def EditUserProfile(user_id):
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
     update_user_list()
+
+    response = requests.get(f"{api_url}/users/{user_id}/accounts")
+    accounts = {}
+    for accountDict in response.json():
+        accounts.update({f"{accountDict['AccountName']}": f"{accountDict['AccountNumber']}"})
     user = users[user_id]
     form = UserCreationForm()
-    return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+    return render_template('edit_user.html', title='edit ' + user.username, form=form, accounts=accounts, user=user, url=app_url, api=api_url, sessionUser=g.user)
+
+@app.route("/users/<int:user_id>/accounts/edit", methods=['GET', 'POST'])
+def UserAccountsEditView(user_id):
+    if g.user == None:
+        return render_template('login.html')
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    update_user_list()
+    user = users[user_id]
+    accounts = populateAccountsListByUserID(user_id, api_url)
+    return render_template('user_accounts_edit_view.html', title='Edit Accounts ' + user.username, accounts=accounts, user=users[user_id], sessionUser=g.user, app=app_url)
 
 @app.route("/users/<int:user_id>/edit_password", methods=['GET', 'POST'])
 def EditPassword(user_id):
@@ -246,7 +264,6 @@ def EditAccount(account_number):
         return render_template('login.html')
     response = requests.get(f"{api_url}/accounts/{account_number}")
     accountDict = response.json()
-    #print(accountDict['id'])
     account = Account(id=accountDict['id'],
                       accountName=accountDict['AccountName'],
                       accountNumber=accountDict['AccountNumber'],
