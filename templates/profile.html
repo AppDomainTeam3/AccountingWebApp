@@ -1,44 +1,29 @@
-<html>
-  <head>
-    <title>{{ title }} - AppDomain</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logo.css')}}"/>
-    <script src="https://kit.fontawesome.com/1e2d487faa.js" crossorigin="anonymous"></script>
-  </head>
-  
-  <div class = profilePic>
-    <img src="{{ g.user.avatarlink }}" />
-    <a href = "/users/{{ user.id }}">{{g.user.username}}</a>
-  </div>
-  
-  <body>
-    <div class="topnav">
-      <a href="/">Home</a>
-      <a href="/users/{{ user.id }}">Profile</a>
-      <a href="/users">Users</a>
-      <a href="/sign_out">Sign-Out</a>&emsp;
-     
-      {% if user.usertype == 'administrator' %}
-      Admin: 
-      <a href="/users/expired_passwords">Expired Passwords</a>
-      <a href="/add-user">Create User</a>
-      <a href="/user-mail"> Admin Mail</a>&emsp;
-      {% endif %}
-    </div>
-    
-    <h1>{{ userData.username }}'s Profile</h1> 
-    {% if canEdit %}
-        <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
-    {% endif %}
-    <div class = "profileAvatar">
-      <img src={{ userData.avatarlink }}>  
-    </div>
-    {% if userData.isActive.lower() == 'true' %}
-      <p>Status: Active</p>
-    {% elif userData.isActive.lower() == 'false' %}
-      <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
-    {% endif %}
-    <p>{{ userData.firstname }} {{ userData.lastname }} <span> </span><a href="/user-mail"><i class="fas fa-envelope"></i></a></p>
-    <p>{{ userData.email }}</p>
-    <p>{{ userData.usertype }}</p>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+      <div class= "container float-left">
+        <h1 class="pt-2">{{ userData.username }}'s Profile</h1> 
+        {% if canEdit %}
+          <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
+        {% endif %}
+        <div id='profileAvatar'>
+          <img src={{ userData.avatarlink }} height="240">  
+        </div>
+        {% if userData.isActive.lower() == 'true' %}
+          <p>Status: Active</p>
+        {% elif userData.isActive.lower() == 'false' %}
+          <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
+        {% endif %}
+        <p>{{ userData.firstname }} {{ userData.lastname }} <span> </span><a href="/user-mail"><i class="fas fa-envelope"></i></a></p>
+        <p>{{ userData.email }}</p>
+        <p>{{ userData.usertype }}</p>
+        <p>Accounts:</p>
+        {% for account in accounts %}
+          <p id="{{ account.AccountNumber }}">{{ account.AccountName }}: {{ "Active" if account.IsActive == "True" else "Deactivated" }}</p>
+        {% endfor %}
+      </div>
+
+    {%endblock%}

@@ -15,6 +15,24 @@ class UserCreationForm(FlaskForm):
     password = StringField('Password', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
+class AccountCreationForm(FlaskForm):
+    accountHolderUsername = StringField('Username', validators=[DataRequired('field is required.')])
+    accountName = StringField('Account Name', validators=[DataRequired('field is required.')])
+    accountDesc = StringField('Description', validators=[DataRequired('field is required.')])
+    normalSide = StringField('Normal Side', validators=[DataRequired('field is required.')])
+    category = SelectField('Category', choices=[('Checking', 'Checking'), ('Savings', 'Savings')], validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
+class AccountEditForm(FlaskForm):
+    accountName = StringField('Account Name', validators=[DataRequired('field is required.')])
+    accountDesc = StringField('Description', validators=[DataRequired('field is required.')])
+    normalSide = StringField('Normal Side', validators=[DataRequired('field is required.')])
+    category = SelectField('Category', choices=[('Checking', 'Checking'), ('Savings', 'Savings')], validators=[DataRequired('field is required.')])
+    subcategory = StringField('Subcategory', validators=[DataRequired('field is required.')])
+    accountOrder = StringField('Account Order', validators=[DataRequired('field is required.')])
+    comment = StringField('Comment', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
 class UserPasswordChangeForm(FlaskForm):
     currentPassword = StringField('Current Password', validators=[DataRequired('field is required.')])
     newPassword = StringField('New Password', validators=[DataRequired('field is required.')])
