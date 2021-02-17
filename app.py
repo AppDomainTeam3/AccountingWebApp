@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
-from scripts.User import User
-from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm, AdminEmailForm, ForgotPasswordForm
+from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList
+from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
+from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -15,29 +16,9 @@ api_url = 'https://appdomainteam3api.herokuapp.com'
 
 mail = Mail(app)
 
-userList = []
-users = []
 #adds userdata to list for user tracking and authentication
-def update_user_list():
-    response = requests.get(f"{api_url}/users")
-    userList = response.json()
-    users.clear()
-    for x in range(len(userList)):
-        userDict = userList[x]
-        users.append(User(id=userDict['id'], 
-                          username = userDict['username'],
-                          email = userDict['email'],
-                          usertype = userDict['usertype'],
-                          firstname = userDict['firstname'],
-                          lastname = userDict['lastname'],
-                          avatarlink = userDict['avatarlink'],
-                          password = userDict['hashed_password'],
-                          isActive = userDict['is_active'],
-                          isPasswordExpired = userDict['is_password_expired'],
-                          reactivateUserDate = userDict['reactivate_user_date'],
-                          failedLoginAttempts = userDict['failed_login_attempts'],
-                          passwordExpirationDate = userDict['password_expiration_date']))
-update_user_list()
+users = []
+users = updateUserList(users, api_url)
 
 def passwordExEmail(user):
     
@@ -66,7 +47,8 @@ def passwordExEmail(user):
             mail.send(msg)
         
 def updataUserSessionData():
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     for userIndex in range(len(users)):
         if g.user.id == users[userIndex].id:
             g.user = users[userIndex]
@@ -82,7 +64,8 @@ def before_request():
 #starts the session/checks for auth
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     if request.method == 'POST':
         session.pop('user_id',None)
         username = request.form['username'].lower()
@@ -97,7 +80,6 @@ def login():
                 if _user.isActive == 'True':
                     session['user_id'] = _user.id
                     passwordExEmail(_user)
-                    print(g.user)
                     return redirect(url_for('index'))
                 else:
                     flash(f"{_user.username} is disabled until {_user.reactivateUserDate}")
@@ -109,7 +91,8 @@ def login():
 
 @app.route("/user-mail", methods=['GET', 'POST'])
 def userMail():
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     form = AdminEmailForm()
     if g.user == None:
         return render_template('login.html')
@@ -163,14 +146,16 @@ def index():
 def DisplayAllUsers():
     if g.user == None:
         return render_template('login.html')
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     return render_template('users.html', title='All Users', userdata=users, user=g.user, url=app_url)
 
 @app.route("/users/expired_passwords/")
 def DisplayAllUsersWithExpiredPasswords():
     if g.user == None:
         return render_template('login.html')
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
     expiredUsers = []
     for user_ in users:
         if users[user_.id].isPasswordExpired == 'True':
@@ -186,14 +171,15 @@ def UserProfile(user_id):
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
     user = users[user_id]
-    response = requests.get(f"{api_url}/accounts/{user_id}")
+    response = requests.get(f"{api_url}/users/{user_id}/accounts")
     accounts = []
-    for entry in response.json():
-        accounts.append(entry)
+    if response.status_code != 404:
+        for entry in response.json():
+            accounts.append(entry)
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, canEdit=canEdit)
+    return render_template('profile.html', user=g.user, title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, api=api_url, canEdit=canEdit)
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
@@ -202,22 +188,45 @@ def EditUserProfile(user_id):
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
+
+    accounts = populateAccountsListByUserID(user_id, api_url)
     user = users[user_id]
     form = UserCreationForm()
-    return render_template('edit_user.html', title='edit ' + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+    canEdit = False
+    if g.user.usertype == 'administrator' or g.user.id == user_id:
+        canEdit = True
+    return render_template('edit_user.html', title='edit ' + user.username, form=form, accounts=accounts, user=user, url=app_url, api=api_url, sessionUser=g.user, canEdit=canEdit)
 
-@app.route("/users/<int:user_id>/update_password", methods=['GET', 'POST'])
-def UpdatePassword(user_id):
+@app.route("/users/<int:user_id>/accounts/edit", methods=['GET', 'POST'])
+def UserAccountsEditView(user_id):
     if g.user == None:
         return render_template('login.html')
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
-    update_user_list()
+    global users
+    users = updateUserList(users, api_url)
+    user = users[user_id]
+    accounts = populateAccountsListByUserID(user_id, api_url)
+    canEdit = False
+    if g.user.usertype == 'administrator' or g.user.id == user_id:
+        canEdit = True
+    return render_template('user_accounts_edit_view.html', title='Edit Accounts ' + user.username, accounts=accounts, user=g.user, canEdit=canEdit, sessionUser=g.user, app=app_url, api=api_url)
+
+@app.route("/users/<int:user_id>/edit_password", methods=['GET', 'POST'])
+def EditPassword(user_id):
+    if g.user == None:
+        return render_template('login.html')
+    response = requests.get(f"{api_url}/users/{user_id}")
+    if response.status_code == 404:
+        return render_template('error.html', user=g.user)
+    global users
+    users = updateUserList(users, api_url)
     user = users[user_id]
     form = UserPasswordChangeForm()
-    return render_template('update_password.html', title=f"Update Password, {user}" + user.username, form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+    return render_template('edit_password.html', title=f"Update Password, {user.username}", form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
 
 @app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
@@ -236,12 +245,24 @@ def CreateAccount():
     if g.user == None:
         return render_template('login.html')
     form = AccountCreationForm()
-    return render_template('create_account.html', title='Open Account', form=form, api=api_url,user=g.user, sessionUser=g.user)
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url, user=g.user, sessionUser=g.user)
+
+@app.route("/accounts/<int:account_number>/edit", methods=['GET', 'POST'])
+def EditAccount(account_number):
+    if g.user == None:
+        return render_template('login.html')
+    account = populateAccountByAccountNumber(account_number, api_url)
+    form = AccountEditForm()
+    return render_template('edit_account.html', title='Edit Account', form=form, api=api_url, account=account, user=g.user, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
     form = ForgotPasswordForm()
     return render_template('forgot_password.html', title='Forgot Password', form=form, api=api_url)
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('error.html', user=g.user), 404
 
 if __name__ == "__main__":
     app.run(debug=False)
