@@ -5,9 +5,18 @@
     {%block content%}
 
         <div class= "container float-left">
-            <h1 class="pt-2">Choose an account to edit</h1>
-            {% for account in accounts %}
-              <p><a href="{{ app }}/accounts/{{ account.accountNumber }}/edit">{{ account.accountName }} | {{ account.category }} | {{ account.accountNumber }}</a></p>
-            {% endfor %}
+            {% if canEdit %}
+              {% if accounts %}
+                <h1 class="pt-2">Choose an account to edit</h1>
+                {% for account in accounts %}
+                  <p><a href="{{ app }}/accounts/{{ account.accountNumber }}/edit">{{ account.accountName }} | {{ account.category }} | {{ account.accountNumber }}</a></p>
+                {% endfor %}
+              {% else %}
+                <h1 class="pt-2">This user doesn't have any accounts to edit</h1>
+              {% endif %}
+            {% else %}
+              <h1 class="pt-2">You are not authorized to view this page</h1>
+            {% endif %}
+
         </div>
     {%endblock%}
