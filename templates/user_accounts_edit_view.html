@@ -9,7 +9,10 @@
               {% if accounts %}
                 <h1 class="pt-2">Choose an account to edit</h1>
                 {% for account in accounts %}
-                  <p><a href="{{ app }}/accounts/{{ account.accountNumber }}/edit">{{ account.accountName }} | {{ account.category }} | {{ account.accountNumber }}</a></p>
+                  <p><a href="{{ app }}/accounts/{{ account.accountNumber }}/edit">{{ account.accountName }} | {{ account.category }} | {{ account.accountNumber }}</a>
+                    {% if canEdit %}
+                    <button id="{{ account.accountNumber }}" onclick="ToggleAccountStatus('{{ account.accountNumber }}')">{{ "Deactivate" if account.isActive == "True" else "Activate" }}</button>
+                    {% endif %}</p>
                 {% endfor %}
               {% else %}
                 <h1 class="pt-2">This user doesn't have any accounts to edit</h1>
@@ -20,3 +23,13 @@
 
         </div>
     {%endblock%}
+
+    {% block script %}
+      <script>
+        function ToggleAccountStatus(accountNumber) {
+          fetch('{{ api }}/accounts/' + accountNumber + '/toggle', { method: 'POST' });
+          alert('Account ' + accountNumber + ' status changed!')
+          window.location.href = "{{ url }}/users/{{ accounts[0].id }}";
+        }
+      </script>
+    {% endblock %}

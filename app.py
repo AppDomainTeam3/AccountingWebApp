@@ -213,7 +213,7 @@ def UserAccountsEditView(user_id):
     canEdit = False
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
-    return render_template('user_accounts_edit_view.html', title='Edit Accounts ' + user.username, accounts=accounts, user=users[user_id], canEdit=canEdit, sessionUser=g.user, app=app_url)
+    return render_template('user_accounts_edit_view.html', title='Edit Accounts ' + user.username, accounts=accounts, user=g.user, canEdit=canEdit, sessionUser=g.user, app=app_url, api=api_url)
 
 @app.route("/users/<int:user_id>/edit_password", methods=['GET', 'POST'])
 def EditPassword(user_id):
