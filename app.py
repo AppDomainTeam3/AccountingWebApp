@@ -247,6 +247,13 @@ def CreateAccount():
     form = AccountCreationForm()
     return render_template('create_account.html', title='Open Account', form=form, api=api_url, user=g.user, sessionUser=g.user)
 
+@app.route("/accounts/<int:account_number>", methods=['GET', 'POST'])
+def AccountOverview(account_number):
+    if g.user == None:
+        return render_template('login.html')
+    account = populateAccountByAccountNumber(account_number, api_url)
+    return render_template('account_overview.html', title='Account Overview', account=account, api=api_url, user=g.user, sessionUser=g.user)
+
 @app.route("/accounts/<int:account_number>/edit", methods=['GET', 'POST'])
 def EditAccount(account_number):
     if g.user == None:
