@@ -25,11 +25,23 @@
     {%endblock%}
 
     {% block script %}
-      <script>
-        function ToggleAccountStatus(accountNumber) {
-          fetch('{{ api }}/accounts/' + accountNumber + '/toggle', { method: 'POST' });
-          alert('Account ' + accountNumber + ' status changed!')
-          window.location.href = "{{ url }}/users/{{ accounts[0].id }}";
-        }
-      </script>
+    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      function ToggleAccountStatus(accountNumber) {
+        $.ajax({
+          url: '{{ api }}/accounts/' + accountNumber + '/toggle',
+          type: 'post'
+        })
+        .done(function(response) {
+          alert(response['message'])
+          window.location.href = "{{ url }}/users/{{ accounts[0].id }}/accounts/edit"
+        })
+        .fail(function(response) {
+          alert(response.responseJSON['message'])
+        })
+        .always(function(response) {
+          console.log(response)
+        })
+      }
+    </script>
     {% endblock %}
