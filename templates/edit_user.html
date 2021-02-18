@@ -1,4 +1,4 @@
-{% if sessionUser.usertype == 'administrator' or g.user.usertype == 'manager' or user.id == sessionUser.id %}
+{% if canEdit %}
 
 {% extends 'base.html' %}
 
@@ -7,8 +7,11 @@
     {%block content%}
 
         <div class= "container float-left">
-            <h1>Edit data for {{ user.username }}:</h1>
-            <button onclick="location.href = '/users/{{ user.id }}/update_password';">Update Password</button>
+            <h1 class="pt-2">Edit data for {{ user.username }}:</h1>
+            <p><button onclick="location.href = '/users/{{ user.id }}/edit_password';">Edit Password</button></p>
+            {% if accounts %}
+                <p><button onclick="location.href = '/users/{{ user.id }}/accounts/edit';">Edit Accounts</button></p>
+            {% endif %}
             <form id="UserCreationForm" action="" method="POST">
                 {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
                 <p>
