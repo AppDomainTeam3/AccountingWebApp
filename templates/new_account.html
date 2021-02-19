@@ -57,7 +57,17 @@
         }
         else
         {
-            $.post(api_url + '/users/create-user', {form: $('#UserCreationForm').serialize(), sessionUserID: -1})
+            $.ajax({
+                url: api_url + '/users/create-user',
+                type: 'post',
+                data: {
+                    form: $('#UserCreationForm').serialize(),
+                    sessionUserID: -1
+                },
+                headers: {
+                    'Access-Control-Allow-Origin': '*' 
+                }
+            })
             .done(function(){
                 alert('User Created!')
                 window.location.href = "{{ url }}/login";
