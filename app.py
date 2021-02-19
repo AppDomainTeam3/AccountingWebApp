@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, g, flash
 from flask_mail import Mail, Message
+from flask_cors import CORS
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
@@ -9,6 +10,7 @@ from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPas
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
 
 app = Flask(__name__, static_folder='static')
+CORS(app)
 app.config.from_object("config.DevelopementConfig")
 
 app_url = 'https://appdomainteam3.herokuapp.com'
