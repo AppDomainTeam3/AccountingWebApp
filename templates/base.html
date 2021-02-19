@@ -19,9 +19,9 @@
 
         <img class="pl=0 pr-3" src="{{ url_for('static', filename='logoBlack.png') }}" alt="User Logo" height="80px"/> 
 
-        <a class="navbar-brand" href="/users/{{ user.id }}">
+        <a class="navbar-brand" href="/users/{{ sessionUser.id }}">
           <img src="{{ g.user.avatarlink }}" alt="User Logo" />
-          <a class="" href="/users/{{ user.id }}" style="color:white;">{{g.user.username}}</a>&emsp;
+          <a class="" href="/users/{{ sessionUser.id }}" style="color:white;">{{g.user.username}}</a>&emsp;
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -31,7 +31,7 @@
           <div class="navbar-nav">
             
             <a class="nav-link" aria-current="page" href="/">Home</a>
-            <a class="nav-link" href="/users/{{ user.id }}">Profile</a>
+            <a class="nav-link" href="/users/{{ sessionUser.id }}">Profile</a>
             <a class="nav-link" href="/users">Users</a>
             <a class="nav-link" href="/accounts/create">Open Account</a>
             
@@ -49,7 +49,7 @@
             
             <a class="nav-link" href="/sign_out">Sign-Out</a>&emsp;
 
-            {% if user.usertype == 'administrator' %}
+            {% if sessionUser.usertype == 'administrator' %}
             <span class="navbar-text">Admin:</span>
             <a class="nav-link" href="/users/expired_passwords">Expired Passwords</a>
             <a class="nav-link" href="/add-user">Create User</a>
