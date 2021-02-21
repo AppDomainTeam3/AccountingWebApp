@@ -61,7 +61,7 @@
                         $.ajax({
                             url: api_url + '/users/create-user',
                             type: 'post',
-                            data:$('#UserCreationForm').serialize(),
+                            data: {form: $('#UserCreationForm').serialize(), sessionUserID: -1},
                             success: window.setTimeout(
                                 function(){
                                     alert('User Created!')
