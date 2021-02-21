@@ -1,17 +1,20 @@
 {% extends 'altBase.html' %}
 
-{%block title%} {{title}} {%endblock%}
+    {%block title%} {{title}} {%endblock%}
+    
 
-{%block content%}
+    {%block content%}
 
-    <nav class="navbar navbar-dark bg-primary">
-        <a class="navbar-brand-alt" href="/" style="color:white">
-            <img src="{{ url_for('static', filename='logoBlack.png') }}" alt="User Logo" height="80px"/>
-            <a  href="/" style="color:white;">Back to Login</a>
-        </a>
-    </nav>
+        <nav class="navbar navbar-dark bg-primary">
+            <a class="navbar-brand-alt" href="/" style="color:white">
+                <img src="{{ url_for('static', filename='logoBlack.png') }}" alt="User Logo" height="80px"/>
+                <a  href="/" style="color:white;">Back to Login</a>
+            </a>
+        </nav>
 
-    <div class= "container float-left">
+
+
+        <div class= "container float-left">
         <h2>Enter new user data:</h2>
         <form id="UserCreationForm" action="" method="POST">
             <p>
@@ -36,47 +39,36 @@
             </p>
             <p>{{ form.submit() }}</p>
         </form>
-    </div>
 {%endblock%}
+   {%block script%}
+    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script type=text/javascript src="../static/js/CheckPassword.js"></script>
+            <script id = "UserCreationScript" data-search={{ api }}>
+                var script_tag = document.getElementById("UserCreationScript")
+                var api_url = script_tag.getAttribute("data-search")
 
-{%block script%}
-<script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script type=text/javascript src="../static/js/CheckPassword.js"></script>
-<script id = "UserCreationScript" data-search={{ api }}>
-    var script_tag = document.getElementById("UserCreationScript")
-    var api_url = script_tag.getAttribute("data-search")
-
-    $('#UserCreationForm').submit(function(e){
-        e.preventDefault();
-        var form_tag = document.getElementById("UserCreationForm")
-        var password = document.getElementById("password").value;
-        var error_message = CheckPassword(password)
-        if (error_message !== "")
-        {
-            alert(error_message)
-        }
-        else
-        {
-            $.ajax({
-                url: api_url + '/users/create-user',
-                xhrFields: { withCredentials: true },
-                type: 'post',
-                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-                data: {
-                    form: $('#UserCreationForm').serialize(),
-                    sessionUserID: -1
-                },
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': '*',
-                    'Access-Control-Allow-Credentials': true
-                }
-            })
-            .done(function(){
-                alert('User Created!')
-                window.location.href = "{{ url }}/login";
-            });
-        }
-    });
-</script>
-{%endblock%}
+                $('#UserCreationForm').submit(function(e){
+                    e.preventDefault();
+                    var form_tag = document.getElementById("UserCreationForm")
+                    var password = document.getElementById("password").value;
+                    var error_message = CheckPassword(password)
+                    if (error_message !== "")
+                    {
+                        alert(error_message)
+                    }
+                    else
+                    {
+                        $.ajax({
+                            url: api_url + '/users/create-user',
+                            type: 'post',
+                            data: {form: $('#UserCreationForm').serialize(), sessionUserID: -1},
+                            success: window.setTimeout(
+                                function(){
+                                    alert('User Created!')
+                                    window.location.href = "{{ url }}/login";
+                                })
+                        });
+                    }
+                });
+            </script>
+    {%endblock%}
