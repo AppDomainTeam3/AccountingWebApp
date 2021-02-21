@@ -1,4 +1,4 @@
-{% if user.usertype == 'administrator' %}
+{% if sessionUser.usertype == 'administrator' %}
 
 {% extends 'base.html' %}
 
@@ -46,7 +46,7 @@
           $.ajax({
               url: api_url + '/users/create-user',
               type: 'post',
-              data: {form: $('#UserCreationForm').serialize(), sessionUserID: "{{ user.id }}"},
+              data: {form: $('#UserCreationForm').serialize(), sessionUserID: "{{ sessionUser.id }}"},
               success: window.setTimeout(function(){
                   alert('User Created!')
                   window.location.href = "{{ url }}/users";
