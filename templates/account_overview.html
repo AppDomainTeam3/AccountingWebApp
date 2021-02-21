@@ -11,7 +11,11 @@
                 Creation Date: {{ account.accountCreationDate }} | Acc Order: {{ account.accountOrder }} | Statement: {{ account.statement }} |
                 Comment: {{ account.comment }} | Active: {{ account.isActive }}</p>
             <h1 class="pt-2">Events</h1>
-            <p id="EventLog"></p>
+            {% if events != None %}
+                {% for event in events %}
+                    <p>EventID: {{ event.EventID }} | SessionUserID: {{ event.SessionUserID }} | Event: {{ event.Event }} | EventID: {{ event.EventID }} | Timestamp: {{ event.Timestamp }}</p>
+                {% endfor %}
+            {% endif %}
         </div>
 
     {%endblock%}

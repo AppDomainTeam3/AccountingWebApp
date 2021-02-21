@@ -44,6 +44,15 @@ def populateAccountByAccountNumber(account_number, api_url):
                       isActive=accountDict['IsActive'])
     return account
 
+def populateEventsListByEndpoint(endpoint, api_url):
+    response = requests.get(api_url + endpoint)
+    if response.status_code == 404:
+        return None
+    eventList = []
+    for event in response.json():
+        eventList.append(event)
+    return eventList
+
 def updateUserList(users, api_url):
     response = requests.get(f"{api_url}/users")
     userList = response.json()
