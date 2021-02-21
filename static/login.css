@@ -68,4 +68,15 @@ body{
     padding: 0;
 }
 
+#helpIcon:hover img{
+color:blanchedalmond;
+}
+/* Help Button*/
 
+#helpIconModal {
+    position: fixed;
+    margin: auto;
+    width: 550px;
+    height: 100%;
+    right: 50px;
+}

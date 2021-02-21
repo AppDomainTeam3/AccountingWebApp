@@ -99,7 +99,7 @@ def userMail():
     elif g.user.usertype == 'administrator':
         return render_template('userMail.html', title = 'Admin Email', form=form, sessionUser=g.user)
     else:
-        return render_template('access_denied.html', title = 'Access Denied')
+        return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
         
 @app.route("/send_message", methods=['GET','POST'])
 def send_message():
@@ -120,10 +120,10 @@ def send_message():
             message = Message(subject = subject, recipients = eList)
             message.body = msg
             mail.send(message)
-            return render_template('message_sent.html', title = 'Message Sent')
+            return render_template('message_sent.html', title = 'Message Sent',sessionUser=g.user)
 
         except Exception:
-            return render_template('user_not_exist.html', title = "User does not exist")
+            return render_template('user_not_exist.html', title = "User does not exist",sessionUser=g.user)
 
 @app.route("/sign_out/")
 def sign_out():
