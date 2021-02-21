@@ -49,7 +49,10 @@
         $.ajax({
             url: '{{ api }}/accounts/create/{{ sessionUser.username }}',
             type: 'post',
-            data:$('#AccountCreationForm').serialize(),
+            data: { 
+                form: $('#AccountCreationForm').serialize(),
+                sessionUserID: '{{ sessionUser.id }}'
+            }
         })
         .done(function(response){
             if (response['status'] !== 404){
