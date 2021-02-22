@@ -17,7 +17,7 @@ def populateAccountsListByUserID(user_id, api_url):
                                 category=accountDict['Category'],
                                 subcategory=accountDict['Subcategory'],
                                 balance=accountDict['Balance'],
-                                accountCreationDate=accountDict['AccountCreationDate'],
+                                accountCreationDate=accountDict['CreationDate'],
                                 accountOrder=accountDict['AccountOrder'],
                                 statement=accountDict['Statement'],
                                 comment=accountDict['Comment'],

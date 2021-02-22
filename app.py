@@ -195,6 +195,15 @@ def AccountsList():
     
     return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
 
+@app.route("/events")
+def EventLog():
+    if g.user == None:
+        return render_template('login.html')
+    
+    events = populateEventsListByEndpoint("/events", api_url)
+
+    return render_template('eventlog.html', sessionUser=g.user, title = 'Eventlog', events=events)
+
 
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
