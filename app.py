@@ -177,6 +177,26 @@ def UserProfile(user_id):
         canEdit = True
     return render_template('profile.html',  title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
+
+@app.route("/accounts")
+def AccountsList():
+    if g.user == None:
+        return render_template('login.html')
+    updataUserSessionData()
+    
+    accounts = []
+    userCount = int(requests.get(f"{api_url}/users/count").text)
+    for user_id in range(userCount):
+        response = requests.get(f"{api_url}/users/{user_id}/accounts")
+        if response.status_code != 404:
+            for entry in response.json():
+                accounts.append(entry)
+    
+    
+    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
+
+
+
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
     if g.user == None:
