@@ -24,7 +24,7 @@
         {% for account in accounts %}
           <a href="{{ url }}/accounts/{{ account.AccountNumber }}"><p id="{{ account.AccountNumber }}">{{ account.AccountName }} | Acc Number: {{ account.AccountNumber }} | Acc Desc: {{ account.AccountDesc }} | 
             Normal Side{{ account.NormalSide }} | Category: {{ account.Category }} | Subcategory: {{ account.Subcategory }} | Balance: ${{ account.Balance }} | 
-            Creation Date: {{ account.AccountCreationDate }} | Acc Order: {{ account.AccountOrder }} | Statement: {{ account.Statement }} |
+            Creation Date: {{ account.CreationDate }} | Acc Order: {{ account.AccountOrder }} | Statement: {{ account.Statement }} |
             Comment: {{ account.Comment }} | Active: {{ account.IsActive }}</p></a>
         {% endfor %}
       </div>
