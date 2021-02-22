@@ -11,8 +11,8 @@ from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEdi
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
 
-app_url = 'https://appdomainteam3.herokuapp.com'
-api_url = 'https://appdomainteam3api.herokuapp.com'
+app_url = 'http://127.0.0.1:5000'
+api_url = 'http://127.0.0.2:5000'
 
 mail = Mail(app)
 
@@ -268,4 +268,4 @@ def page_not_found(error):
     return render_template('error.html', sessionUser=g.user), 404
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

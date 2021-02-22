@@ -57,7 +57,11 @@
                 $.ajax({
                     url: api_url + '/users/{{ user.id }}/edit',
                     type: 'post',
-                    data:$('#UserCreationForm').serialize(),
+                    data: { 
+                        form: $('#UserCreationForm').serialize(), 
+                        sessionUserID: '{{ sessionUser.id }}',
+                        userID: '{{ user.id }}'
+                    },
                     success: window.setTimeout(function(){
                         alert('User updated!')
                         window.location.href = "{{ url }}/users/{{ user.id }}";
