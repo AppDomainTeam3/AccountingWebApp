@@ -99,7 +99,7 @@ def userMail():
     elif g.user.usertype == 'administrator':
         return render_template('userMail.html', title = 'Admin Email', form=form, sessionUser=g.user)
     else:
-        return render_template('access_denied.html', title = 'Access Denied')
+        return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
         
 @app.route("/send_message", methods=['GET','POST'])
 def send_message():
@@ -120,10 +120,10 @@ def send_message():
             message = Message(subject = subject, recipients = eList)
             message.body = msg
             mail.send(message)
-            return render_template('message_sent.html', title = 'Message Sent')
+            return render_template('message_sent.html', title = 'Message Sent',sessionUser=g.user)
 
         except Exception:
-            return render_template('user_not_exist.html', title = "User does not exist")
+            return render_template('user_not_exist.html', title = "User does not exist",sessionUser=g.user)
 
 @app.route("/sign_out/")
 def sign_out():
@@ -176,6 +176,26 @@ def UserProfile(user_id):
     if g.user.usertype == 'administrator' or g.user.id == user_id:
         canEdit = True
     return render_template('profile.html',  title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
+
+
+@app.route("/accounts")
+def AccountsList():
+    if g.user == None:
+        return render_template('login.html')
+    updataUserSessionData()
+    
+    accounts = []
+    userCount = int(requests.get(f"{api_url}/users/count").text)
+    for user_id in range(userCount):
+        response = requests.get(f"{api_url}/users/{user_id}/accounts")
+        if response.status_code != 404:
+            for entry in response.json():
+                accounts.append(entry)
+    
+    
+    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
+
+
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
