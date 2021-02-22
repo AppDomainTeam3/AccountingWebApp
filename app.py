@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
-from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList
+from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
 
@@ -195,6 +195,15 @@ def AccountsList():
     
     return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
 
+@app.route("/events")
+def EventLog():
+    if g.user == None:
+        return render_template('login.html')
+    
+    events = populateEventsListByEndpoint("/events", api_url)
+
+    return render_template('eventlog.html', sessionUser=g.user, title = 'Eventlog', events=events)
+
 
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
@@ -268,7 +277,10 @@ def AccountOverview(account_number):
     if g.user == None:
         return render_template('login.html')
     account = populateAccountByAccountNumber(account_number, api_url)
-    return render_template('account_overview.html', title='Account Overview', account=account, api=api_url, sessionUser=g.user)
+    if account == None:
+        return render_template('error.html', sessionUser=g.user)
+    events = populateEventsListByEndpoint(f"/events/{account_number}", api_url)
+    return render_template('account_overview.html', title='Account Overview', account=account, events=events, api=api_url, sessionUser=g.user)
 
 @app.route("/accounts/<int:account_number>/edit", methods=['GET', 'POST'])
 def EditAccount(account_number):
