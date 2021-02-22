@@ -4,12 +4,36 @@
 
     {%block content%}
 
-        <div class= "container float-left pt-3">
-            {% for user_ in userdata %}
-            <div>
-                <p><a href="/users/{{ user_.id }}"><img src={{ user_.avatarlink }} width="32" height="32"> Username: {{ user_.username }} | Email: {{ user_.email }} | Usertype: {{ user_.usertype }} | Firstname: {{ user_.firstname }} | Lastname: {{ user_.lastname }}</a></b></p>
-            </div>
-            {% endfor %}
+        <div class= "container float-left pt-3"></div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col"> </th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Usertype</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for user_ in userdata %}
+                    <tr>
+                        
+                        <td> <img src={{ user_.avatarlink }} width="32" height="32"> </td>
+                        <td><a href="/users/{{ user_.id }}">{{ user_.username }} </a> </td>
+                        <td>{{ user_.email }}</td>
+                        <td>{{ user_.usertype }}</td>
+                        <td>{{ user_.firstname }}</td>
+                        <td>{{ user_.lastname }}</td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
         </div>
+
+
     {%endblock%}
-   
+
+
+    

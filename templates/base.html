@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css')}}"/>
     <script src="https://kit.fontawesome.com/1e2d487faa.js" crossorigin="anonymous"></script>
     {% endblock %}
@@ -40,7 +42,7 @@
                 Services
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Journalizing</a>
+                <a class="dropdown-item" href="/accounts">Chart of Accounts</a>
                 <a class="dropdown-item" href="#">Ledger</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Future Services</a>
@@ -55,9 +57,79 @@
             <a class="nav-link" href="/add-user">Create User</a>
             <a class="nav-link" href="/user-mail">Admin Mail</a>
             {% endif %}
-          </div>
-        </div>
+
+            <h3 id="helpIcon" data-toggle="modal" data-target="#myModal">&nbsp;&nbsp;&nbsp;<img src ={{ url_for('static', filename='question-square.svg') }} data-placement="right" title="Help"></h3>
+             <!-- Modal of Help Icon -->
+              <div class="modal fade modal-lg" id="myModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog" id="helpIconModal">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="staticBackdropLabel">Help</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      
+                      <div class="accordion" id="helpAccordion">
+                        <div class="card">
+                          <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Administrator Functions
+                              </button>
+                            </h5>
+                          </div>
+                      
+                          <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div class="card-body">
+                              <p>As an administrator you will have access to special funcitons, which include:</p>
+                              <p> <b>Create users: </b> By selecting "create user", located in the navbar, an administrator can create a new user to be stored in the system.</p>
+                              <p> <b>Show expired password user list: </b> By selecting "Expired Passwords", located in the navbar, an administrator can see a list of users with expired passwords.</p>
+                              <p> <b>Admin mail: </b> By selecting "Admin mail", located in the navbar, an administrator can send emails to all users or a select user that exists in the system. To send an email to all users, enter the keyword "all".</p>
+                              <p> <b>Edit users: </b> Administrators can modify user information stored in the system. The option to edit users is located in the profile page of the website, and will be found above the user profile avatar in the profile page. </p>
+                              <p> <b>Add, view, edit, and deactivate accounts: </b> Administrators can modify and create accounts for users in the system. An administrator can open an account by selecting "open account" in the navbar, where the admin can input the necessary information  </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                              <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Regular User Functions
+                              </button>
+                            </h5>
+                          </div>
+                          <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                            <div class="card-body">
+                              <p> <b>View Profile: </b> To view your user profile you can either click on your username, profile avatar, and/or the profile link in the navbar.</p>
+                              <p> <b>Update password: </b> To change your password navigate to your profile page and select "edit profile". Next, select "edit password" and enter the approiate requested information.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" id="headingThree">
+                            <h5 class="mb-0">
+                              <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                TBA
+                              </button>
+                            </h5>
+                          </div>
+                          <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+                            <div class="card-body">
+                              <p> <b>To be added: yer yer eyr</b>  </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer text-center d-block">
+                      <button type="button" class="btn btn-primary float-center" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+              </div>
       </div>
+              <!--End of Help Icon Modal-->
     </nav>
     
     <!--Will display hello, word if content block is not overwritten in child template-->
@@ -70,6 +142,8 @@
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
 
   {%block script%}
   <!--Scripts from child templates-->

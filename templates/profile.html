@@ -17,7 +17,7 @@
         {% elif userData.isActive.lower() == 'false' %}
           <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
         {% endif %}
-        <p>{{ userData.firstname }} {{ userData.lastname }} <span> </span><a href="/user-mail"><i class="fas fa-envelope"></i></a></p>
+        <p>{{ userData.firstname }} {{ userData.lastname }} <span>  </span> <a href="/user-mail" <span class="fas fa-envelope" data-toggle="tooltip" data-placement="right" title="Email User"> </span> </a>       </p>
         <p>{{ userData.email }}</p>
         <p>{{ userData.usertype }}</p>
         <p><h3 class="pt-2">Accounts:</h1></p>
@@ -28,5 +28,15 @@
             Comment: {{ account.Comment }} | Active: {{ account.IsActive }}</p></a>
         {% endfor %}
       </div>
+
+    {%endblock%}
+
+    {%block script%}
+
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
 
     {%endblock%}
