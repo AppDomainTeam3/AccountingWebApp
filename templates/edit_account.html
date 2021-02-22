@@ -55,7 +55,11 @@
             $.ajax({
                 url: '{{ api }}/accounts/{{ account.accountNumber }}/edit',
                 type: 'post',
-                data:$('#AccountEditForm').serialize(),
+                data: { 
+                    form: $('#AccountEditForm').serialize(),
+                    sessionUserID: '{{ sessionUser.id }}',
+                    userID: '{{ account.id }}'
+                }
             })
             .done(function(response){
                 if (response['status'] !== 404){
