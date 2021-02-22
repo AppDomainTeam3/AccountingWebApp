@@ -53,7 +53,7 @@
               <tbody>
               {% for account in accounts %}
                   <tr>
-                      <td>{{ account.AccountName}}</td>
+                      <td> <a href="{{ url }}/accounts/{{ account.AccountNumber }}" > {{ account.AccountName}} </a> </td>
                       <td>{{ account.AccountNumber}}</td>
                       <td>{{ account.AccountDesc }}</td>
                       <td>{{ account.NormalSide }}</td>
