@@ -21,13 +21,56 @@
         <p>{{ userData.email }}</p>
         <p>{{ userData.usertype }}</p>
         <p><h3 class="pt-2">Accounts:</h1></p>
-        {% for account in accounts %}
-          <a href="{{ url }}/accounts/{{ account.AccountNumber }}"><p id="{{ account.AccountNumber }}">{{ account.AccountName }} | Acc Number: {{ account.AccountNumber }} | Acc Desc: {{ account.AccountDesc }} | 
-            Normal Side{{ account.NormalSide }} | Category: {{ account.Category }} | Subcategory: {{ account.Subcategory }} | Balance: ${{ account.Balance }} | 
-            Creation Date: {{ account.CreationDate }} | Acc Order: {{ account.AccountOrder }} | Statement: {{ account.Statement }} |
-            Comment: {{ account.Comment }} | Active: {{ account.IsActive }}</p></a>
-        {% endfor %}
+
+
       </div>
+
+
+        <div class="container-fluid ml-1 mb-3 mt-3">
+          <table class="table table-striped table-bordered mydatatable" style="width: 100%">
+              <thead>
+                  <tr>
+                      <th colspan="6"> Account Details</th>
+                      <th colspan="6"> Account Status</th>
+                  </tr>
+                  <tr>
+                      <th>Name</th>
+                      <th>Number</th>
+                      <th>Description</th>
+                      <th>Normal Side</th>
+                      <th>Category</th>
+                      <th>Subcategory</th>
+                      <th>Balance</th>
+                      <th>Creation Date</th>
+                      <th>AccountOrder</th>
+                      <th>Statement</th>
+                      <th>Comment</th>
+                      <th>Active Status</th>
+                      
+                  </tr>
+              </thead>
+  
+              <tbody>
+              {% for account in accounts %}
+                  <tr>
+                      <td>{{ account.AccountName}}</td>
+                      <td>{{ account.AccountNumber}}</td>
+                      <td>{{ account.AccountDesc }}</td>
+                      <td>{{ account.NormalSide }}</td>
+                      <td>{{ account.Category }}</td>
+                      <td>{{ account.subCategory }}</td>
+                      <td>${{ account.Balance }}</td>
+                      <td>{{ account.CreationDate }}</td>
+                      <td>{{ account.AccountOrder }}</td>
+                      <td>{{ account.Comment }}</td>
+                      <td>{{ account.Comment }}</td>
+                      <td>{{ account.IsActive }}</td>
+                  </tr>
+              {% endfor %}
+              </tbody>
+
+          </table>
+        </div>
 
     {%endblock%}
 
@@ -38,5 +81,12 @@
       $('[data-toggle="tooltip"]').tooltip()
     })
     </script>
+
+  <script>
+    $('.mydatatable').DataTable({
+        order: [[3,'desc']],
+        pagingType: 'full_numbers'
+    });
+  </script>
 
     {%endblock%}
