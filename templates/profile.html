@@ -100,18 +100,18 @@
               <tbody>
               {% for account in accounts %}
                   <tr>
-                      <td> <a href="{{ url }}/accounts/{{ account.AccountNumber }}" > {{ account.AccountName}} </a> </td>
-                      <td>{{ account.AccountNumber}}</td>
-                      <td>{{ account.AccountDesc }}</td>
-                      <td>{{ account.NormalSide }}</td>
-                      <td>{{ account.Category }}</td>
-                      <td>{{ account.subCategory }}</td>
-                      <td>${{ account.Balance }}</td>
-                      <td>{{ account.CreationDate }}</td>
-                      <td>{{ account.AccountOrder }}</td>
-                      <td>{{ account.Comment }}</td>
-                      <td>{{ account.Comment }}</td>
-                      <td>{{ account.IsActive }}</td>
+                      <td> <a href="{{ url }}/accounts/{{ account.AccountNumber }}" > {{ account.accountName}} </a> </td>
+                      <td>{{ account.accountNumber}}</td>
+                      <td>{{ account.accountDesc }}</td>
+                      <td>{{ account.normalSide }}</td>
+                      <td>{{ account.category }}</td>
+                      <td>{{ account.subcategory }}</td>
+                      <td>${{ "{:,.2f}".format(account.balance) }}</td>
+                      <td>{{ account.accountCreationDate }}</td>
+                      <td>{{ account.accountOrder }}</td>
+                      <td>{{ account.statement }}</td>
+                      <td>{{ account.comment }}</td>
+                      <td>{{ account.isActive }}</td>
                   </tr>
               {% endfor %}
               </tbody>
@@ -133,6 +133,10 @@
     $('.mydatatable').DataTable({
         order: [[3,'desc']],
         pagingType: 'full_numbers',
+        "columnDefs": [
+          { "width": "5%", "targets": 6 },
+          { "width": "2%", "targets": 8 }
+        ]
     });
     $('.ledgerDataTable').DataTable({
         order: [[2,'desc']],
