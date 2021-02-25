@@ -96,7 +96,7 @@ def userMail():
     form = AdminEmailForm()
     if g.user == None:
         return render_template('login.html')
-    elif g.user.usertype == 'administrator':
+    elif g.user.usertype == 'administrator' or g.user.usertype == 'accountant' or g.user.usertype== 'manager':
         return render_template('userMail.html', title = 'Admin Email', form=form, sessionUser=g.user)
     else:
         return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
