@@ -56,7 +56,7 @@
             <span class="navbar-text">Admin:</span>
             <a class="nav-link" href="/users/expired_passwords">Expired Passwords</a>
             <a class="nav-link" href="/add-user">Create User</a>
-            <a class="nav-link" href="/user-mail">Admin Mail</a>
+            <a class="nav-link" href="/user-mail">System Email</a>
             {% endif %}
 
             {% if sessionUser.usertype == 'manager' %}
@@ -64,7 +64,7 @@
             <a class="nav-link" href="/user-mail">System Email</a>
             {% endif %}
 
-            {% if sessionUser.usertype == 'accountant' %}
+            {% if sessionUser.usertype == 'regular_user' %}
             <span class="navbar-text">Accountant:</span>
             <a class="nav-link" href="/user-mail">System Email</a>
             {% endif %}
@@ -156,7 +156,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
-
+  
   {%block script%}
   <!--Scripts from child templates-->
   {%endblock%}
