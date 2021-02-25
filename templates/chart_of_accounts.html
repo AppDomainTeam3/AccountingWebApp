@@ -38,11 +38,11 @@
                     <td>{{ account.AccountDesc }}</td>
                     <td>{{ account.NormalSide }}</td>
                     <td>{{ account.Category }}</td>
-                    <td>{{ account.subCategory }}</td>
-                    <td>${{ account.Balance }}</td>
+                    <td>{{ account.Subcategory }}</td>
+                    <td>${{ "{:,.2f}".format(account.Balance) }}</td>
                     <td>{{ account.CreationDate }}</td>
                     <td>{{ account.AccountOrder }}</td>
-                    <td>{{ account.Comment }}</td>
+                    <td>{{ account.Statement }}</td>
                     <td>{{ account.Comment }}</td>
                     <td>{{ account.IsActive }}</td>
                 </tr>

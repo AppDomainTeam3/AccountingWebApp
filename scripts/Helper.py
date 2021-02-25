@@ -73,3 +73,9 @@ def updateUserList(users, api_url):
                           failedLoginAttempts = userDict['failed_login_attempts'],
                           passwordExpirationDate = userDict['password_expiration_date']))
     return users
+
+def getUserEditStatus(user, user_id):
+    canEdit = False
+    if user.usertype == 'administrator' or user.id == user_id:
+        canEdit = True
+    return canEdit

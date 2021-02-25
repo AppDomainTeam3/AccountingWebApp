@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
-from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint
+from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
 
@@ -162,20 +162,15 @@ def DisplayAllUsersWithExpiredPasswords():
 def UserProfile(user_id):
     if g.user == None:
         return render_template('login.html')
-    updataUserSessionData()
     response = requests.get(f"{api_url}/users/{user_id}")
     if response.status_code == 404:
         return render_template('error.html', user=g.user)
+    updataUserSessionData()
     user = users[user_id]
-    response = requests.get(f"{api_url}/users/{user_id}/accounts")
-    accounts = []
-    if response.status_code != 404:
-        for entry in response.json():
-            accounts.append(entry)
-    canEdit = False
-    if g.user.usertype == 'administrator' or g.user.id == user_id:
-        canEdit = True
-    return render_template('profile.html',  title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
+    accounts = populateAccountsListByUserID(user_id, api_url)
+    balanceEvents = populateEventsListByEndpoint(f"/events/{user.id}/balance", api_url)
+    canEdit = getUserEditStatus(g.user, user_id)
+    return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, balanceEvents=balanceEvents, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
 
 @app.route("/accounts")
@@ -193,7 +188,7 @@ def AccountsList():
                 accounts.append(entry)
     
     
-    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
+    return render_template('chart_of_accounts.html', sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts)
 
 @app.route("/events")
 def EventLog():
@@ -270,7 +265,8 @@ def CreateAccount():
     if g.user == None:
         return render_template('login.html')
     form = AccountCreationForm()
-    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user)
+    canEdit = True if g.user.usertype == 'administrator' else False
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user, canEdit=canEdit)
 
 @app.route("/accounts/<int:account_number>", methods=['GET', 'POST'])
 def AccountOverview(account_number):

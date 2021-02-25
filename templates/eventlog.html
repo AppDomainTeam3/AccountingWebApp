@@ -27,7 +27,7 @@
                     <td>{{ event['UserID'] }}</td>
                     <td>{{ event['AccountNumber'] }}</td>
                     <td>{{ event['Event'] }}</td>
-                    <td>{{ event['Amount'] }}</td>
+                    <td>${{ "{:,.2f}".format(event['Amount']) }}</td>
                     <td>{{ event['Timestamp'] }}</td>
                 </tr>
             {% endfor %}
