@@ -96,7 +96,7 @@ def userMail():
     form = AdminEmailForm()
     if g.user == None:
         return render_template('login.html')
-    elif g.user.usertype == 'administrator':
+    elif g.user.usertype == 'administrator' or g.user.usertype == 'regular_user' or g.user.usertype== 'manager':
         return render_template('userMail.html', title = 'Admin Email', form=form, sessionUser=g.user)
     else:
         return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
@@ -156,7 +156,10 @@ def DisplayAllUsersWithExpiredPasswords():
     for user_ in users:
         if users[user_.id].isPasswordExpired == 'True':
             expiredUsers.append(user_)
-    return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, url=app_url , sessionUser=g.user)
+    if g.user.usertype == 'administrator':
+        return render_template('expired_passwords.html', title='Expired Passwords Report', userdata=expiredUsers, url=app_url , sessionUser=g.user)
+    else:
+        return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
 
 @app.route("/users/<int:user_id>/")
 def UserProfile(user_id):
@@ -177,18 +180,15 @@ def UserProfile(user_id):
 def AccountsList():
     if g.user == None:
         return render_template('login.html')
+    response = requests.get(f"{api_url}/accounts")
+    if response.status_code == 404:
+        return render_template('error.html', sessionUser=g.user)
     updataUserSessionData()
-    
     accounts = []
-    userCount = int(requests.get(f"{api_url}/users/count").text)
-    for user_id in range(userCount):
-        response = requests.get(f"{api_url}/users/{user_id}/accounts")
-        if response.status_code != 404:
-            for entry in response.json():
-                accounts.append(entry)
-    
-    
-    return render_template('chart_of_accounts.html', sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts)
+    if response.status_code != 404:
+        for entry in response.json():
+            accounts.append(entry)
+    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
 
 @app.route("/events")
 def EventLog():
@@ -246,14 +246,20 @@ def EditPassword(user_id):
     users = updateUserList(users, api_url)
     user = users[user_id]
     form = UserPasswordChangeForm()
-    return render_template('edit_password.html', title=f"Update Password, {user.username}", form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+    if user.id == g.user.id:
+        return render_template('edit_password.html', title=f"Update Password, {user.username}", form=form, user=user, url=app_url, api=api_url, sessionUser=g.user)
+    else: 
+        return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
 
 @app.route("/add-user/", methods=['GET', 'POST'])
 def CreateUser():
     if g.user == None:
         return render_template('login.html')
     form = UserCreationForm()
-    return render_template('create_user.html', title='Create User', form=form, api=api_url, sessionUser=g.user)
+    if g.user.usertype == 'administrator':
+        return render_template('create_user.html', title='Create User', form=form, api=api_url, sessionUser=g.user)
+    else: 
+        return render_template("access_denied.html",title='Access Denied', sessionUser=g.user)
 
 @app.route("/new_account/", methods=['GET', 'POST'])
 def NewAccount():
