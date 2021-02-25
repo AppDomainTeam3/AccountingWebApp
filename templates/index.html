@@ -22,14 +22,19 @@
             {% endwith %}
         </div>
 
-<h1>Hello, {{ g.user.username }}!</h1>
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container jumbocontent">
+        <h1 class="display-4">Hello, {{ g.user.username }}!</h1>
+        <p class="lead">Welcome to Finantec Tools, a simple solution to all your complex accounting needs</p>
+        <hr class="my-4">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+          Launch Calendar
+        </button>
+      </div>
+    </div>
 
 <div class="container float-left">
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
-    Launch Calendar
-  </button>
-  
   <!-- Modal -->
   <div class="modal fade modal-lg" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -17,7 +17,7 @@ def populateAccountsListByUserID(user_id, api_url):
                                 category=accountDict['Category'],
                                 subcategory=accountDict['Subcategory'],
                                 balance=accountDict['Balance'],
-                                accountCreationDate=accountDict['AccountCreationDate'],
+                                accountCreationDate=accountDict['CreationDate'],
                                 accountOrder=accountDict['AccountOrder'],
                                 statement=accountDict['Statement'],
                                 comment=accountDict['Comment'],
@@ -37,12 +37,21 @@ def populateAccountByAccountNumber(account_number, api_url):
                       category=accountDict['Category'],
                       subcategory=accountDict['Subcategory'],
                       balance=accountDict['Balance'],
-                      accountCreationDate=accountDict['AccountCreationDate'],
+                      accountCreationDate=accountDict['CreationDate'],
                       accountOrder=accountDict['AccountOrder'],
                       statement=accountDict['Statement'],
                       comment=accountDict['Comment'],
                       isActive=accountDict['IsActive'])
     return account
+
+def populateEventsListByEndpoint(endpoint, api_url):
+    response = requests.get(api_url + endpoint)
+    if response.status_code == 404:
+        return None
+    eventList = []
+    for event in response.json():
+        eventList.append(event)
+    return eventList
 
 def updateUserList(users, api_url):
     response = requests.get(f"{api_url}/users")
@@ -64,3 +73,9 @@ def updateUserList(users, api_url):
                           failedLoginAttempts = userDict['failed_login_attempts'],
                           passwordExpirationDate = userDict['password_expiration_date']))
     return users
+
+def getUserEditStatus(user, user_id):
+    canEdit = False
+    if user.usertype == 'administrator' or user.id == user_id:
+        canEdit = True
+    return canEdit

@@ -3,30 +3,147 @@
   {%block title%} {{title}} {%endblock%}
 
     {%block content%}
-
-      <div class= "container float-left">
-        <h1 class="pt-2">{{ userData.username }}'s Profile</h1> 
-        {% if canEdit %}
-          <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
-        {% endif %}
-        <div id='profileAvatar'>
-          <img src={{ userData.avatarlink }} height="240">  
+    <div class="container-fluid">
+      <div class="row">
+        <div class= "col" style="max-width: fit-content;">
+          <h1 class="pt-2">{{ userData.username }}'s Profile</h1> 
+          {% if canEdit %}
+            <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
+          {% endif %}
+          <div id='profileAvatar' style="border-style: solid; border-color:rgb(0, 0, 0); width: fit-content;">
+            <img src={{ userData.avatarlink }} height="240">  
+          </div>
+          {% if userData.isActive.lower() == 'true' %}
+            <p>Status: Active</p>
+          {% elif userData.isActive.lower() == 'false' %}
+            <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
+          {% endif %}
+          <p>{{ userData.firstname }} {{ userData.lastname }} <span>  </span> <a href="/user-mail" <span class="fas fa-envelope" data-toggle="tooltip" data-placement="right" title="Email User"> </span> </a>       </p>
+          <p>{{ userData.email }}</p>
+          <p>{{ userData.usertype }}</p>
         </div>
-        {% if userData.isActive.lower() == 'true' %}
-          <p>Status: Active</p>
-        {% elif userData.isActive.lower() == 'false' %}
-          <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
-        {% endif %}
-        <p>{{ userData.firstname }} {{ userData.lastname }} <span> </span><a href="/user-mail"><i class="fas fa-envelope"></i></a></p>
-        <p>{{ userData.email }}</p>
-        <p>{{ userData.usertype }}</p>
-        <p><h3 class="pt-2">Accounts:</h1></p>
-        {% for account in accounts %}
-          <a href="{{ url }}/accounts/{{ account.AccountNumber }}"><p id="{{ account.AccountNumber }}">{{ account.AccountName }} | Acc Number: {{ account.AccountNumber }} | Acc Desc: {{ account.AccountDesc }} | 
-            Normal Side{{ account.NormalSide }} | Category: {{ account.Category }} | Subcategory: {{ account.Subcategory }} | Balance: ${{ account.Balance }} | 
-            Creation Date: {{ account.AccountCreationDate }} | Acc Order: {{ account.AccountOrder }} | Statement: {{ account.Statement }} |
-            Comment: {{ account.Comment }} | Active: {{ account.IsActive }}</p></a>
-        {% endfor %}
+        <div class= "col" style="padding: 15px;">
+          <table class="table table-striped table-bordered ledgerDataTable" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th id="ledgerHeader" colspan="12">Click on an account to view ledger</th>
+                </tr>
+                <tr>
+                    <th>Transaction</th>
+                    <th>Amount</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+        </table>
+        </div>
       </div>
+    </div>
+    <div class="container-fluid" style="padding-bottom: 5px;">
+          <h3 class="pt-2">Accounts:</h1>
+          <table class="table table-bordered mydatatable hover" style="width: 100%">
+              <thead>
+                  <tr>
+                      <th colspan="6"> Account Details</th>
+                      <th colspan="6"> Account Status</th>
+                  </tr>
+                  <tr>
+                      <th>Name</th>
+                      <th>Number</th>
+                      <th>Description</th>
+                      <th>Normal Side</th>
+                      <th>Category</th>
+                      <th>Subcategory</th>
+                      <th>Balance</th>
+                      <th>Creation Date</th>
+                      <th>AccountOrder</th>
+                      <th>Statement</th>
+                      <th>Comment</th>
+                      <th>Active Status</th>
+                      
+                  </tr>
+              </thead>
+  
+              <tbody>
+              {% if accounts %}
+                {% for account in accounts %}
+                    <tr style="cursor: pointer;">
+                        <td>{{ account.accountName}}</td>
+                        <td>{{ account.accountNumber}}</td>
+                        <td>{{ account.accountDesc }}</td>
+                        <td>{{ account.normalSide }}</td>
+                        <td>{{ account.category }}</td>
+                        <td>{{ account.subcategory }}</td>
+                        <td>${{ "{:,.2f}".format(account.balance) }}</td>
+                        <td>{{ account.accountCreationDate }}</td>
+                        <td>{{ account.accountOrder }}</td>
+                        <td>{{ account.statement }}</td>
+                        <td>{{ account.comment }}</td>
+                        <td>{{ account.isActive }}</td>
+                    </tr>
+                {% endfor %}
+              {% endif %}
+              </tbody>
+
+          </table>
+        </div>
+
+
+        
+
+    {%endblock%}
+
+    {%block script%}
+
+    <script>
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+    </script>
+
+    <script>
+      $('.mydatatable').DataTable({
+          order: [[3,'desc']],
+          pagingType: 'full_numbers',
+          "columnDefs": [
+            { "width": "5%", "targets": 6 },
+            { "width": "2%", "targets": 8 }
+          ]
+      });
+      $('.ledgerDataTable').DataTable({
+          order: [[2,'desc']],
+          scrollY: "225px",
+          scrollCollapse: true,
+          paging: false,
+          "columnDefs": [
+            { "width": "65%", "targets": 0 },
+          ]
+      });
+      $('.mydatatable').on('click', 'tbody tr', function() {
+        var table = $('.mydatatable').DataTable();
+        var ledger = $('.ledgerDataTable').DataTable();
+        var balanceEvents = {{ balanceEvents|safe }};
+        ledger.clear().draw();
+
+        var clickedAccountNumber = table.row(this).data()[accountNumberCol = 1];
+
+        balanceEventsLength = balanceEvents.length;
+        let i;
+        let balanceEventsForClickedAccount = [];
+        for (i = 0; i < balanceEventsLength; i++){
+          if (balanceEvents[i]['AccountNumber'] == clickedAccountNumber){
+            balanceEventsForClickedAccount.push(balanceEvents[i]);
+          }
+        }
+        balanceEventsLength = balanceEventsForClickedAccount.length
+        document.getElementById("ledgerHeader").innerHTML = "Account " + clickedAccountNumber + " ledger";
+        for (i = 0; i < balanceEventsLength; i++){
+          ledger.row.add([
+            balanceEventsForClickedAccount[i]['Event'],
+            '$' + Number(balanceEventsForClickedAccount[i]['Amount']).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            balanceEventsForClickedAccount[i]['Timestamp'],
+          ]).draw();
+        }
+      })
+    </script>
 
     {%endblock%}

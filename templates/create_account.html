@@ -7,10 +7,15 @@
         <div class= "container float-left">
             <h1 class="pt-2">Open Account</h1>
             <form id="AccountCreationForm" action="" method="POST">
-                {% if sessionUser.usertype == 'administrator' %}
+                {% if canEdit %}
                 <p>
                     {{ form.accountHolderUsername.label }}<br>
-                    {{ form.accountHolderUsername(size=16) }}<br>
+                    {{ form.accountHolderUsername(size=16, value=sessionUser.username) }}<br>
+                </p>
+                {% else %}
+                <p>
+                    {{ form.accountHolderUsername.label }}<br>
+                    {{ form.accountHolderUsername(size=16, value=sessionUser.username, disabled=True) }}<br>
                 </p>
                 {% endif %}
                 <p>
@@ -45,18 +50,24 @@
     <script id = "AccountCreationForm">
     $('#AccountCreationForm').submit(function(e){
         e.preventDefault();
+        $(':disabled').each(function(e) {
+            $(this).removeAttr('disabled');
+        })
         var form_tag = document.getElementById("AccountCreationForm")
         $.ajax({
             url: '{{ api }}/accounts/create/{{ sessionUser.username }}',
             type: 'post',
-            data:$('#AccountCreationForm').serialize(),
+            data: { 
+                form: $('#AccountCreationForm').serialize(),
+                sessionUserID: '{{ sessionUser.id }}'
+            }
         })
         .done(function(response){
-            if (response['status'] !== 404){
-                alert(response['message'])
-                window.location.href = "/";
-            }
-            else { alert(response['message']) }
+            alert(response['message'])
+            window.location.href = "/";
+        })
+        .fail(function(response){
+            alert(response.responseJSON['message'])
         });
     });
     </script>

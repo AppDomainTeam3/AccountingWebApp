@@ -1,4 +1,4 @@
-{% if sessionUser.usertype == 'administrator' %}
+
 {% extends 'base.html' %}
 
   {%block title%} {{title}} {%endblock%}
@@ -6,7 +6,7 @@
     {%block content%}
 
         <div class= "container float-left">
-            <h1 class="pt-2"> Admin Email System </h1>
+            <h1 class="pt-2"> Internal Email System </h1>
             <form id ="AdminEmailForm" action="{{url_for('send_message')}}" method="POST">
                 <p>
                     {{ form.username.label }}<br>
@@ -26,6 +26,3 @@
 
     {%endblock%}
 
-{% else %}
-    <html>You are not authorized to edit this user.</html>
-{% endif %}
