@@ -167,10 +167,10 @@ def UserProfile(user_id):
         return render_template('error.html', user=g.user)
     updataUserSessionData()
     user = users[user_id]
-    response = requests.get(f"{api_url}/users/{user_id}/accounts")
     accounts = populateAccountsListByUserID(user_id, api_url)
+    balanceEvents = populateEventsListByEndpoint(f"/events/{user.id}/balance", api_url)
     canEdit = getUserEditStatus(g.user, user_id)
-    return render_template('profile.html',  title = 'User Profile Page',userData=users[user_id], accounts=accounts, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
+    return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, balanceEvents=balanceEvents, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
 
 @app.route("/accounts")
@@ -188,7 +188,7 @@ def AccountsList():
                 accounts.append(entry)
     
     
-    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
+    return render_template('chart_of_accounts.html', sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts)
 
 @app.route("/events")
 def EventLog():
