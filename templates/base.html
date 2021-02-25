@@ -56,7 +56,17 @@
             <span class="navbar-text">Admin:</span>
             <a class="nav-link" href="/users/expired_passwords">Expired Passwords</a>
             <a class="nav-link" href="/add-user">Create User</a>
-            <a class="nav-link" href="/user-mail">Admin Mail</a>
+            <a class="nav-link" href="/user-mail">System Email</a>
+            {% endif %}
+
+            {% if sessionUser.usertype == 'manager' %}
+            <span class="navbar-text">Manager:</span>
+            <a class="nav-link" href="/user-mail">System Email</a>
+            {% endif %}
+
+            {% if sessionUser.usertype == 'regular_user' %}
+            <span class="navbar-text">Accountant:</span>
+            <a class="nav-link" href="/user-mail">System Email</a>
             {% endif %}
 
             <h3 id="helpIcon" data-toggle="modal" data-target="#myModal">&nbsp;&nbsp;&nbsp;<img src ={{ url_for('static', filename='question-square.svg') }} data-placement="right" title="Help"></h3>
@@ -70,7 +80,7 @@
                         <span aria-hidden="true">&times;</span>
                       </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" id="modal-body1">
                       
                       <div class="accordion" id="helpAccordion">
                         <div class="card">
@@ -105,6 +115,7 @@
                             <div class="card-body">
                               <p> <b>View Profile: </b> To view your user profile you can either click on your username, profile avatar, and/or the profile link in the navbar.</p>
                               <p> <b>Update password: </b> To change your password navigate to your profile page and select "edit profile". Next, select "edit password" and enter the approiate requested information.</p>
+                              <p> <b>Open Account: </b> By selecting "open account", located in the navbar, any user will be able to open an account in their name.</p>
                             </div>
                           </div>
                         </div>
@@ -112,13 +123,13 @@
                           <div class="card-header" id="headingThree">
                             <h5 class="mb-0">
                               <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                TBA
+                                Accountant & Manager Functions
                               </button>
                             </h5>
                           </div>
                           <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
                             <div class="card-body">
-                              <p> <b>To be added: yer yer eyr</b>  </p>
+                              <p> <b>Access to administator funcitons</b>Accountants and Managers will be able to perform the same functions as an administrator excluding adding, editing, and deactivating accounts.</p>
                             </div>
                           </div>
                         </div>
@@ -143,9 +154,9 @@
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
-
+  <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
+  
   {%block script%}
   <!--Scripts from child templates-->
   {%endblock%}

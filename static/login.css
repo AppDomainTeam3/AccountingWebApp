@@ -8,7 +8,7 @@ body{
     background:#f3f3f3;
 }
 
-.row{
+#loginRow{
     background:white;
     border-radius: 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
@@ -80,3 +80,15 @@ color:blanchedalmond;
     height: 100%;
     right: 50px;
 }
+.jumbocontent {
+    text-align:left;
+    padding-left: 0;
+    margin-left: 0;
+    position: relative;
+    left:20px;
+}
+#modal-body1{
+    height: 800px;
+    overflow-y: auto;
+}
+
