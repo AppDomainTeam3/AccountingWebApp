@@ -265,7 +265,8 @@ def CreateAccount():
     if g.user == None:
         return render_template('login.html')
     form = AccountCreationForm()
-    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user)
+    canEdit = True if g.user.usertype == 'administrator' else False
+    return render_template('create_account.html', title='Open Account', form=form, api=api_url, sessionUser=g.user, canEdit=canEdit)
 
 @app.route("/accounts/<int:account_number>", methods=['GET', 'POST'])
 def AccountOverview(account_number):
