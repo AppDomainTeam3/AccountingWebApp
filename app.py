@@ -182,17 +182,14 @@ def UserProfile(user_id):
 def AccountsList():
     if g.user == None:
         return render_template('login.html')
+    response = requests.get(f"{api_url}/accounts")
+    if response.status_code == 404:
+        return render_template('error.html', sessionUser=g.user)
     updataUserSessionData()
-    
     accounts = []
-    userCount = int(requests.get(f"{api_url}/users/count").text)
-    for user_id in range(userCount):
-        response = requests.get(f"{api_url}/users/{user_id}/accounts")
-        if response.status_code != 404:
-            for entry in response.json():
-                accounts.append(entry)
-    
-    
+    if response.status_code != 404:
+        for entry in response.json():
+            accounts.append(entry)
     return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
 
 @app.route("/events")
