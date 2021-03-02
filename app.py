@@ -188,7 +188,7 @@ def AccountsList():
     if response.status_code != 404:
         for entry in response.json():
             accounts.append(entry)
-    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
+    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts, app_url=app_url)
 
 @app.route("/events")
 def EventLog():
@@ -300,6 +300,10 @@ def ForgotPassword():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('error.html', sessionUser=g.user), 404
+
+@app.route("/401")
+def unauthorized():
+    return render_template('unauthorized.html', sessionUser=g.user)
 
 if __name__ == "__main__":
     app.run(debug=True)
