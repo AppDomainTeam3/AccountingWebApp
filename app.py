@@ -6,7 +6,7 @@ import requests
 
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
-from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
+from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -175,7 +175,6 @@ def UserProfile(user_id):
     canEdit = getUserEditStatus(g.user, user_id)
     return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, balanceEvents=balanceEvents, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
-
 @app.route("/accounts")
 def AccountsList():
     if g.user == None:
@@ -291,6 +290,13 @@ def EditAccount(account_number):
     account = populateAccountByAccountNumber(account_number, api_url)
     form = AccountEditForm()
     return render_template('edit_account.html', title='Edit Account', form=form, api=api_url, account=account, sessionUser=g.user)
+
+@app.route("/journals/create", methods=['GET', 'POST'])
+def CreateJournalEntry():
+    if g.user == None:
+        return render_template('login.html')
+    form = JournalEntryForm()
+    return render_template('create_journal_entry.html', title='Create Journal Entry', form=form, api=api_url, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():

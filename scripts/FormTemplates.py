@@ -33,6 +33,12 @@ class AccountEditForm(FlaskForm):
     comment = StringField('Comment', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
+class JournalEntryForm(FlaskForm):
+    AccountNumber = StringField('Account Number', validators=[DataRequired('field is required.')])
+    Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')])
+    Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
 class UserPasswordChangeForm(FlaskForm):
     currentPassword = StringField('Current Password', validators=[DataRequired('field is required.')])
     newPassword = StringField('New Password', validators=[DataRequired('field is required.')])
