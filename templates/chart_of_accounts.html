@@ -42,7 +42,7 @@
                     {% else %}
                         <td>{{ account.AccountName }}</td>
                     {% endif %}
-                    <td>{{ account.AccountNumber}}</td>
+                    <td><a href="/user-mail?userID={{ account.id }}" <span class="fas fa-envelope" data-placement="right" title="Email User" /></a> {{ account.AccountNumber}}</td>
                     <td>{{ account.AccountDesc }}</td>
                     <td>{{ account.NormalSide }}</td>
                     <td>{{ account.Category }}</td>
