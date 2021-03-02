@@ -536,6 +536,12 @@ class CreateJournalEntry(Resource):
         except Exception as e:
             print(e)
             return Helper.CustomResponse(500, 'SQL Error')
+
+        userID = response.json()['id']
+        message = f"Journal Entry Created"
+        data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Amount': 0, 'Event': message}
+        requests.post(f"{api_url}/events/create", json=data)
+
         return Helper.CustomResponse(200, 'Entry Submitted!')
 
 class GetJournalCount(Resource):
