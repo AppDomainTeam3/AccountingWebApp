@@ -516,6 +516,39 @@ class GetEvents(Resource):
             abort(Helper.CustomResponse(404, 'no events found'))
         return a
 
+class CreateJournalEntry(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('form')
+        parser.add_argument('sessionUserID')
+        args = parser.parse_args()
+        formDict = Helper.ParseArgs(args['form'])
+        response = requests.get(f"{api_url}/accounts/{formDict['AccountNumber']}")
+        if response.status_code == 404:
+            abort(Helper.CustomResponse(404, 'Account number does not exist.'))
+        Journal_ID = requests.get(f"{api_url}/journals/count").json()
+        RequestorUserID = args['sessionUserID']
+        AccountName = requests.get(f"{api_url}/accounts/{formDict['AccountNumber']}").json()['AccountName']
+        Status = 'pending'
+        query = f"""INSERT INTO Journals VALUES ({Journal_ID}, {RequestorUserID}, '{AccountName}', {formDict['AccountNumber']}, '{Status}', '{formDict['Debits']}', '{formDict['Credits']}')"""
+        try:
+            engine.execute(query)
+        except Exception as e:
+            print(e)
+            return Helper.CustomResponse(500, 'SQL Error')
+        return Helper.CustomResponse(200, 'Entry Submitted!')
+
+class GetJournalCount(Resource):
+    def get(self):
+        query = "SELECT COUNT(Journal_ID) from Journals"
+        try:
+            resultProxy = engine.execute(query)
+        except Exception as e:
+            print(e)
+            return Helper.CustomResponse(500, 'SQL Error')
+        for rowProxy in resultProxy:
+            return rowProxy[0]
+
 # ENDPOINTS -----------------------------------------------------------------
 
 # GET
@@ -531,6 +564,7 @@ api.add_resource(GetEvents, "/events")
 api.add_resource(GetEventsByAccountNumber, "/events/<int:account_number>")
 api.add_resource(GetBalanceEventsByUserID, "/events/<int:user_id>/balance")
 api.add_resource(GetAllAccounts, "/accounts")
+api.add_resource(GetJournalCount, "/journals/count")
 
 # POST
 api.add_resource(CreateUser, "/users/create-user")
@@ -542,6 +576,6 @@ api.add_resource(CreateAccount, "/accounts/create/<string:username>")
 api.add_resource(EditAccount, "/accounts/<int:account_number>/edit")
 api.add_resource(ToggleAccountActiveStatus, "/accounts/<int:account_number>/toggle")
 api.add_resource(CreateEvent, "/events/create")
-
+api.add_resource(CreateJournalEntry, "/journals/create")
 if (__name__) == "__main__":
     app.run(host='127.0.0.2', debug=True)

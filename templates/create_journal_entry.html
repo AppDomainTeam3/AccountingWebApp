@@ -26,7 +26,6 @@
     {%endblock%}
 
     {%block script%}
-        <!-- Account Creation Script-->
         <script id = "JournalEntryForm">
         $('#JournalEntryForm').submit(function(e){
             e.preventDefault();
@@ -39,11 +38,11 @@
                 }
             })
             .done(function(response){
-                alert(response['message'])
+                alert(response.message);
                 window.location.href = "/";
             })
             .fail(function(response){
-                alert(response.responseJSON['message'])
+                alert(JSON.parse(response.responseText)['message']);
             });
         });
         </script>
