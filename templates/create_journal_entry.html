@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1 class="pt-2">Create Journal Entry</h1>
+            <form id="JournalEntryForm" action="" method="POST">
+                <p>
+                    {{ form.AccountNumber.label }}<br>
+                    {{ form.AccountNumber(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.Debits.label }}<br>
+                    {{ form.Debits(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.Credits.label }}<br>
+                    {{ form.Credits(size=16) }}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+
+    {%endblock%}
+
+    {%block script%}
+        <!-- Account Creation Script-->
+        <script id = "JournalEntryForm">
+        $('#JournalEntryForm').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                url: '{{ api }}/journals/create',
+                type: 'post',
+                data: { 
+                    form: $('#JournalEntryForm').serialize(),
+                    sessionUserID: '{{ sessionUser.id }}'
+                }
+            })
+            .done(function(response){
+                alert(response['message'])
+                window.location.href = "/";
+            })
+            .fail(function(response){
+                alert(response.responseJSON['message'])
+            });
+        });
+        </script>
+    {%endblock%}
+
+ 
+ 
+ 
