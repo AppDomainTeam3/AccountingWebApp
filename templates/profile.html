@@ -121,12 +121,21 @@
       $('.mydatatable').on('click', 'tbody tr', function() {
         var table = $('.mydatatable').DataTable();
         var ledger = $('.ledgerDataTable').DataTable();
-        var balanceEvents = {{ balanceEvents|safe }};
+        var balanceEvents, balanceEventsLength;
+        let temp = "{{ balanceEvents|safe }}";
+        if (temp === "None") {
+          balanceEvents = null;
+          balanceEventsLength = 0;
+        }
+        else {
+          balanceEvents = {{ balanceEvents|safe }};
+          balanceEventsLength = balanceEvents.length;
+        }
+        
         ledger.clear().draw();
 
         var clickedAccountNumber = table.row(this).data()[accountNumberCol = 1];
-
-        balanceEventsLength = balanceEvents.length;
+        
         let i;
         let balanceEventsForClickedAccount = [];
         for (i = 0; i < balanceEventsLength; i++){
