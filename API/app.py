@@ -550,19 +550,23 @@ class CreateJournalEntry(Resource):
 
 class JournalAction(Resource):
     def post(self):
-        action = request.args.get('action')
-        journal_ID = request.args.get('journal_id')
-        query = f"""UPDATE Journals SET Status = '{action}' WHERE Journal_ID = {journal_ID}"""
+        parser = reqparse.RequestParser()
+        parser.add_argument('action')
+        parser.add_argument('journal_id')
+        parser.add_argument('form')
+        parser.add_argument('sessionUserID')
+        args = parser.parse_args()
+        action = args['action']
+        journal_ID = args['journal_id']
+        formDict = Helper.ParseArgs(args['form'])
+        sessionUserID = args['sessionUserID']
+        query = f"""UPDATE Journals SET Status = '{action}', Message = '{formDict['message']}' WHERE Journal_ID = {journal_ID}"""
         try:
             engine.execute(query)
         except Exception as e:
             print(e)
             return Helper.CustomResponse(500, 'SQL Error')
 
-        # userID = response.json()['id']
-        # message = f"Journal Entry Created"
-        # data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Amount': 0, 'Event': message}
-        # requests.post(f"{api_url}/events/create", json=data)
         return Helper.CustomResponse(200, f"Journal Entry {action}")
 
 class GetJournals(Resource):

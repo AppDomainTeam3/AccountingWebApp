@@ -4,6 +4,10 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 
+class JournalActionForm(FlaskForm):
+    message = StringField('Message: ', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
 class UserCreationForm(FlaskForm):
     deactivate = DateField('Deactivate User until', format='%Y-%m-%d')
     username = StringField('Username', validators=[DataRequired('field is required.')])

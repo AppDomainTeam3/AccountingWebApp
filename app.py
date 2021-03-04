@@ -6,7 +6,7 @@ import requests
 
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus, populateJournalsListWithAllJournals
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
-from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm
+from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -189,12 +189,13 @@ def AccountsList():
             accounts.append(entry)
     return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts, app_url=app_url)
 
-@app.route("/journals")
+@app.route("/journals", methods=['GET','POST'])
 def journalList():
     if g.user == None:
         return render_template('login.html')
     journals = populateJournalsListWithAllJournals(api_url)
-    return render_template('chart_of_journals.html', sessionUser=g.user,title = 'Journal Entries', journals=journals, app_url=app_url, api_url=api_url)
+    form = JournalActionForm()
+    return render_template('chart_of_journals.html', form=form, sessionUser=g.user,title = 'Journal Entries', journals=journals, app_url=app_url, api_url=api_url)
 
 @app.route("/events")
 def EventLog():
