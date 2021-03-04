@@ -19,7 +19,11 @@
                     {{ form.Credits.label }}<br>
                     {{ form.Credits(size=16) }}<br>
                 </p>
-                <p>{{ form.submit() }}</p>
+                <p>
+                    {{ form.Comment.label }}<br>
+                    {{ form.Comment(size=32) }}<br>
+                </p>
+                <p>{{ form.Submit() }}</p>
             </form>
         </div>
 
@@ -39,7 +43,7 @@
             })
             .done(function(response){
                 alert(response.message);
-                window.location.href = "/";
+                window.location.href = "/journals";
             })
             .fail(function(response){
                 alert(JSON.parse(response.responseText)['message']);
