@@ -548,6 +548,39 @@ class CreateJournalEntry(Resource):
 
         return Helper.CustomResponse(200, 'Entry Submitted!')
 
+class JournalAction(Resource):
+    def post(self):
+        action = request.args.get('action')
+        journal_ID = request.args.get('journal_id')
+        query = f"""UPDATE Journals SET Status = '{action}' WHERE Journal_ID = {journal_ID}"""
+        try:
+            engine.execute(query)
+        except Exception as e:
+            print(e)
+            return Helper.CustomResponse(500, 'SQL Error')
+
+        # userID = response.json()['id']
+        # message = f"Journal Entry Created"
+        # data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Amount': 0, 'Event': message}
+        # requests.post(f"{api_url}/events/create", json=data)
+        return Helper.CustomResponse(200, f"Journal Entry {action}")
+
+class GetJournals(Resource):
+    @marshal_with(Marshal_Fields.journal_fields)
+    def get(self):
+        resultproxy = engine.execute(f"SELECT * FROM Journals")
+        d, a = {}, []
+        for rowproxy in resultproxy:
+            # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
+            for column, value in rowproxy.items():
+                # build up the dictionary
+                d = {**d, **{column: value.strip()}}
+                
+            a.append(d)
+        if not a:
+            abort(Helper.CustomResponse(404, 'no journals found'))
+        return a
+
 class GetJournalCount(Resource):
     def get(self):
         query = "SELECT COUNT(Journal_ID) from Journals"
@@ -574,6 +607,7 @@ api.add_resource(GetEvents, "/events")
 api.add_resource(GetEventsByAccountNumber, "/events/<int:account_number>")
 api.add_resource(GetBalanceEventsByUserID, "/events/<int:user_id>/balance")
 api.add_resource(GetAllAccounts, "/accounts")
+api.add_resource(GetJournals, "/journals")
 api.add_resource(GetJournalCount, "/journals/count")
 
 # POST
@@ -587,5 +621,6 @@ api.add_resource(EditAccount, "/accounts/<int:account_number>/edit")
 api.add_resource(ToggleAccountActiveStatus, "/accounts/<int:account_number>/toggle")
 api.add_resource(CreateEvent, "/events/create")
 api.add_resource(CreateJournalEntry, "/journals/create")
+api.add_resource(JournalAction, "/journals/action")
 if (__name__) == "__main__":
     app.run(host='127.0.0.2', debug=True)

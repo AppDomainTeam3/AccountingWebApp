@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+    {% if sessionUser.usertype == 'manager' %}
+        {% set manager = True %}
+    {% endif %}
+
+    <div class="container-fluid ml-1 mb-3 mt-3">
+        <table class="table table-striped table-bordered mydatatable" style="width: 100%">
+            <thead>
+                <tr>
+                    <th colspan="8">Journal Entries</th>
+                </tr>
+                <tr>
+                    <th>Journal ID</th>
+                    <th>RequestorUserID</th>
+                    <th>AccountName</th>
+                    <th>AccountNumber</th>
+                    <th>Status</th>
+                    <th>Message</th>
+                    <th>Debits</th>
+                    <th>Credits</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for journal in journals %}
+                <tr>
+                    <td>
+                        {% if manager %}
+                            <button id="Approve_Button#{{ journal.Journal_ID }}" onclick="approve({{ journal.Journal_ID }})">Approve</button>
+                            <button id="Deny_Button#{{ journal.Journal_ID }}" onclick="deny({{ journal.Journal_ID }})">Deny</button>
+                            {{ journal.Journal_ID }}
+                        {% else %}
+                            {{ journal.Journal_ID }}
+                        {% endif %}
+                    </td>
+                    <td>{{ journal.RequestorUserID }}</td>
+                    <td>{{ journal.AccountName }}</td>
+                    <td>{{ journal.AccountNumber }}</td>
+                    <td id='{{ journal.Journal_ID }}'>{{ journal.Status }}</td>
+                    <td>{{ journal.Message }}</td>
+                    <td>{{ journal.Debits }}</td>
+                    <td>{{ journal.Credits }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+            <tfoot>
+                <th>Journal ID</th>
+                <th>RequestorUserID</th>
+                <th>AccountName</th>
+                <th>AccountNumber</th>
+                <th>Status</th>
+                <th>Message</th>
+                <th>Debits</th>
+                <th>Credits</th>
+            </tfoot>
+        </table>
+    </div>
+    {%endblock%}
+
+
+    {%block script%}
+    <script src="../static/js/Helper.js"></script>
+    <script>
+        $('.mydatatable').DataTable({
+            order: [[0,'asc']],
+            pagingType: 'full_numbers'
+        });
+    </script>
+    
+    <script>
+        function approve(journalID){
+            var url = "{{ api_url }}/journals/action?action=Approved&journal_id=" + journalID;
+            let data = getQueryVariable("action");
+            let xhttp = new XMLHttpRequest();
+
+            xhttp.open("POST", url, true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById(journalID).innerHTML = "Approved";
+                }
+            };
+        }
+
+        function deny(journalID){
+            var url = "{{ api_url }}/journals/action?action=Denied&journal_id=" + journalID;
+            let data = getQueryVariable("action");
+            let xhttp = new XMLHttpRequest();
+
+            xhttp.open("POST", url, true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById(journalID).innerHTML = "Denied";
+                }
+            };
+        }
+    </script>
+    {%endblock%}

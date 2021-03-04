@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
-from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
+from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus, populateJournalsListWithAllJournals
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm
 
@@ -188,6 +188,13 @@ def AccountsList():
         for entry in response.json():
             accounts.append(entry)
     return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts, app_url=app_url)
+
+@app.route("/journals")
+def journalList():
+    if g.user == None:
+        return render_template('login.html')
+    journals = populateJournalsListWithAllJournals(api_url)
+    return render_template('chart_of_journals.html', sessionUser=g.user,title = 'Journal Entries', journals=journals, app_url=app_url, api_url=api_url)
 
 @app.route("/events")
 def EventLog():
