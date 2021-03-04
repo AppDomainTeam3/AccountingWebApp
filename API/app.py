@@ -530,7 +530,11 @@ class CreateJournalEntry(Resource):
         RequestorUserID = args['sessionUserID']
         AccountName = requests.get(f"{api_url}/accounts/{formDict['AccountNumber']}").json()['AccountName']
         Status = 'pending'
-        query = f"""INSERT INTO Journals VALUES ({Journal_ID}, {RequestorUserID}, '{AccountName}', {formDict['AccountNumber']}, '{Status}', '{formDict['Debits']}', '{formDict['Credits']}')"""
+        Message = formDict['Comment']
+        if (Message == ''):
+            Message = 'No Message provided'
+        query = f"""INSERT INTO Journals VALUES ({Journal_ID}, {RequestorUserID}, '{AccountName}', {formDict['AccountNumber']},
+                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{Message}')"""
         try:
             engine.execute(query)
         except Exception as e:
