@@ -34,10 +34,37 @@ mail = Mail(app)
 CORS(app)
 api = Api(app)
 
-class GetAllUsers(Resource):
+class GetUsers(Resource):
     @marshal_with(Marshal_Fields.resource_fields)
     def get(self):
-        resultproxy = engine.execute(f"SELECT * FROM Users ORDER BY id ASC")
+        ##### optional url query parameters
+        args = {
+            'id': request.args.get('id'),
+            'username': request.args.get('username'),
+            'usertype': request.args.get('usertype'),
+            'firstname': request.args.get('firstname'),
+            'lastname': request.args.get('lastname'),
+            'email': request.args.get('email'),
+            'is_active': request.args.get('is_active'),
+            'is_password_expired': request.args.get('is_password_expired'),
+            'password_expiration_date': request.args.get('password_expiration_date'),
+        }
+        
+        params = 'where '
+        for key, value in args.items():
+            if value != None:
+                params += f"{key} = '{value}' and "
+        if params == 'where ':
+            params = ''
+        else:
+            params = params[0: len(params)-4]
+        #####
+
+        query = f"SELECT * FROM Users {params} ORDER BY id ASC"
+        try:
+            resultproxy = engine.execute(query)
+        except:
+            return Helper.CustomResponse(500, 'SQL ERROR')
         d, a = {}, []
         for rowproxy in resultproxy:
             # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
@@ -599,7 +626,7 @@ class GetJournalCount(Resource):
 # ENDPOINTS -----------------------------------------------------------------
 
 # GET
-api.add_resource(GetAllUsers, "/users")
+api.add_resource(GetUsers, "/users")
 api.add_resource(GetUserByID, "/users/<int:user_id>")
 api.add_resource(GetUserByUsername, "/users/<string:username>")
 api.add_resource(GetUserCount, "/users/count")
