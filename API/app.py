@@ -211,7 +211,7 @@ class CreateUser(Resource):
                         INSERT INTO Passwords (id, password) VALUES ({id}, '{hashed_password}');""")
 
         message = f"User created"
-        data = {'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = {'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Event': message, 'Amount': 0}
         requests.post(f"{api_url}/events/create", json=data)
 
         msg = Message('Hello from appdomainteam3!', recipients=[email])
@@ -263,7 +263,7 @@ class CreateAccount(Resource):
             return Response("SQL Error", status=500, mimetype='application/json')
 
         message = f"Account created"
-        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': accountNumber, 'Amount': 0, 'Event': message }
+        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': accountNumber, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         email = user['email']
@@ -302,7 +302,7 @@ class EditAccount(Resource):
             return Response("SQL Error", status=500, mimetype='application/json')
 
         message = f"Account updated"
-        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': account_number, 'Amount': 0, 'Event': message }
+        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': account_number, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = Helper.CustomResponse(200, 'Account Edited Successfully!')
@@ -337,13 +337,13 @@ class ToggleAccountActiveStatus(Resource):
         if isActive == 'True':
             message = f"Account deactivated"
             custom_response = Helper.CustomResponse(200, message)
-            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Amount': 0, 'Event': message}
+            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Event': message, 'Amount': 0 }
             requests.post(f"{api_url}/events/create", json=data)
             return custom_response
         else:
             message = f"Account activated!"
             custom_response = Helper.CustomResponse(200, message)
-            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Amount': 0, 'Event': message}
+            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Event': message, 'Amount': 0 }
             requests.post(f"{api_url}/events/create", json=data)
             return custom_response
 
@@ -372,7 +372,7 @@ class ForgotPassword(Resource):
         engine.execute(f"""UPDATE Users SET hashed_password = '{password}' WHERE id = {id}; INSERT INTO Passwords (id, password) VALUES ({id}, '{password}');""")
 
         message = 'Used forgot password function'
-        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         return Response(f"Temporary password sent!", status=200, mimetype='application/json')
@@ -436,7 +436,7 @@ class UpdatePassword(Resource):
         engine.execute(f"""UPDATE Users SET hashed_password = '{newPassword}' WHERE id = {user_id}; INSERT INTO Passwords (id, password) VALUES ({user_id}, '{newPassword}');""")
 
         message = "User Password Updated"
-        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = Helper.CustomResponse(200, 'Password has been updated!')
@@ -469,7 +469,7 @@ class EditUser(Resource):
                            avatarlink = '{avatarlink}', is_active = '{active}', reactivate_user_date = '{reactivateUserDate}' WHERE id = '{user_id}';""")
 
         message = f"User profile updated"
-        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = Response(f"'{username}' updated\n" + json.dumps(args), status=200, mimetype='application/json')
@@ -481,6 +481,7 @@ class CreateEvent(Resource):
         creationDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         eventID = requests.get(f"{api_url}/events/count").json()
         query = f"""INSERT INTO Events VALUES ({eventID}, {content['SessionUserID']}, {content['UserID']}, {content['AccountNumber']}, '{content['Event']}', {content['Amount']}, '{creationDateTime}')"""
+        query = f"""INSERT INTO Events VALUES ({eventID}, {content['SessionUserID']}, {content['UserID']}, {content['AccountNumber']}, '{content['Event']}', '{creationDateTime}', {content['Amount']})"""
         try:
             engine.execute(query)
         except Exception as e:
@@ -570,7 +571,7 @@ class CreateJournalEntry(Resource):
 
         userID = response.json()['id']
         message = f"Journal Entry Created"
-        data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = requests.get(f"{api_url}/users?usertype=manager")
