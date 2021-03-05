@@ -557,11 +557,11 @@ class CreateJournalEntry(Resource):
         RequestorUserID = args['sessionUserID']
         AccountName = requests.get(f"{api_url}/accounts/{formDict['AccountNumber']}").json()['AccountName']
         Status = 'pending'
-        Message = formDict['Comment']
-        if (Message == ''):
-            Message = 'No Message provided'
+        message = formDict['Comment']
+        if (message == ''):
+            message = 'No Message provided'
         query = f"""INSERT INTO Journals VALUES ({Journal_ID}, {RequestorUserID}, '{AccountName}', {formDict['AccountNumber']},
-                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{Message}')"""
+                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}')"""
         try:
             engine.execute(query)
         except Exception as e:
@@ -572,6 +572,17 @@ class CreateJournalEntry(Resource):
         message = f"Journal Entry Created"
         data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Amount': 0, 'Event': message}
         requests.post(f"{api_url}/events/create", json=data)
+
+        response = requests.get(f"{api_url}/users?usertype=manager")
+        emailDictList = response.json()
+        emails = []
+        for entry in emailDictList:
+            emails.append(entry['email'])
+
+        for email in emails:
+            msg = Message('New Journal Created', recipients=[email])
+            msg.body = f"Hello,\nA new journal entry has been created and is awaiting your approval"
+            mail.send(msg)
 
         return Helper.CustomResponse(200, 'Entry Submitted!')
 
