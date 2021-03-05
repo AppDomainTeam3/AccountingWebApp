@@ -61,7 +61,10 @@ class GetUsers(Resource):
         #####
 
         query = f"SELECT * FROM Users {params} ORDER BY id ASC"
-        resultproxy = engine.execute(query)
+        try:
+            resultproxy = engine.execute(query)
+        except:
+            return Helper.CustomResponse(500, 'SQL ERROR')
         d, a = {}, []
         for rowproxy in resultproxy:
             # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
