@@ -38,7 +38,8 @@ class AccountEditForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class JournalEntryForm(FlaskForm):
-    AccountNumber = StringField('Account Number', validators=[DataRequired('field is required.')], render_kw={"placeholder": "12345678"})
+    SourceAccountNumber = StringField('Account Number', validators=[DataRequired('field is required.')], render_kw={"placeholder": "12345678"})
+    DestAccountNumber = StringField('Account Number', validators=[DataRequired('field is required.')], render_kw={"placeholder": "87654321"})
     Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Comment = StringField('Comment', render_kw={"placeholder": "optional comment"})

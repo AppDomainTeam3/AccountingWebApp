@@ -45,10 +45,12 @@ event_fields = {
 journal_fields = {
     'Journal_ID': fields.Integer,
     'RequestorUserID': fields.Integer,
-    'AccountName': fields.String,
-    'AccountNumber': fields.Integer,
+    'SourceAccountNumber': fields.Integer,
+    'DestAccountNumber': fields.Integer,
     'Status': fields.String,
     'Debits': fields.String,
     'Credits': fields.String,
-    'Message': fields.String
+    'Message': fields.String,
+    'SourceAccountName': fields.String,
+    'DestAccountName': fields.String
 }

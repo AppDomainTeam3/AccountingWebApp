@@ -24,17 +24,19 @@
         <table class="table table-striped table-bordered mydatatable" style="width: 100%">
             <thead>
                 <tr>
-                    <th colspan="9">Journal Entries</th>
+                    <th colspan="11">Journal Entries</th>
                 </tr>
                 <tr>
                     {% if manager %}
                     <th></th>
                     {% endif %}
+                    <th>Status</th>
                     <th>Journal ID</th>
                     <th>RequestorUserID</th>
-                    <th>AccountName</th>
-                    <th>AccountNumber</th>
-                    <th>Status</th>
+                    <th>SourceAccountName</th>
+                    <th>SourceAccountNumber</th>
+                    <th>DestAccountName</th>
+                    <th>DestAccountNumber</th>
                     <th>Message</th>
                     <th>Debits</th>
                     <th>Credits</th>
@@ -50,11 +52,13 @@
                         <button class="popup-with-form" href="#JournalActionForm" id="Deny_Button#{{ journal.Journal_ID }}" onclick="deny({{ journal.Journal_ID }})">Deny</button>
                     </td>
                     {% endif %}
+                    <td id='{{ journal.Journal_ID }}'>{{ journal.Status }}</td>
                     <td>{{ journal.Journal_ID }}</td>
                     <td>{{ journal.RequestorUserID }}</td>
-                    <td>{{ journal.AccountName }}</td>
-                    <td>{{ journal.AccountNumber }}</td>
-                    <td id='{{ journal.Journal_ID }}'>{{ journal.Status }}</td>
+                    <td>{{ journal.SourceAccountName }}</td>
+                    <td>{{ journal.SourceAccountNumber }}</td>
+                    <td>{{ journal.DestAccountName }}</td>
+                    <td>{{ journal.DestAccountNumber }}</td>
                     <td>{{ journal.Message }}</td>
                     <td>{{ journal.Debits }}</td>
                     <td>{{ journal.Credits }}</td>
@@ -66,11 +70,13 @@
                 {% if manager %}
                 <td></td>
                 {% endif %}
+                <th>Status</th>
                 <th>Journal ID</th>
                 <th>RequestorUserID</th>
-                <th>AccountName</th>
-                <th>AccountNumber</th>
-                <th>Status</th>
+                <th>SourceAccountName</th>
+                <th>SourceAccountNumber</th>
+                <th>DestAccountName</th>
+                <th>DestAccountNumber</th>
                 <th>Message</th>
                 <th>Debits</th>
                 <th>Credits</th>
@@ -91,7 +97,7 @@
     <link rel="stylesheet" href="../static/css/magnific-popup.css">
     <script>
         $('.mydatatable').DataTable({
-            order: [[1,'asc']],
+            order: [[2,'asc']],
             pagingType: 'full_numbers'
         });
 

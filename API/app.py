@@ -551,17 +551,21 @@ class CreateJournalEntry(Resource):
         parser.add_argument('sessionUserID')
         args = parser.parse_args()
         formDict = Helper.ParseArgs(args['form'])
-        response = requests.get(f"{api_url}/accounts/{formDict['AccountNumber']}")
-        if response.status_code == 404:
-            abort(Helper.CustomResponse(404, 'Account number does not exist.'))
-        Journal_ID = requests.get(f"{api_url}/journals/count").json()
+        response1 = requests.get(f"{api_url}/accounts/{formDict['SourceAccountNumber']}")
+        response2 = requests.get(f"{api_url}/accounts/{formDict['DestAccountNumber']}")
+        if response1.status_code == 404:
+            abort(Helper.CustomResponse(404, 'Source Account number does not exist.'))
+        if response2.status_code == 404:
+            abort(Helper.CustomResponse(404, 'Destination Account number does not exist.'))
+        if response1.json()['AccountNumber'] == response2.json()['AccountNumber']:
+            abort(Helper.CustomResponse(400, 'Account numbers cannot be the same.'))
+        Journal_ID = len(requests.get(f"{api_url}/journals").json())
         RequestorUserID = args['sessionUserID']
-        AccountName = requests.get(f"{api_url}/accounts/{formDict['AccountNumber']}").json()['AccountName']
         Status = 'pending'
         message = formDict['Comment']
         if (message == ''):
             message = 'No Message provided'
-        query = f"""INSERT INTO Journals VALUES ({Journal_ID}, {RequestorUserID}, '{AccountName}', {formDict['AccountNumber']},
+        query = f"""INSERT INTO JournalEntries VALUES ({Journal_ID}, {RequestorUserID}, {formDict['SourceAccountNumber']}, {formDict['DestAccountNumber']},
                                                 '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}')"""
         try:
             engine.execute(query)
@@ -569,21 +573,26 @@ class CreateJournalEntry(Resource):
             print(e)
             return Helper.CustomResponse(500, 'SQL Error')
 
-        userID = response.json()['id']
+        srcUserID = response1.json()['id']
+        destUserID = response2.json()['id']
         message = f"Journal Entry Created"
-        data = { 'SessionUserID': RequestorUserID, 'UserID': userID, 'AccountNumber': formDict['AccountNumber'], 'Event': message, 'Amount': 0 }
+        data = { 'SessionUserID': RequestorUserID, 'UserID': srcUserID, 'AccountNumber': formDict['SourceAccountNumber'], 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
-        response = requests.get(f"{api_url}/users?usertype=manager")
-        emailDictList = response.json()
-        emails = []
-        for entry in emailDictList:
-            emails.append(entry['email'])
+        message = f"Journal Entry Created"
+        data = { 'SessionUserID': RequestorUserID, 'UserID': destUserID, 'AccountNumber': formDict['DestAccountNumber'], 'Event': message, 'Amount': 0 }
+        requests.post(f"{api_url}/events/create", json=data)
 
-        for email in emails:
-            msg = Message('New Journal Created', recipients=[email])
-            msg.body = f"Hello,\nA new journal entry has been created and is awaiting your approval"
-            mail.send(msg)
+        # response = requests.get(f"{api_url}/users?usertype=manager")
+        # emailDictList = response.json()
+        # emails = []
+        # for entry in emailDictList:
+        #     emails.append(entry['email'])
+
+        # for email in emails:
+        #     msg = Message('New Journal Created', recipients=[email])
+        #     msg.body = f"Hello,\nA new journal entry has been created and is awaiting your approval"
+        #     mail.send(msg)
 
         return Helper.CustomResponse(200, 'Entry Submitted!')
 
@@ -599,41 +608,70 @@ class JournalAction(Resource):
         journal_ID = args['journal_id']
         formDict = Helper.ParseArgs(args['form'])
         sessionUserID = args['sessionUserID']
-        query = f"""UPDATE Journals SET Status = '{action}', Message = '{formDict['message']}' WHERE Journal_ID = {journal_ID}"""
+        query = f"""UPDATE JournalEntries SET Status = '{action}', Message = '{formDict['message']}' WHERE Journal_ID = {journal_ID}"""
+
         try:
             engine.execute(query)
         except Exception as e:
             print(e)
             return Helper.CustomResponse(500, 'SQL Error')
+        
+        journalEntryDict = requests.get(f"{api_url}/journals?Journal_ID={journal_ID}").json()
+        srcAccountDict = requests.get(f"{api_url}/accounts/{journalEntryDict[0]['SourceAccountNumber']}").json()
+        destAccountDict = requests.get(f"{api_url}/accounts/{journalEntryDict[0]['DestAccountNumber']}").json()
+        
+        message = f"Journal Entry {action}"
+        data = { 'SessionUserID': sessionUserID, 'UserID': srcAccountDict['id'], 'AccountNumber': srcAccountDict['AccountNumber'], 'Event': message, 'Amount': 0 }
+        requests.post(f"{api_url}/events/create", json=data)
+
+        message = f"Journal Entry {action}"
+        data = { 'SessionUserID': sessionUserID, 'UserID': destAccountDict['id'], 'AccountNumber': destAccountDict['AccountNumber'], 'Event': message, 'Amount': 0 }
+        requests.post(f"{api_url}/events/create", json=data)
 
         return Helper.CustomResponse(200, f"Journal Entry {action}")
 
 class GetJournals(Resource):
     @marshal_with(Marshal_Fields.journal_fields)
     def get(self):
-        resultproxy = engine.execute(f"SELECT * FROM Journals")
+        ##### optional url query parameters
+        args = {
+            'Journal_ID': request.args.get('Journal_ID'),
+            'RequestorUserID': request.args.get('RequestorUserID'),
+            'SourceAccountNumber': request.args.get('SourceAccountNumber'),
+            'DestAccountNumber': request.args.get('DestAccountNumber'),
+            'Status': request.args.get('Status'),
+            'Credits': request.args.get('Credits'),
+            'Message': request.args.get('Message'),
+        }
+        
+        params = 'where '
+        for key, value in args.items():
+            if value != None:
+                params += f"{key} = '{value}' and "
+        if params == 'where ':
+            params = ''
+        else:
+            params = params[0: len(params)-4]
+        #####
+
+        query = f"""select JournalEntries.*, src.AccountName as SourceAccountName, dest.AccountName as DestAccountName
+                    from JournalEntries
+                    inner join Accounts src on JournalEntries.SourceAccountNumber=src.AccountNumber
+                    inner join Accounts dest on JournalEntries.DestAccountNumber=dest.AccountNumber
+                    {params}"""
+
+        resultproxy = engine.execute(query)
         d, a = {}, []
         for rowproxy in resultproxy:
             # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
             for column, value in rowproxy.items():
                 # build up the dictionary
-                d = {**d, **{column: value.strip()}}
+                d = {**d, **{column: value}}
                 
             a.append(d)
         if not a:
             abort(Helper.CustomResponse(404, 'no journals found'))
         return a
-
-class GetJournalCount(Resource):
-    def get(self):
-        query = "SELECT COUNT(Journal_ID) from Journals"
-        try:
-            resultProxy = engine.execute(query)
-        except Exception as e:
-            print(e)
-            return Helper.CustomResponse(500, 'SQL Error')
-        for rowProxy in resultProxy:
-            return rowProxy[0]
 
 # ENDPOINTS -----------------------------------------------------------------
 
@@ -651,7 +689,6 @@ api.add_resource(GetEventsByAccountNumber, "/events/<int:account_number>")
 api.add_resource(GetBalanceEventsByUserID, "/events/<int:user_id>/balance")
 api.add_resource(GetAllAccounts, "/accounts")
 api.add_resource(GetJournals, "/journals")
-api.add_resource(GetJournalCount, "/journals/count")
 
 # POST
 api.add_resource(CreateUser, "/users/create-user")
