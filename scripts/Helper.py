@@ -12,8 +12,10 @@ def populateJournalsListWithAllJournals(api_url):
     for journalDict in journalList:
         journals.append(Journal(Journal_ID=journalDict['Journal_ID'],
                                 RequestorUserID=journalDict['RequestorUserID'],
-                                AccountName=journalDict['AccountName'],
-                                AccountNumber=journalDict['AccountNumber'],
+                                SourceAccountName=journalDict['SourceAccountName'],
+                                SourceAccountNumber=journalDict['SourceAccountNumber'],
+                                DestAccountName=journalDict['DestAccountName'],
+                                DestAccountNumber=journalDict['DestAccountNumber'],
                                 Status=journalDict['Status'],
                                 Debits=journalDict['Debits'],
                                 Credits=journalDict['Credits'],

@@ -8,8 +8,12 @@
             <h1 class="pt-2">Create Journal Entry</h1>
             <form id="JournalEntryForm" action="" method="POST">
                 <p>
-                    {{ form.AccountNumber.label }}<br>
-                    {{ form.AccountNumber(size=16) }}<br>
+                    {{ form.SourceAccountNumber.label }}<br>
+                    {{ form.SourceAccountNumber(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.DestAccountNumber.label }}<br>
+                    {{ form.DestAccountNumber(size=16) }}<br>
                 </p>
                 <p>
                     {{ form.Debits.label }}<br>
