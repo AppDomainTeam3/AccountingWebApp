@@ -41,3 +41,14 @@ event_fields = {
     'Amount': fields.Float,
     'Timestamp': fields.String
 }
+
+journal_fields = {
+    'Journal_ID': fields.Integer,
+    'RequestorUserID': fields.Integer,
+    'AccountName': fields.String,
+    'AccountNumber': fields.Integer,
+    'Status': fields.String,
+    'Debits': fields.String,
+    'Credits': fields.String,
+    'Message': fields.String
+}

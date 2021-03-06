@@ -1,6 +1,24 @@
+from scripts.Journal import Journal
 from scripts.Account import Account
 from scripts.User import User
 import requests
+
+def populateJournalsListWithAllJournals(api_url):
+    response = requests.get(f"{api_url}/journals")
+    journalList = response.json()
+    journals = []
+    if response.status_code == 404:
+        return None
+    for journalDict in journalList:
+        journals.append(Journal(Journal_ID=journalDict['Journal_ID'],
+                                RequestorUserID=journalDict['RequestorUserID'],
+                                AccountName=journalDict['AccountName'],
+                                AccountNumber=journalDict['AccountNumber'],
+                                Status=journalDict['Status'],
+                                Debits=journalDict['Debits'],
+                                Credits=journalDict['Credits'],
+                                Message=journalDict['Message']))
+    return journals
 
 def populateAccountsListByUserID(user_id, api_url):
     response = requests.get(f"{api_url}/users/{user_id}/accounts")

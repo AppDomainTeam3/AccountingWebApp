@@ -4,6 +4,10 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 
+class JournalActionForm(FlaskForm):
+    message = StringField('Message: ', validators=[DataRequired('field is required.')])
+    submit = SubmitField('Submit')
+
 class UserCreationForm(FlaskForm):
     deactivate = DateField('Deactivate User until', format='%Y-%m-%d')
     username = StringField('Username', validators=[DataRequired('field is required.')])
@@ -34,10 +38,11 @@ class AccountEditForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class JournalEntryForm(FlaskForm):
-    AccountNumber = StringField('Account Number', validators=[DataRequired('field is required.')])
-    Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')])
-    Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')])
-    submit = SubmitField('Submit')
+    AccountNumber = StringField('Account Number', validators=[DataRequired('field is required.')], render_kw={"placeholder": "12345678"})
+    Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
+    Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
+    Comment = StringField('Comment', render_kw={"placeholder": "optional comment"})
+    Submit = SubmitField('Submit')
 
 class UserPasswordChangeForm(FlaskForm):
     currentPassword = StringField('Current Password', validators=[DataRequired('field is required.')])
