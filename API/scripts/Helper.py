@@ -38,3 +38,12 @@ def ParseArgs(str):
         split = split.split("=")
         data.update({f"{split[0]}": f"{split[1]}"})
     return data
+
+def buildFloatArrayFromCommaDelimitedString(str):
+    str = str.split(',')
+    for i, value in enumerate(str):
+        str[i] = "".join(str[i].split())
+    arr = []
+    for entry in str:
+        arr.append(float(entry))
+    return arr

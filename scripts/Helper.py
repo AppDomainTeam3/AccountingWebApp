@@ -83,6 +83,12 @@ def populateEventsListByEndpoint(endpoint, api_url):
         eventList.append(event)
     return eventList
 
+def sumBalanceEvents(balanceEvents, api_url):
+    balance = 0.0
+    for event in balanceEvents:
+        balance += event['Amount']
+    return balance
+
 def updateUserList(users, api_url):
     response = requests.get(f"{api_url}/users")
     userList = response.json()

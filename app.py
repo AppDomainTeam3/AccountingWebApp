@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
+import scripts.Helper as Helper
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus, populateJournalsListWithAllJournals
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
