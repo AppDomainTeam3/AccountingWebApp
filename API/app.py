@@ -583,16 +583,16 @@ class CreateJournalEntry(Resource):
         data = { 'SessionUserID': RequestorUserID, 'UserID': destUserID, 'AccountNumber': formDict['DestAccountNumber'], 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
-        # response = requests.get(f"{api_url}/users?usertype=manager")
-        # emailDictList = response.json()
-        # emails = []
-        # for entry in emailDictList:
-        #     emails.append(entry['email'])
+        response = requests.get(f"{api_url}/users?usertype=manager")
+        emailDictList = response.json()
+        emails = []
+        for entry in emailDictList:
+            emails.append(entry['email'])
 
-        # for email in emails:
-        #     msg = Message('New Journal Created', recipients=[email])
-        #     msg.body = f"Hello,\nA new journal entry has been created and is awaiting your approval"
-        #     mail.send(msg)
+        for email in emails:
+            msg = Message('New Journal Created', recipients=[email])
+            msg.body = f"Hello,\nA new journal entry has been created and is awaiting your approval"
+            mail.send(msg)
 
         return Helper.CustomResponse(200, 'Entry Submitted!')
 
