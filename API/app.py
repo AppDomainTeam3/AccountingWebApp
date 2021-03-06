@@ -565,8 +565,9 @@ class CreateJournalEntry(Resource):
         message = formDict['Comment']
         if (message == ''):
             message = 'No Message provided'
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         query = f"""INSERT INTO JournalEntries VALUES ({Journal_ID}, {RequestorUserID}, {formDict['SourceAccountNumber']}, {formDict['DestAccountNumber']},
-                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}')"""
+                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}')"""
         try:
             engine.execute(query)
         except Exception as e:
@@ -642,6 +643,7 @@ class GetJournals(Resource):
             'Status': request.args.get('Status'),
             'Credits': request.args.get('Credits'),
             'Message': request.args.get('Message'),
+            'Timestamp': request.args.get('Timestamp')
         }
         
         params = 'where '

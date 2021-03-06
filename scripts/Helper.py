@@ -19,7 +19,8 @@ def populateJournalsListWithAllJournals(api_url):
                                 Status=journalDict['Status'],
                                 Debits=journalDict['Debits'],
                                 Credits=journalDict['Credits'],
-                                Message=journalDict['Message']))
+                                Message=journalDict['Message'],
+                                Timestamp=journalDict['Timestamp']))
     return journals
 
 def populateAccountsListByUserID(user_id, api_url):
