@@ -17,11 +17,20 @@ def populateJournalsListWithAllJournals(api_url):
                                 DestAccountName=journalDict['DestAccountName'],
                                 DestAccountNumber=journalDict['DestAccountNumber'],
                                 Status=journalDict['Status'],
-                                Debits=journalDict['Debits'],
-                                Credits=journalDict['Credits'],
+                                Debits=buildFloatArrayFromCommaDelimitedString(journalDict['Debits']),
+                                Credits=buildFloatArrayFromCommaDelimitedString(journalDict['Credits']),
                                 Message=journalDict['Message'],
                                 Timestamp=journalDict['Timestamp']))
     return journals
+
+def buildFloatArrayFromCommaDelimitedString(str):
+    str = str.split(',')
+    for i, value in enumerate(str):
+        str[i] = "".join(str[i].split())
+    arr = []
+    for entry in str:
+        arr.append(float(entry))
+    return arr
 
 def populateAccountsListByUserID(user_id, api_url):
     response = requests.get(f"{api_url}/users/{user_id}/accounts")
