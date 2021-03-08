@@ -4,7 +4,7 @@
 
     {%block content%}
         <div class= "container float-left">
-            <h1 class="pt-2">Account Overview</h1>
+            <h1 class="pt-2">Account Overview <a href="/user-mail" <span class="fas fa-envelope" data-placement="right" title="Email User" /></a></h1>
             <p id="{{ account.AccountNumber }}">{{ account.accountName }} | Acc Number: {{ account.accountNumber }} | Acc Desc: {{ account.accountDesc }} | 
                 Normal Side: {{ account.normalSide }} | Category: {{ account.category }} | Subcategory: {{ account.subcategory }} | Balance: ${{ account.balance }} | 
                 Creation Date: {{ account.accountCreationDate }} | Acc Order: {{ account.accountOrder }} | Statement: {{ account.statement }} |
