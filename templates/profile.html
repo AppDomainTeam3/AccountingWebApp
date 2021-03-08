@@ -26,12 +26,14 @@
           <table class="table table-striped table-bordered ledgerDataTable" style="width: 100%;">
             <thead>
                 <tr>
-                    <th id="ledgerHeader" colspan="12">Click on an account to view ledger</th>
+                  <th id="ledgerHeader" colspan="12">Click on an account to view ledger</th>
                 </tr>
                 <tr>
-                    <th>Amount</th>
-                    <th>Timestamp</th>
-                    <th>Transaction</th>
+                  <th>Timestamp</th>
+                  <th>Message</th>
+                  <th>Debit</th>
+                  <th>Credit</th>
+                  <th>Balance</th>
                 </tr>
             </thead>
         </table>
@@ -87,9 +89,6 @@
           </table>
         </div>
 
-
-        
-
     {%endblock%}
 
     {%block script%}
@@ -110,14 +109,16 @@
           ]
       });
       $('.ledgerDataTable').DataTable({
-          order: [[1,'desc']],
+          order: [[0,'desc']],
           scrollY: "225px",
           scrollCollapse: true,
           paging: false,
           "columnDefs": [
             { "width": "5%", "targets": 0 },
-            { "width": "1%", "targets": 1 },
-            { "width": "65%", "targets": 2 },
+            { "width": "65%", "targets": 1 },
+            { "width": "1%", "targets": 2 },
+            { "width": "1%", "targets": 3 },
+            { "width": "1%", "targets": 4 },
           ]
       });
       $('.mydatatable').on('click', 'tbody tr', function() {
@@ -148,18 +149,29 @@
         }
         journalEntriesLength = journalEntriesForClickedAccount.length
         document.getElementById("ledgerHeader").innerHTML = "Account " + clickedAccountNumber + " ledger | Balance: $" + accountBalances[clickedAccountNumber];
+        var balance = 0;
         for (i = 0; i < journalEntriesLength; i++){
           var sum = 0;
-          if (journalEntriesForClickedAccount[i].SourceAccountNumber == clickedAccountNumber) {
-            sum = -sumEntries(journalEntriesForClickedAccount[i].Debits);
+          var isCredit = journalEntriesForClickedAccount[i].SourceAccountNumber == clickedAccountNumber;
+          var debit = 0;
+          var credit = 0;
+          if (isCredit) {
+            sum = sumEntries(journalEntriesForClickedAccount[i].Credits);
+            credit = sum;
+            balance -= credit;
           }
           else {
             sum = sumEntries(journalEntriesForClickedAccount[i].Debits);
+            debit = sum;
+            balance += debit;
           }
+          
           ledger.row.add([
-            '$' + Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             journalEntriesForClickedAccount[i].Timestamp,
-            journalEntriesForClickedAccount[i].Message
+            journalEntriesForClickedAccount[i].Message,
+            '$' + Number(debit).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            '$' + Number(credit).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            '$' + Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2 }),
           ]).draw();
         }
       })
