@@ -559,7 +559,11 @@ class CreateJournalEntry(Resource):
             abort(Helper.CustomResponse(404, 'Destination Account number does not exist.'))
         if response1.json()['AccountNumber'] == response2.json()['AccountNumber']:
             abort(Helper.CustomResponse(400, 'Account numbers cannot be the same.'))
-        Journal_ID = len(requests.get(f"{api_url}/journals").json())
+        response = requests.get(f"{api_url}/journals")
+        if response.status_code == 404:
+            Journal_ID = 0
+        else:
+            Journal_ID = len(requests.get(f"{api_url}/journals").json())
         RequestorUserID = args['sessionUserID']
         Status = 'pending'
         message = formDict['Comment']
@@ -576,12 +580,17 @@ class CreateJournalEntry(Resource):
 
         srcUserID = response1.json()['id']
         destUserID = response2.json()['id']
+        creditsList = Helper.buildFloatArrayFromCommaDelimitedString(formDict['Credits'])
+        debitsList = Helper.buildFloatArrayFromCommaDelimitedString(formDict['Debits'])
+
+
+
         message = f"Journal Entry Created"
-        data = { 'SessionUserID': RequestorUserID, 'UserID': srcUserID, 'AccountNumber': formDict['SourceAccountNumber'], 'Event': message, 'Amount': 0 }
+        data = { 'SessionUserID': RequestorUserID, 'UserID': srcUserID, 'AccountNumber': formDict['SourceAccountNumber'], 'Event': message, 'Amount': -sum(creditsList) }
         requests.post(f"{api_url}/events/create", json=data)
 
         message = f"Journal Entry Created"
-        data = { 'SessionUserID': RequestorUserID, 'UserID': destUserID, 'AccountNumber': formDict['DestAccountNumber'], 'Event': message, 'Amount': 0 }
+        data = { 'SessionUserID': RequestorUserID, 'UserID': destUserID, 'AccountNumber': formDict['DestAccountNumber'], 'Event': message, 'Amount': sum(debitsList) }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = requests.get(f"{api_url}/users?usertype=manager")

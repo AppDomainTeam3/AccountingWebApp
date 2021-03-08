@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
-from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus, populateJournalsListWithAllJournals
+import scripts.Helper as Helper
+from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
 
@@ -171,9 +172,39 @@ def UserProfile(user_id):
     updataUserSessionData()
     user = users[user_id]
     accounts = populateAccountsListByUserID(user_id, api_url)
-    balanceEvents = populateEventsListByEndpoint(f"/events/{user.id}/balance", api_url)
+
+    # Ledger data
+    journalList = []
+    accountBalances = {}
+    for account in accounts:
+        approvedSrcJournals = Helper.populateJournalsList(api_url, f"?SourceAccountNumber={account.accountNumber}&Status=Approved")
+        approvedDestJournals = Helper.populateJournalsList(api_url, f"?DestAccountNumber={account.accountNumber}&Status=Approved")
+        balance = 0
+        if approvedSrcJournals is not None:
+            for journalEntry in approvedSrcJournals:
+                exists = False
+                for entry in journalList:
+                    if journalEntry.Journal_ID == entry.Journal_ID:
+                        exists = True
+                        break
+                if not exists:
+                    journalList.append(journalEntry)
+                balance -= sum(journalEntry.Debits)
+        if approvedDestJournals is not None:
+            for journalEntry in approvedDestJournals:
+                exists = False
+                for entry in journalList:
+                    if journalEntry.Journal_ID == entry.Journal_ID:
+                        exists = True
+                        break
+                if not exists:
+                    journalList.append(journalEntry)
+                balance += sum(journalEntry.Debits)
+        accountBalances.update({f"{account.accountNumber}": balance})
+    # end ledger data
+    
     canEdit = getUserEditStatus(g.user, user_id)
-    return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, balanceEvents=balanceEvents, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
+    return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, accountBalances=accountBalances, journalList=journalList, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
 @app.route("/accounts")
 def AccountsList():
@@ -193,7 +224,7 @@ def AccountsList():
 def journalList():
     if g.user == None:
         return render_template('login.html')
-    journals = populateJournalsListWithAllJournals(api_url)
+    journals = Helper.populateJournalsList(api_url)
     form = JournalActionForm()
     return render_template('chart_of_journals.html', form=form, sessionUser=g.user,title = 'Journal Entries', journals=journals, app_url=app_url, api_url=api_url)
 

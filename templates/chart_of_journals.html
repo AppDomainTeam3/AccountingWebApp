@@ -38,8 +38,7 @@
                     <th>DestAccountName</th>
                     <th>DestAccountNumber</th>
                     <th>Message</th>
-                    <th>Debits</th>
-                    <th>Credits</th>
+                    <th>Debits/Credits</th>
                     <th>Timestamp</th>
                 </tr>
             </thead>
@@ -61,8 +60,11 @@
                     <td>{{ journal.DestAccountName }}</td>
                     <td>{{ journal.DestAccountNumber }}</td>
                     <td>{{ journal.Message }}</td>
-                    <td>{{ journal.Debits }}</td>
-                    <td>{{ journal.Credits }}</td>
+                    <td>
+                        {% for debit in journal.Debits %}
+                            ${{ "{:,.2f}".format(debit) }} 
+                        {% endfor %}
+                    </td>
                     <th>{{ journal.Timestamp }}</th>
                 </tr>
             {% endfor %}
@@ -80,8 +82,7 @@
                 <th>DestAccountName</th>
                 <th>DestAccountNumber</th>
                 <th>Message</th>
-                <th>Debits</th>
-                <th>Credits</th>
+                <th>Debits/Credits</th>
                 <th>Timestamp</th>
             </tfoot>
         </table>
