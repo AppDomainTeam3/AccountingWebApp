@@ -4,15 +4,11 @@
 
     {%block content%}
 
-    {% if sessionUser.usertype == 'administrator' %}
-        {% set admin = True %}
-    {% endif %}
-
     <div class="container-fluid ml-1 mb-3 mt-3">
         <table class="table table-striped table-bordered mydatatable" style="width: 100%">
             <thead>
                 <tr>
-                    <th colspan="1" rowspan="2"> ID</th>
+                    <th colspan="1" rowspan="2">ID</th>
                     <th colspan="6"> Account Details</th>
                     <th colspan="6"> Account Status</th>
                 </tr>
@@ -37,11 +33,7 @@
             {% for account in accounts %}
                 <tr>
                     <td>{{ account.id }}</td>
-                    {% if admin %}
-                        <td><a href="{{ app_url }}/accounts/{{ account.AccountNumber }}">{{ account.AccountName }}</a></td>
-                    {% else %}
-                        <td>{{ account.AccountName }}</td>
-                    {% endif %}
+                    <td><a href="{{ app_url }}/accounts/{{ account.AccountNumber }}">{{ account.AccountName }}</a></td>
                     <td><a href="/user-mail?userID={{ account.id }}" <span class="fas fa-envelope" data-placement="right" title="Email User" /></a> {{ account.AccountNumber}}</td>
                     <td>{{ account.AccountDesc }}</td>
                     <td>{{ account.NormalSide }}</td>
