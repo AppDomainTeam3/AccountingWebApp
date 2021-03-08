@@ -559,7 +559,11 @@ class CreateJournalEntry(Resource):
             abort(Helper.CustomResponse(404, 'Destination Account number does not exist.'))
         if response1.json()['AccountNumber'] == response2.json()['AccountNumber']:
             abort(Helper.CustomResponse(400, 'Account numbers cannot be the same.'))
-        Journal_ID = len(requests.get(f"{api_url}/journals").json())
+        response = requests.get(f"{api_url}/journals")
+        if response.status_code == 404:
+            Journal_ID = 0
+        else:
+            Journal_ID = len(requests.get(f"{api_url}/journals").json())
         RequestorUserID = args['sessionUserID']
         Status = 'pending'
         message = formDict['Comment']

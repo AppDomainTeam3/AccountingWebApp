@@ -123,15 +123,16 @@
       $('.mydatatable').on('click', 'tbody tr', function() {
         var table = $('.mydatatable').DataTable();
         var ledger = $('.ledgerDataTable').DataTable();
-        var balanceEvents, balanceEventsLength;
-        let temp = "{{ balanceEvents|safe }}";
+        var journalEntries, journalEntriesLength;
+        var accountBalances = {{ accountBalances|safe }}
+        let temp = {{ journalList|safe }};
         if (temp === "None") {
-          balanceEvents = null;
-          balanceEventsLength = 0;
+          journalEntries = null;
+          journalEntriesLength = 0;
         }
         else {
-          balanceEvents = {{ balanceEvents|safe }};
-          balanceEventsLength = balanceEvents.length;
+          journalEntries = temp;
+          journalEntriesLength = journalEntries.length;
         }
         
         ledger.clear().draw();
@@ -139,24 +140,36 @@
         var clickedAccountNumber = table.row(this).data()[accountNumberCol = 1];
         
         let i;
-        let balanceEventsForClickedAccount = [];
-        let balanceForClickedAccount = 0.0;
-        for (i = 0; i < balanceEventsLength; i++){
-          if (balanceEvents[i]['AccountNumber'] == clickedAccountNumber){
-            balanceEventsForClickedAccount.push(balanceEvents[i]);
-            balanceForClickedAccount += balanceEvents[i]['Amount'];
+        let journalEntriesForClickedAccount = [];
+        for (i = 0; i < journalEntriesLength; i++){
+          if (journalEntries[i].SourceAccountNumber == clickedAccountNumber || journalEntries[i].DestAccountNumber == clickedAccountNumber) {
+            journalEntriesForClickedAccount.push(journalEntries[i]);
           }
         }
-        balanceEventsLength = balanceEventsForClickedAccount.length
-        document.getElementById("ledgerHeader").innerHTML = "Account " + clickedAccountNumber + " ledger | Balance: $" + balanceForClickedAccount;
-        for (i = 0; i < balanceEventsLength; i++){
+        journalEntriesLength = journalEntriesForClickedAccount.length
+        document.getElementById("ledgerHeader").innerHTML = "Account " + clickedAccountNumber + " ledger | Balance: $" + accountBalances[clickedAccountNumber];
+        for (i = 0; i < journalEntriesLength; i++){
+          var sum = 0;
+          if (journalEntriesForClickedAccount[i].SourceAccountNumber == clickedAccountNumber) {
+            sum = -sumEntries(journalEntriesForClickedAccount[i].Debits);
+          }
+          else {
+            sum = sumEntries(journalEntriesForClickedAccount[i].Debits);
+          }
           ledger.row.add([
-            '$' + Number(balanceEventsForClickedAccount[i]['Amount']).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-            balanceEventsForClickedAccount[i]['Timestamp'],
-            balanceEventsForClickedAccount[i]['Event']
+            '$' + Number(sum).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            journalEntriesForClickedAccount[i].Timestamp,
+            journalEntriesForClickedAccount[i].Message
           ]).draw();
         }
       })
+      function sumEntries(entries) {
+        let i, sum = 0;
+        for (i = 0; i < entries.length; i++) {
+          sum += entries[i];
+        }
+        return sum;
+      }
     </script>
 
     {%endblock%}

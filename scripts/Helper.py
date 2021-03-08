@@ -3,8 +3,8 @@ from scripts.Account import Account
 from scripts.User import User
 import requests
 
-def populateJournalsListWithAllJournals(api_url):
-    response = requests.get(f"{api_url}/journals")
+def populateJournalsList(api_url, url_params=""):
+    response = requests.get(f"{api_url}/journals{url_params}")
     journalList = response.json()
     journals = []
     if response.status_code == 404:
