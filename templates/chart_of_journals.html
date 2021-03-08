@@ -100,11 +100,34 @@
     <script src="../static/js/Helper.js"></script>
     <link rel="stylesheet" href="../static/css/magnific-popup.css">
     <script>
-        $('.mydatatable').DataTable({
-            order: [[2,'asc']],
-            pagingType: 'full_numbers'
-        });
 
+    $(document).ready(function() {
+    // Input in each footer cell
+        $('.mydatatable tfoot th').each( function () {
+            var title = $(this).text();
+            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        });
+    
+        var table = $('.mydatatable').DataTable({
+            order: [[1,'asc']],
+            pagingType: 'full_numbers',
+            initComplete: function () {
+                // Apply the search
+                this.api().columns().every( function () {
+                    var that = this;
+    
+                    $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                        if ( that.search() !== this.value ) {
+                            that
+                                .search( this.value )
+                                .draw();
+                        }
+                    } );
+                } );
+            }
+        });
+    });
+        
         var url = "{{ api_url }}/journals/action";
         
         function approve(journalID){
