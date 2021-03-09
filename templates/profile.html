@@ -152,6 +152,7 @@
       })
 
       function populateLedger(row, accountNumber) {
+        if (accountNumber == "") { accountNumber = null; }
         var journalEntries, journalEntriesLength;
         var accounts = {{ accounts|safe }};
         var accountBalances = {{ accountBalances|safe }}
@@ -166,11 +167,13 @@
         
         ledger.clear().draw();
 
-        if (accountNumber != "") {
-          var clickedAccountNumber = accountNumber;
-        } else if (row != null) {
+        if (row != null) {
           clickedAccountNumber = table.row(row).data()[accountNumberCol = 1];
-        } else {
+        }
+        else if (accountNumber != null) {
+          var clickedAccountNumber = accountNumber;
+        }
+        else {
           clickedAccountNumber = accounts[0]['accountNumber'];
         }
         
