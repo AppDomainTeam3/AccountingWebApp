@@ -122,8 +122,9 @@
             { "width": "1%", "targets": 4 },
           ]
       });
+
       $('.ledgerDataTable').on('click', 'tbody tr', function() {
-        var url = "http://127.0.0.1:5000/journals?Journal_ID=";
+        var url = "{{ url }}/journals?Journal_ID=";
         var ledger = $('.ledgerDataTable').DataTable();
         var clickedAccountNumber = ledger.row(this).data()[accountNumberCol = 2];
         url += clickedAccountNumber;
