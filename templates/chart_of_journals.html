@@ -100,12 +100,48 @@
     <script src="../static/js/Helper.js"></script>
     <link rel="stylesheet" href="../static/css/magnific-popup.css">
     <script>
+        let url_string = window.location.href;
+        var url = new URL(url_string);
+        params = {
+            Status: url.searchParams.get("Status"),
+            Journal_ID: url.searchParams.get("Journal_ID"),
+            RequestorUserID: url.searchParams.get("RequestorUserID"),
+            SourceAccountName: url.searchParams.get("SourceAccountName"),
+            SourceAccountNumber: url.searchParams.get("SourceAccountNumber"),
+            DestAccountName: url.searchParams.get("DestAccountName"),
+            DestAccountNumber: url.searchParams.get("DestAccountNumber"),
+            Message: url.searchParams.get("Message"),
+            Timestamp: url.searchParams.get("Timestamp")
+        };
+
+        //handle empty url parameters
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                if (params[key] == null) {
+                    params[key] = "";
+                }
+            }
+        }
+
         $('.mydatatable').DataTable({
             order: [[2,'asc']],
-            pagingType: 'full_numbers'
+            pagingType: 'full_numbers',
+            "searchCols": [
+                null,
+                { "search": params.Status },
+                { "search": params.Journal_ID },
+                { "search": params.RequestorUserID },
+                { "search": params.SourceAccountName },
+                { "search": params.SourceAccountNumber },
+                { "search": params.DestAccountName },
+                { "search": params.DestAccountNumber },
+                { "search": params.Message },
+                null,
+                { "search": params.Timestamp }
+            ]
         });
 
-        var url = "{{ api_url }}/journals/action";
+        url = "{{ api_url }}/journals/action";
         
         function approve(journalID){
             $('#JournalActionForm').submit(function(e){
