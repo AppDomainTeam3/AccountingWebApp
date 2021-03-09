@@ -31,6 +31,7 @@
                 <tr>
                   <th>Timestamp</th>
                   <th>Message</th>
+                  <th>PR</th>
                   <th>Debit</th>
                   <th>Credit</th>
                   <th>Balance</th>
@@ -169,6 +170,7 @@
           ledger.row.add([
             journalEntriesForClickedAccount[i].Timestamp,
             journalEntriesForClickedAccount[i].Message,
+            journalEntriesForClickedAccount[i].Journal_ID,
             '$' + Number(debit).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             '$' + Number(credit).toLocaleString(undefined, { minimumFractionDigits: 2 }),
             '$' + Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2 }),
