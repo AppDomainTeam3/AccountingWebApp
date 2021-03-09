@@ -122,6 +122,14 @@
             { "width": "1%", "targets": 4 },
           ]
       });
+      $('.ledgerDataTable').on('click', 'tbody tr', function() {
+        var url = "http://127.0.0.1:5000/journals?Journal_ID=";
+        var ledger = $('.ledgerDataTable').DataTable();
+        var clickedAccountNumber = ledger.row(this).data()[accountNumberCol = 2];
+        url += clickedAccountNumber;
+        window.location = url;
+      });
+
       $('.mydatatable').on('click', 'tbody tr', function() {
         var table = $('.mydatatable').DataTable();
         var ledger = $('.ledgerDataTable').DataTable();
