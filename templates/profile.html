@@ -23,12 +23,12 @@
           <p>{{ userData.usertype }}</p>
         </div>
         <div class= "col" style="padding: 15px;">
-          <table class="table table-striped table-bordered ledgerDataTable" style="width: 100%;">
+          <table class="table table-bordered ledgerDataTable hover" style="width: 100%;">
             <thead>
                 <tr>
                   <th id="ledgerHeader" colspan="12">Click on an account to view ledger</th>
                 </tr>
-                <tr>
+                <tr style="cursor: pointer;">
                   <th>Timestamp</th>
                   <th>Message</th>
                   <th>Debit</th>
@@ -121,6 +121,12 @@
             { "width": "1%", "targets": 4 },
           ]
       });
+
+    
+    $('.ledgerDataTable').on('click', 'tbody tr', function() {
+          window.location = '/journals';
+        });
+
       $('.mydatatable').on('click', 'tbody tr', function() {
         var table = $('.mydatatable').DataTable();
         var ledger = $('.ledgerDataTable').DataTable();
