@@ -101,8 +101,22 @@
     </script>
 
     <script>
+      let url_string = window.location.href;
+      var url = new URL(url_string);
+      params = {
+          AccountNumber: url.searchParams.get("AccountNumber")
+      };
+
+      //handle empty url parameters
+      for (var key in params) {
+          if (params.hasOwnProperty(key)) {
+              if (params[key] == null) {
+                  params[key] = "";
+              }
+          }
+      }
       $('.mydatatable').DataTable({
-          order: [[3,'desc']],
+          order: [[11,'desc']],
           pagingType: 'full_numbers',
           "columnDefs": [
             { "width": "5%", "targets": 6 },
@@ -122,33 +136,43 @@
             { "width": "1%", "targets": 4 },
           ]
       });
+      var ledger = $('.ledgerDataTable').DataTable();
+      var table = $('.mydatatable').DataTable();
+      populateLedger(null, params.AccountNumber);
 
       $('.ledgerDataTable').on('click', 'tbody tr', function() {
         var url = "{{ url }}/journals?Journal_ID=";
-        var ledger = $('.ledgerDataTable').DataTable();
         var clickedAccountNumber = ledger.row(this).data()[accountNumberCol = 2];
         url += clickedAccountNumber;
         window.location = url;
       });
 
       $('.mydatatable').on('click', 'tbody tr', function() {
-        var table = $('.mydatatable').DataTable();
-        var ledger = $('.ledgerDataTable').DataTable();
+        populateLedger(this);
+      })
+
+      function populateLedger(row, accountNumber) {
         var journalEntries, journalEntriesLength;
+        var accounts = {{ accounts|safe }};
         var accountBalances = {{ accountBalances|safe }}
         let temp = {{ journalList|safe }};
         if (temp === "None") {
           journalEntries = null;
           journalEntriesLength = 0;
-        }
-        else {
+        } else {
           journalEntries = temp;
           journalEntriesLength = journalEntries.length;
         }
         
         ledger.clear().draw();
 
-        var clickedAccountNumber = table.row(this).data()[accountNumberCol = 1];
+        if (accountNumber != "") {
+          var clickedAccountNumber = accountNumber;
+        } else if (row != null) {
+          clickedAccountNumber = table.row(row).data()[accountNumberCol = 1];
+        } else {
+          clickedAccountNumber = accounts[0]['accountNumber'];
+        }
         
         let i;
         let journalEntriesForClickedAccount = [];
@@ -185,7 +209,8 @@
             '$' + Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2 }),
           ]).draw();
         }
-      })
+      }
+
       function sumEntries(entries) {
         let i, sum = 0;
         for (i = 0; i < entries.length; i++) {
