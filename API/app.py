@@ -550,7 +550,7 @@ class CreateJournalEntry(Resource):
         parser.add_argument('form')
         parser.add_argument('sessionUserID')
         args = parser.parse_args()
-        formDict = Helper.ParseArgs(args['form'])
+        formDict = json.loads(args['form'])
         response1 = requests.get(f"{api_url}/accounts/{formDict['SourceAccountNumber']}")
         response2 = requests.get(f"{api_url}/accounts/{formDict['DestAccountNumber']}")
         if response1.status_code == 404:
@@ -582,8 +582,6 @@ class CreateJournalEntry(Resource):
         destUserID = response2.json()['id']
         creditsList = Helper.buildFloatArrayFromCommaDelimitedString(formDict['Credits'])
         debitsList = Helper.buildFloatArrayFromCommaDelimitedString(formDict['Debits'])
-
-
 
         message = f"Journal Entry Created"
         data = { 'SessionUserID': RequestorUserID, 'UserID': srcUserID, 'AccountNumber': formDict['SourceAccountNumber'], 'Event': message, 'Amount': -sum(creditsList) }

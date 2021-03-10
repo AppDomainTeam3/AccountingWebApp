@@ -37,21 +37,30 @@
         <script id = "JournalEntryForm">
         $('#JournalEntryForm').submit(function(e){
             e.preventDefault();
-            $.ajax({
-                url: '{{ api }}/journals/create',
-                type: 'post',
-                data: { 
-                    form: $('#JournalEntryForm').serialize(),
-                    sessionUserID: '{{ sessionUser.id }}'
-                }
-            })
-            .done(function(response){
-                alert(response.message);
-                window.location.href = "/journals";
-            })
-            .fail(function(response){
-                alert(JSON.parse(response.responseText)['message']);
-            });
+            let formData = new FormData(e.target);
+            formData = Object.fromEntries(formData.entries());
+            formData.Debits = formData.Debits.replace(/ /g, "");
+            formData.Credits = formData.Credits.replace(/ /g, "");
+            if (formData.Debits != formData.Credits) {
+                alert('Credits must equal debits.');
+            } else {
+                formData = JSON.stringify(formData);
+                $.ajax({
+                    url: '{{ api }}/journals/create',
+                    type: 'post',
+                    data: { 
+                        form: formData,
+                        sessionUserID: '{{ sessionUser.id }}'
+                    }
+                })
+                .done(function(response){
+                    alert(response.message);
+                    window.location.href = "/journals";
+                })
+                .fail(function(response){
+                    alert(JSON.parse(response.responseText)['message']);
+                });
+            }
         });
         </script>
     {%endblock%}
