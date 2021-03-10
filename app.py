@@ -176,31 +176,32 @@ def UserProfile(user_id):
     # Ledger data
     journalList = []
     accountBalances = {}
-    for account in accounts:
-        approvedSrcJournals = Helper.populateJournalsList(api_url, f"?SourceAccountNumber={account.accountNumber}&Status=Approved")
-        approvedDestJournals = Helper.populateJournalsList(api_url, f"?DestAccountNumber={account.accountNumber}&Status=Approved")
-        balance = 0
-        if approvedSrcJournals is not None:
-            for journalEntry in approvedSrcJournals:
-                exists = False
-                for entry in journalList:
-                    if journalEntry.Journal_ID == entry.Journal_ID:
-                        exists = True
-                        break
-                if not exists:
-                    journalList.append(journalEntry)
-                balance -= sum(journalEntry.Debits)
-        if approvedDestJournals is not None:
-            for journalEntry in approvedDestJournals:
-                exists = False
-                for entry in journalList:
-                    if journalEntry.Journal_ID == entry.Journal_ID:
-                        exists = True
-                        break
-                if not exists:
-                    journalList.append(journalEntry)
-                balance += sum(journalEntry.Debits)
-        accountBalances.update({f"{account.accountNumber}": balance})
+    if (accounts):
+        for account in accounts:
+            approvedSrcJournals = Helper.populateJournalsList(api_url, f"?SourceAccountNumber={account.accountNumber}&Status=Approved")
+            approvedDestJournals = Helper.populateJournalsList(api_url, f"?DestAccountNumber={account.accountNumber}&Status=Approved")
+            balance = 0
+            if approvedSrcJournals is not None:
+                for journalEntry in approvedSrcJournals:
+                    exists = False
+                    for entry in journalList:
+                        if journalEntry.Journal_ID == entry.Journal_ID:
+                            exists = True
+                            break
+                    if not exists:
+                        journalList.append(journalEntry)
+                    balance -= sum(journalEntry.Debits)
+            if approvedDestJournals is not None:
+                for journalEntry in approvedDestJournals:
+                    exists = False
+                    for entry in journalList:
+                        if journalEntry.Journal_ID == entry.Journal_ID:
+                            exists = True
+                            break
+                    if not exists:
+                        journalList.append(journalEntry)
+                    balance += sum(journalEntry.Debits)
+            accountBalances.update({f"{account.accountNumber}": balance})
     # end ledger data
     
     canEdit = getUserEditStatus(g.user, user_id)

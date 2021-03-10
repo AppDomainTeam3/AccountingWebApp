@@ -100,33 +100,69 @@
     <script src="../static/js/Helper.js"></script>
     <link rel="stylesheet" href="../static/css/magnific-popup.css">
     <script>
+        let url_string = window.location.href;
+        var url = new URL(url_string);
+        params = {
+            Status: url.searchParams.get("Status"),
+            Journal_ID: url.searchParams.get("Journal_ID"),
+            RequestorUserID: url.searchParams.get("RequestorUserID"),
+            SourceAccountName: url.searchParams.get("SourceAccountName"),
+            SourceAccountNumber: url.searchParams.get("SourceAccountNumber"),
+            DestAccountName: url.searchParams.get("DestAccountName"),
+            DestAccountNumber: url.searchParams.get("DestAccountNumber"),
+            Message: url.searchParams.get("Message"),
+            Timestamp: url.searchParams.get("Timestamp")
+        };
+
+        //handle empty url parameters
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                if (params[key] == null) {
+                    params[key] = "";
+                }
+            }
+        }
 
     $(document).ready(function() {
-    // Input in each footer cell
-        $('.mydatatable tfoot th').each( function () {
-            var title = $(this).text();
-            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-        });
-    
-        var table = $('.mydatatable').DataTable({
-            order: [[1,'asc']],
-            pagingType: 'full_numbers',
-            initComplete: function () {
-                // Apply the search
-                this.api().columns().every( function () {
-                    var that = this;
-    
-                    $( 'input', this.footer() ).on( 'keyup change clear', function () {
-                        if ( that.search() !== this.value ) {
-                            that
-                                .search( this.value )
-                                .draw();
-                        }
+        // Input in each footer cell
+            $('.mydatatable tfoot th').each( function () {
+                var title = $(this).text();
+                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            });
+        
+            var table = $('.mydatatable').DataTable({
+                order: [[1,'asc']],
+                pagingType: 'full_numbers',
+                "searchCols": [
+                null,
+                { "search": params.Status },
+                { "search": params.Journal_ID },
+                { "search": params.RequestorUserID },
+                { "search": params.SourceAccountName },
+                { "search": params.SourceAccountNumber },
+                { "search": params.DestAccountName },
+                { "search": params.DestAccountNumber },
+                { "search": params.Message },
+                null,
+                { "search": params.Timestamp }
+            ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                            if ( that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        } );
                     } );
-                } );
-            }
+                }
+            });
         });
-    });
+
         
         var url = "{{ api_url }}/journals/action";
         
