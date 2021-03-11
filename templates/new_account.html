@@ -52,9 +52,12 @@
                     var form_tag = document.getElementById("UserCreationForm")
                     var password = document.getElementById("password").value;
                     var error_message = CheckPassword(password)
+                    var errorPopup = document.getElementById("error-popup");
+                    var errorText = document.getElementById("error-text");
                     if (error_message !== "")
                     {
-                        alert(error_message)
+                        errorText.innerHTML = error_message;
+                        errorPopup.click();
                     }
                     else
                     {

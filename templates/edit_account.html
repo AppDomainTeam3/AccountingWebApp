@@ -45,9 +45,10 @@
 
 {%block script%}
     <!-- Account Creation Script-->
-    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script id = "AccountEditForm">
         var cateogory = document.getElementById("category")
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
         category.value = "{{ account.category }}"
         $('#AccountEditForm').submit(function(e){
             e.preventDefault();
@@ -61,12 +62,13 @@
                     userID: '{{ account.id }}'
                 }
             })
-            .done(function(response){
-                if (response['status'] !== 404){
-                    alert(response['message'])
-                    window.location.href = "/";
-                }
-                else { alert(response['message']) }
+            .done(function(response) {
+                alert(response['message'])
+                window.location.href = "/";
+            })
+            .fail(function(response) {
+                errorText.innerHTML =  JSON.parse(response.responseText)['message'];
+                errorPopup.click();
             });
         });
     </script>
