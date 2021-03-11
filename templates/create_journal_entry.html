@@ -3,6 +3,13 @@
   {%block title%} {{title}} {%endblock%}
 
     {%block content%}
+        <a id="error-popup" class="popup-with-zoom-anim" href="#small-dialog"></a>
+
+        <!-- dialog itself, mfp-hide class is required to make dialog hidden -->
+        <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+            <h1>Error</h1>
+            <p id="error-text" style="color: red;">You can't do that</p>
+        </div>
 
         <div class= "container float-left">
             <h1 class="pt-2">Create Journal Entry</h1>
@@ -34,15 +41,22 @@
     {%endblock%}
 
     {%block script%}
+        <script src="../static/js/jquery.magnific-popup.min.js"></script>
+        <link rel="stylesheet" href="../static/css/magnific-popup.css">
         <script id = "JournalEntryForm">
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
+
         $('#JournalEntryForm').submit(function(e){
+            
             e.preventDefault();
             let formData = new FormData(e.target);
             formData = Object.fromEntries(formData.entries());
             formData.Debits = formData.Debits.replace(/ /g, "");
             formData.Credits = formData.Credits.replace(/ /g, "");
             if (formData.Debits != formData.Credits) {
-                alert('Credits must equal debits.');
+                errorText.innerHTML = "Credits must equal debits.";
+                errorPopup.click();
             } else {
                 formData = JSON.stringify(formData);
                 $.ajax({
@@ -58,10 +72,29 @@
                     window.location.href = "/journals";
                 })
                 .fail(function(response){
-                    alert(JSON.parse(response.responseText)['message']);
+                    errorText.innerHTML = JSON.parse(response.responseText)['message'];
+                    errorPopup.click();
                 });
             }
         });
+
+        $(document).ready(function() {
+            $('.popup-with-zoom-anim').magnificPopup({
+                type: 'inline',
+
+                fixedContentPos: false,
+                fixedBgPos: true,
+
+                overflowY: 'auto',
+
+                closeBtnInside: true,
+                preloader: false,
+                
+                midClick: true,
+                removalDelay: 300,
+                mainClass: 'my-mfp-zoom-in'
+            });
+        })
         </script>
     {%endblock%}
 
