@@ -3,14 +3,6 @@
   {%block title%} {{title}} {%endblock%}
 
     {%block content%}
-        <a id="error-popup" class="popup-with-zoom-anim" href="#small-dialog"></a>
-
-        <!-- dialog itself, mfp-hide class is required to make dialog hidden -->
-        <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
-            <h1>Error</h1>
-            <p id="error-text" style="color: red;">You can't do that</p>
-        </div>
-
         <div class= "container float-left">
             <h1 class="pt-2">Create Journal Entry</h1>
             <form id="JournalEntryForm" action="" method="POST">
@@ -77,24 +69,6 @@
                 });
             }
         });
-
-        $(document).ready(function() {
-            $('.popup-with-zoom-anim').magnificPopup({
-                type: 'inline',
-
-                fixedContentPos: false,
-                fixedBgPos: true,
-
-                overflowY: 'auto',
-
-                closeBtnInside: true,
-                preloader: false,
-                
-                midClick: true,
-                removalDelay: 300,
-                mainClass: 'my-mfp-zoom-in'
-            });
-        })
         </script>
     {%endblock%}
 
