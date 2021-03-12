@@ -650,17 +650,25 @@ class GetJournals(Resource):
             'Status': request.args.get('Status'),
             'Credits': request.args.get('Credits'),
             'Message': request.args.get('Message'),
-            'Timestamp': request.args.get('Timestamp')
+            'Timestamp': request.args.get('Timestamp'),
+            'StartDate': request.args.get('StartDate'),
+            'EndDate': request.args.get('EndDate')
         }
         
+        startDate = datetime.strptime('2000-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+        endDate = datetime.strptime('2100-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
         params = 'where '
         for key, value in args.items():
             if value != None:
-                params += f"{key} = '{value}' and "
+                if key == 'StartDate':
+                    startDate = value
+                elif key == 'EndDate':
+                    endDate = value
+                else:
+                    params += f"{key} = '{value}' and "
+        params += f"TimeStamp BETWEEN '{startDate}' AND '{endDate}'"
         if params == 'where ':
             params = ''
-        else:
-            params = params[0: len(params)-4]
         #####
 
         query = f"""select JournalEntries.*, src.AccountName as SourceAccountName, dest.AccountName as DestAccountName
