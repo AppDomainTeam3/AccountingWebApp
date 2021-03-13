@@ -22,7 +22,20 @@
           <p>{{ userData.email }}</p>
           <p>{{ userData.usertype }}</p>
         </div>
+
+
         <div class= "col" style="padding: 15px;">
+          
+            <h6> Date Range for Jounral Entries: </h6>
+            <div class="input-group input-daterange float-left">
+    
+                <input type="text" id="min-date" data-date-format="yyyy-mm-dd" placeholder="From:">
+    
+                <div class="input-group-addon"> to </div>
+    
+                <input type="text" id="max-date" data-date-format="yyyy-mm-dd" placeholder="To:">
+            </div>
+        
           <table class="table table-bordered ledgerDataTable hover" style="width: 100%;">
             <thead>
                 <tr>
@@ -115,7 +128,7 @@
               }
           }
       }
-      $('.mydatatable').DataTable({
+      table = $('.mydatatable').DataTable({
           order: [[11,'desc']],
           pagingType: 'full_numbers',
           "columnDefs": [
@@ -123,7 +136,7 @@
             { "width": "2%", "targets": 8 }
           ]
       });
-      $('.ledgerDataTable').DataTable({
+      ledger = $('.ledgerDataTable').DataTable({
           order: [[0,'desc']],
           scrollY: "225px",
           scrollCollapse: true,
@@ -136,8 +149,7 @@
             { "width": "1%", "targets": 4 },
           ]
       });
-      var ledger = $('.ledgerDataTable').DataTable();
-      var table = $('.mydatatable').DataTable();
+
       populateLedger(null, params.AccountNumber);
 
       $('.ledgerDataTable').on('click', 'tbody tr', function() {
@@ -150,6 +162,39 @@
       $('.mydatatable').on('click', 'tbody tr', function() {
         populateLedger(this);
       })
+
+      $('.input-daterange input').each(function() {
+        $(this).datepicker(
+            'clearDates',
+            'todayHighlight:true',
+            )
+      });
+
+
+      // Extend dataTables search
+      $.fn.dataTable.ext.search.push(
+      function(settings, data, dataIndex) {
+
+          var min = $('#min-date').val();
+          var max = $('#max-date').val();
+          var createdAt = data[0] ; // Our date column in the table
+
+          if (
+          (min == "" || max == "") ||
+          (moment(createdAt).isSameOrAfter(min) && moment(createdAt).isSameOrBefore(max))
+          ) {
+          return true;
+          }
+          return false;
+      });
+      // Re-draw the table when the a date range filter changes
+      $('.date-range-filter').change(function() {
+      ledger.draw();
+      });
+
+      $('#my-table_filter').hide();
+
+
 
       function populateLedger(row, accountNumber) {
         if (accountNumber == "") { accountNumber = null; }
