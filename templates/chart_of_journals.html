@@ -22,13 +22,13 @@
     {% if journals %}
     <div class= "container float-left mt-2">
         <h6> Date Range for Jounral Entries: </h6>
-        <div class="input-group input-daterange float-left">
+        <div class="input-group input-daterange">
 
-            <input type="text" id="min-date"  data-date-format="yyyy-mm-dd" placeholder="From:">
+            <input type="text" id="min-date" class="date-range-filter" data-date-format="yyyy-mm-dd" placeholder="From:">
 
             <div class="input-group-addon"> to </div>
 
-            <input type="text" id="max-date"  data-date-format="yyyy-mm-dd" placeholder="To:">
+            <input type="text" id="max-date" class="date-range-filter"  data-date-format="yyyy-mm-dd" placeholder="To:">
         </div>
     </div>
 
