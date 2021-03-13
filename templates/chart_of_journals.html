@@ -20,7 +20,20 @@
                 </p>
         </form>
     {% if journals %}
+    <div class= "container float-left mt-2">
+        <h6> Date Range for Jounral Entries: </h6>
+        <div class="input-group input-daterange">
+
+            <input type="text" id="min-date" class="date-range-filter" data-date-format="yyyy-mm-dd" placeholder="From:">
+
+            <div class="input-group-addon"> to </div>
+
+            <input type="text" id="max-date" class="date-range-filter"  data-date-format="yyyy-mm-dd" placeholder="To:">
+        </div>
+    </div>
+
     <div class="container-fluid ml-1 mb-3 mt-3">
+
         <table class="table table-striped table-bordered mydatatable" style="width: 100%">
             <thead>
                 <tr>
@@ -123,10 +136,17 @@
             }
         }
 
-        $('.mydatatable').DataTable({
-            order: [[2,'asc']],
-            pagingType: 'full_numbers',
-            "searchCols": [
+    $(document).ready(function() {
+        // Input in each footer cell
+            $('.mydatatable tfoot th').each( function () {
+                var title = $(this).text();
+                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            });
+        
+            table = $('.mydatatable').DataTable({
+                order: [[1,'asc']],
+                pagingType: 'full_numbers',
+                "searchCols": [
                 null,
                 { "search": params.Status },
                 { "search": params.Journal_ID },
@@ -138,10 +158,53 @@
                 { "search": params.Message },
                 null,
                 { "search": params.Timestamp }
-            ]
+            ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                            if ( that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        } );
+                    } );
+                }
+            });
         });
 
-        url = "{{ api_url }}/journals/action";
+    $('.input-daterange input').each(function() {
+        $(this).datepicker(
+            'clearDates',
+            'todayHighlight:true',
+            )
+    });
+    // Extend dataTables search
+    $.fn.dataTable.ext.search.push(
+    function(settings, data, dataIndex) {
+        var min = $('#min-date').val();
+        var max = $('#max-date').val();
+        var createdAt = data[10] ; // Our date column in the table
+
+        if (
+        (min == "" || max == "") ||
+        (moment(createdAt).isSameOrAfter(min) && moment(createdAt).isSameOrBefore(max))
+        ) {
+        return true;
+        }
+        return false;
+    });
+    // Re-draw the table when the a date range filter changes
+    $('.date-range-filter').change(function() {
+    table.draw();
+    });
+
+    $('#my-table_filter').hide();
+
+        var url = "{{ api_url }}/journals/action";
         
         function approve(journalID){
             $('#JournalActionForm').submit(function(e){
