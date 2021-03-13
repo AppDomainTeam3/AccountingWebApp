@@ -46,10 +46,11 @@
 
 {%block script%}
     <!-- Account Creation Script-->
-    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script id = "AccountCreationForm">
     $('#AccountCreationForm').submit(function(e){
         e.preventDefault();
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
         $(':disabled').each(function(e) {
             $(this).removeAttr('disabled');
         })
@@ -67,7 +68,8 @@
             window.location.href = "/";
         })
         .fail(function(response){
-            alert(response.responseJSON['message'])
+            errorText.innerHTML = JSON.parse(response.responseText)['message'];
+            errorPopup.click();
         });
     });
     </script>
