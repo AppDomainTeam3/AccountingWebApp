@@ -25,9 +25,10 @@
     {%endblock%}
 
     {% block script %}
-    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
       function ToggleAccountStatus(accountNumber) {
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
         $.ajax({
           url: '{{ api }}/accounts/' + accountNumber + '/toggle',
           data: { sessionUserID: "{{ sessionUser.id }}" },
@@ -38,7 +39,8 @@
           window.location.href = "{{ url }}/users/{{ accounts[0].id }}/accounts/edit"
         })
         .fail(function(response) {
-          alert(response.responseJSON['message'])
+          errorText.innerHTML = response.responseJSON['message'];
+          errorPopup.click();
         })
       }
     </script>

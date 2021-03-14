@@ -4,7 +4,6 @@
   {%block title%} {{title}} {%endblock%}
 
     {%block content%}
-
         <div class= "container float-left">
             <h1 class="pt-2"> Internal Email System </h1>
             <form id ="AdminEmailForm" action="{{url_for('send_message')}}" method="POST">
@@ -25,4 +24,21 @@
         </div>
 
     {%endblock%}
+
+    {% block script %}
+        <script src="../static/js/Helper.js"></script>
+        <script>
+            let data = getQueryVariable("userID");
+            let xhttp = new XMLHttpRequest();
+
+            xhttp.open("GET", "{{ api_url }}/users/" + data, true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("username").value = JSON.parse(this.responseText)[0]['username'];
+                }
+              };
+        </script>
+    {% endblock %}
 

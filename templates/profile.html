@@ -18,20 +18,34 @@
           {% elif userData.isActive.lower() == 'false' %}
             <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
           {% endif %}
-          <p>{{ userData.firstname }} {{ userData.lastname }} <span>  </span> <a href="/user-mail" <span class="fas fa-envelope" data-toggle="tooltip" data-placement="right" title="Email User"> </span> </a>       </p>
+          <p>{{ userData.firstname }} {{ userData.lastname }} <span>  </span> <a href="/user-mail?userID={{ userData.id }}" <span class="fas fa-envelope" data-toggle="tooltip" data-placement="right" title="Email User"> </span> </a>       </p>
           <p>{{ userData.email }}</p>
           <p>{{ userData.usertype }}</p>
         </div>
+
         <div class= "col" style="padding: 15px;">
-          <table class="table table-striped table-bordered ledgerDataTable" style="width: 100%;">
+          <h6> Date Range for Jounral Entries: </h6>
+
+          <div class="input-group input-daterange ">
+  
+              <input type="text" id="min-date" class="date-range-filter" data-date-format="yyyy-mm-dd" placeholder="From:">
+  
+              <div class="input-group-addon"> to </div>
+  
+              <input type="text" id="max-date" class="date-range-filter" data-date-format="yyyy-mm-dd" placeholder="To:">
+          </div>
+          <table class="table table-bordered ledgerDataTable hover" style="width: 100%;">
             <thead>
                 <tr>
-                    <th id="ledgerHeader" colspan="12">Click on an account to view ledger</th>
+                  <th id="ledgerHeader" colspan="12">Click on an account to view ledger</th>
                 </tr>
-                <tr>
-                    <th>Transaction</th>
-                    <th>Amount</th>
-                    <th>Timestamp</th>
+                <tr style="cursor: pointer;">
+                  <th>Timestamp</th>
+                  <th>Message</th>
+                  <th>PR</th>
+                  <th>Debit</th>
+                  <th>Credit</th>
+                  <th>Balance</th>
                 </tr>
             </thead>
         </table>
@@ -87,9 +101,6 @@
           </table>
         </div>
 
-
-        
-
     {%endblock%}
 
     {%block script%}
@@ -101,49 +112,158 @@
     </script>
 
     <script>
-      $('.mydatatable').DataTable({
-          order: [[3,'desc']],
+      let url_string = window.location.href;
+      var url = new URL(url_string);
+      params = {
+          AccountNumber: url.searchParams.get("AccountNumber")
+      };
+
+      //handle empty url parameters
+      for (var key in params) {
+          if (params.hasOwnProperty(key)) {
+              if (params[key] == null) {
+                  params[key] = "";
+              }
+          }
+      }
+      table = $('.mydatatable').DataTable({
+          order: [[11,'desc']],
           pagingType: 'full_numbers',
           "columnDefs": [
             { "width": "5%", "targets": 6 },
             { "width": "2%", "targets": 8 }
           ]
       });
-      $('.ledgerDataTable').DataTable({
-          order: [[2,'desc']],
+      ledger = $('.ledgerDataTable').DataTable({
+          order: [[0,'desc']],
           scrollY: "225px",
           scrollCollapse: true,
           paging: false,
           "columnDefs": [
-            { "width": "65%", "targets": 0 },
+            { "width": "5%", "targets": 0 },
+            { "width": "65%", "targets": 1 },
+            { "width": "1%", "targets": 2 },
+            { "width": "1%", "targets": 3 },
+            { "width": "1%", "targets": 4 },
           ]
       });
+
+      populateLedger(null, params.AccountNumber);
+
+      $('.ledgerDataTable').on('click', 'tbody tr', function() {
+        var url = "{{ url }}/journals?Journal_ID=";
+        var clickedAccountNumber = ledger.row(this).data()[accountNumberCol = 2];
+        url += clickedAccountNumber;
+        window.location = url;
+      });
+
       $('.mydatatable').on('click', 'tbody tr', function() {
-        var table = $('.mydatatable').DataTable();
-        var ledger = $('.ledgerDataTable').DataTable();
-        var balanceEvents = {{ balanceEvents|safe }};
+        populateLedger(this);
+      })
+
+      $('.input-daterange input').each(function() {
+        $(this).datepicker(
+            'clearDates',
+            'todayHighlight:true',
+            )
+      });
+
+
+      // Extend dataTables search
+      $.fn.dataTable.ext.search.push(
+      function(settings, data, dataIndex) {
+
+          var min = $('#min-date').val();
+          var max = $('#max-date').val();
+          var createdAt = data[0] ; // Our date column in the table
+
+          if (
+          (min == "" || max == "") ||
+          (moment(createdAt).isSameOrAfter(min) && moment(createdAt).isSameOrBefore(max))
+          ) {
+          return true;
+          }
+          return false;
+      });
+      // Re-draw the table when the a date range filter changes
+      $('.date-range-filter').change(function() {
+      ledger.draw();
+      });
+
+      $('#my-table_filter').hide();
+
+
+
+      function populateLedger(row, accountNumber) {
+        if (accountNumber == "") { accountNumber = null; }
+        var journalEntries, journalEntriesLength;
+        var accounts = {{ accounts|safe }};
+        var accountBalances = {{ accountBalances|safe }}
+        let temp = {{ journalList|safe }};
+        if (temp === "None") {
+          journalEntries = null;
+          journalEntriesLength = 0;
+        } else {
+          journalEntries = temp;
+          journalEntriesLength = journalEntries.length;
+        }
+        
         ledger.clear().draw();
 
-        var clickedAccountNumber = table.row(this).data()[accountNumberCol = 1];
-
-        balanceEventsLength = balanceEvents.length;
+        if (row != null) {
+          clickedAccountNumber = table.row(row).data()[accountNumberCol = 1];
+        }
+        else if (accountNumber != null) {
+          var clickedAccountNumber = accountNumber;
+        }
+        else {
+          clickedAccountNumber = accounts[0]['accountNumber'];
+        }
+        
         let i;
-        let balanceEventsForClickedAccount = [];
-        for (i = 0; i < balanceEventsLength; i++){
-          if (balanceEvents[i]['AccountNumber'] == clickedAccountNumber){
-            balanceEventsForClickedAccount.push(balanceEvents[i]);
+        let journalEntriesForClickedAccount = [];
+        for (i = 0; i < journalEntriesLength; i++){
+          if (journalEntries[i].SourceAccountNumber == clickedAccountNumber || journalEntries[i].DestAccountNumber == clickedAccountNumber) {
+            journalEntriesForClickedAccount.push(journalEntries[i]);
           }
         }
-        balanceEventsLength = balanceEventsForClickedAccount.length
-        document.getElementById("ledgerHeader").innerHTML = "Account " + clickedAccountNumber + " ledger";
-        for (i = 0; i < balanceEventsLength; i++){
+        journalEntriesLength = journalEntriesForClickedAccount.length
+        document.getElementById("ledgerHeader").innerHTML = "Account " + clickedAccountNumber + " ledger | Balance: $" + accountBalances[clickedAccountNumber];
+        var balance = 0;
+        for (i = 0; i < journalEntriesLength; i++){
+          var sum = 0;
+          var isCredit = journalEntriesForClickedAccount[i].SourceAccountNumber == clickedAccountNumber;
+          var debit = 0;
+          var credit = 0;
+          if (isCredit) {
+            sum = sumEntries(journalEntriesForClickedAccount[i].Credits);
+            credit = sum;
+            balance -= credit;
+          }
+          else {
+            sum = sumEntries(journalEntriesForClickedAccount[i].Debits);
+            debit = sum;
+            balance += debit;
+          }
+          
           ledger.row.add([
-            balanceEventsForClickedAccount[i]['Event'],
-            '$' + Number(balanceEventsForClickedAccount[i]['Amount']).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-            balanceEventsForClickedAccount[i]['Timestamp'],
+            journalEntriesForClickedAccount[i].Timestamp,
+            journalEntriesForClickedAccount[i].Message,
+            journalEntriesForClickedAccount[i].Journal_ID,
+            '$' + Number(debit).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            '$' + Number(credit).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+            '$' + Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2 }),
           ]).draw();
         }
-      })
+      }
+
+      function sumEntries(entries) {
+        let i, sum = 0;
+        for (i = 0; i < entries.length; i++) {
+          sum += entries[i];
+        }
+        return sum;
+      }
     </script>
 
     {%endblock%}

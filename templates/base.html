@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css')}}"/>
+    <link rel="stylesheet" type="text/css" href="..\..\..\..\..\static\css\magnific-popup.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
     <script src="https://kit.fontawesome.com/1e2d487faa.js" crossorigin="anonymous"></script>
     {% endblock %}
   </head>
@@ -33,41 +35,73 @@
           <div class="navbar-nav">
             
             <a class="nav-link" aria-current="page" href="/">Home</a>
-            <a class="nav-link" href="/users/{{ sessionUser.id }}">Profile</a>
-            <a class="nav-link" href="/users">Users</a>
-            <a class="nav-link" href="/accounts/create">Open Account</a>
             
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Services
+                View
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="/accounts">Chart of Accounts</a>
-                <a class="dropdown-item" href="/events">Event Log</a>
-                <a class="dropdown-item" href="#">Ledger</a>
+                <a class="dropdown-item" href="/users/{{ sessionUser.id }}">Profile</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Future Services</a>
+                <a class="dropdown-item" href="/accounts">Chart of Accounts</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/journals">Chart of Journal Entries</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/events">Chart of Events</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/users">Chart of Users</a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Create
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/accounts/create">Account</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/journals/create">Journal Entry</a>
               </div>
             </li>
             
-            <a class="nav-link" href="/sign_out">Sign-Out</a>&emsp;
-
             {% if sessionUser.usertype == 'administrator' %}
-            <span class="navbar-text">Admin:</span>
-            <a class="nav-link" href="/users/expired_passwords">Expired Passwords</a>
-            <a class="nav-link" href="/add-user">Create User</a>
-            <a class="nav-link" href="/user-mail">System Email</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Admin Functions
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/users/expired_passwords">Expired Passwords</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/add-user">Create User</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/user-mail">System Email</a>
+              </div>
+            </li>
             {% endif %}
 
             {% if sessionUser.usertype == 'manager' %}
-            <span class="navbar-text">Manager:</span>
-            <a class="nav-link" href="/user-mail">System Email</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Manager Functions
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/user-mail">System Email</a>
+              </div>
+            </li>
             {% endif %}
 
             {% if sessionUser.usertype == 'regular_user' %}
-            <span class="navbar-text">Accountant:</span>
-            <a class="nav-link" href="/user-mail">System Email</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Accountant Functions
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/user-mail">System Email</a>
+              </div>
+            </li>
             {% endif %}
+            
+            <a class="nav-link" href="/sign_out">Sign-Out</a>&emsp;
 
             <h3 id="helpIcon" data-toggle="modal" data-target="#myModal">&nbsp;&nbsp;&nbsp;<img src ={{ url_for('static', filename='question-square.svg') }} data-placement="right" title="Help"></h3>
              <!-- Modal of Help Icon -->
@@ -143,7 +177,13 @@
       </div>
               <!--End of Help Icon Modal-->
     </nav>
-    
+    <a id="error-popup" class="popup-with-zoom-anim" href="#small-dialog"></a>
+
+    <!-- dialog itself, mfp-hide class is required to make dialog hidden -->
+    <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+        <h1>Error</h1>
+        <p id="error-text" style="color: red;">You can't do that</p>
+    </div>
     <!--Will display hello, word if content block is not overwritten in child template-->
     {%block content%}
     <h1>hello, world!</h1>
@@ -151,12 +191,15 @@
 
   </body>
   <!--Bootstrap Javascript -->
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
-  
+  <script src="..\..\..\..\..\static\js\jquery.magnific-popup.min.js"></script>
+  <script src="..\..\..\..\..\static\js\magnific-popups.js"></script>
+  <script src ="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src ="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
   {%block script%}
   <!--Scripts from child templates-->
   {%endblock%}

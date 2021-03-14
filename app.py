@@ -4,9 +4,10 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
 import requests
 
+import scripts.Helper as Helper
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
-from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm
+from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -97,7 +98,7 @@ def userMail():
     if g.user == None:
         return render_template('login.html')
     elif g.user.usertype == 'administrator' or g.user.usertype == 'regular_user' or g.user.usertype== 'manager':
-        return render_template('userMail.html', title = 'Admin Email', form=form, sessionUser=g.user)
+        return render_template('userMail.html', title = 'Admin Email', form=form, sessionUser=g.user, api_url=api_url)
     else:
         return render_template('access_denied.html', title = 'Access Denied',sessionUser=g.user)
         
@@ -171,10 +172,40 @@ def UserProfile(user_id):
     updataUserSessionData()
     user = users[user_id]
     accounts = populateAccountsListByUserID(user_id, api_url)
-    balanceEvents = populateEventsListByEndpoint(f"/events/{user.id}/balance", api_url)
-    canEdit = getUserEditStatus(g.user, user_id)
-    return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, balanceEvents=balanceEvents, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
+    # Ledger data
+    journalList = []
+    accountBalances = {}
+    if (accounts):
+        for account in accounts:
+            approvedSrcJournals = Helper.populateJournalsList(api_url, f"?SourceAccountNumber={account.accountNumber}&Status=Approved")
+            approvedDestJournals = Helper.populateJournalsList(api_url, f"?DestAccountNumber={account.accountNumber}&Status=Approved")
+            balance = 0
+            if approvedSrcJournals is not None:
+                for journalEntry in approvedSrcJournals:
+                    exists = False
+                    for entry in journalList:
+                        if journalEntry.Journal_ID == entry.Journal_ID:
+                            exists = True
+                            break
+                    if not exists:
+                        journalList.append(journalEntry)
+                    balance -= sum(journalEntry.Debits)
+            if approvedDestJournals is not None:
+                for journalEntry in approvedDestJournals:
+                    exists = False
+                    for entry in journalList:
+                        if journalEntry.Journal_ID == entry.Journal_ID:
+                            exists = True
+                            break
+                    if not exists:
+                        journalList.append(journalEntry)
+                    balance += sum(journalEntry.Debits)
+            accountBalances.update({f"{account.accountNumber}": balance})
+    # end ledger data
+    
+    canEdit = getUserEditStatus(g.user, user_id)
+    return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, accountBalances=accountBalances, journalList=journalList, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
 @app.route("/accounts")
 def AccountsList():
@@ -188,7 +219,15 @@ def AccountsList():
     if response.status_code != 404:
         for entry in response.json():
             accounts.append(entry)
-    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts',accounts=accounts)
+    return render_template('chart_of_accounts.html',sessionUser=g.user,title = 'Chart of Accounts', accounts=accounts, app_url=app_url)
+
+@app.route("/journals", methods=['GET','POST'])
+def journalList():
+    if g.user == None:
+        return render_template('login.html')
+    journals = Helper.populateJournalsList(api_url)
+    form = JournalActionForm()
+    return render_template('chart_of_journals.html', form=form, sessionUser=g.user,title = 'Journal Entries', journals=journals, app_url=app_url, api_url=api_url)
 
 @app.route("/events")
 def EventLog():
@@ -292,6 +331,13 @@ def EditAccount(account_number):
     form = AccountEditForm()
     return render_template('edit_account.html', title='Edit Account', form=form, api=api_url, account=account, sessionUser=g.user)
 
+@app.route("/journals/create", methods=['GET', 'POST'])
+def CreateJournalEntry():
+    if g.user == None:
+        return render_template('login.html')
+    form = JournalEntryForm()
+    return render_template('create_journal_entry.html', title='Create Journal Entry', form=form, api=api_url, sessionUser=g.user)
+
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
     form = ForgotPasswordForm()
@@ -300,6 +346,10 @@ def ForgotPassword():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('error.html', sessionUser=g.user), 404
+
+@app.route("/401")
+def unauthorized():
+    return render_template('unauthorized.html', sessionUser=g.user)
 
 if __name__ == "__main__":
     app.run(debug=True)

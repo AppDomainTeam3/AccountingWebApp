@@ -1,6 +1,36 @@
+from scripts.Journal import Journal
 from scripts.Account import Account
 from scripts.User import User
 import requests
+
+def populateJournalsList(api_url, url_params=""):
+    response = requests.get(f"{api_url}/journals{url_params}")
+    journalList = response.json()
+    journals = []
+    if response.status_code == 404:
+        return None
+    for journalDict in journalList:
+        journals.append(Journal(Journal_ID=journalDict['Journal_ID'],
+                                RequestorUserID=journalDict['RequestorUserID'],
+                                SourceAccountName=journalDict['SourceAccountName'],
+                                SourceAccountNumber=journalDict['SourceAccountNumber'],
+                                DestAccountName=journalDict['DestAccountName'],
+                                DestAccountNumber=journalDict['DestAccountNumber'],
+                                Status=journalDict['Status'],
+                                Debits=buildFloatArrayFromCommaDelimitedString(journalDict['Debits']),
+                                Credits=buildFloatArrayFromCommaDelimitedString(journalDict['Credits']),
+                                Message=journalDict['Message'],
+                                Timestamp=journalDict['Timestamp']))
+    return journals
+
+def buildFloatArrayFromCommaDelimitedString(str):
+    str = str.split(',')
+    for i, value in enumerate(str):
+        str[i] = "".join(str[i].split())
+    arr = []
+    for entry in str:
+        arr.append(float(entry))
+    return arr
 
 def populateAccountsListByUserID(user_id, api_url):
     response = requests.get(f"{api_url}/users/{user_id}/accounts")
@@ -52,6 +82,12 @@ def populateEventsListByEndpoint(endpoint, api_url):
     for event in response.json():
         eventList.append(event)
     return eventList
+
+def sumBalanceEvents(balanceEvents, api_url):
+    balance = 0.0
+    for event in balanceEvents:
+        balance += event['Amount']
+    return balance
 
 def updateUserList(users, api_url):
     response = requests.get(f"{api_url}/users")

@@ -34,10 +34,37 @@ mail = Mail(app)
 CORS(app)
 api = Api(app)
 
-class GetAllUsers(Resource):
+class GetUsers(Resource):
     @marshal_with(Marshal_Fields.resource_fields)
     def get(self):
-        resultproxy = engine.execute(f"SELECT * FROM Users ORDER BY id ASC")
+        ##### optional url query parameters
+        args = {
+            'id': request.args.get('id'),
+            'username': request.args.get('username'),
+            'usertype': request.args.get('usertype'),
+            'firstname': request.args.get('firstname'),
+            'lastname': request.args.get('lastname'),
+            'email': request.args.get('email'),
+            'is_active': request.args.get('is_active'),
+            'is_password_expired': request.args.get('is_password_expired'),
+            'password_expiration_date': request.args.get('password_expiration_date'),
+        }
+        
+        params = 'where '
+        for key, value in args.items():
+            if value != None:
+                params += f"{key} = '{value}' and "
+        if params == 'where ':
+            params = ''
+        else:
+            params = params[0: len(params)-4]
+        #####
+
+        query = f"SELECT * FROM Users {params} ORDER BY id ASC"
+        try:
+            resultproxy = engine.execute(query)
+        except:
+            return Helper.CustomResponse(500, 'SQL ERROR')
         d, a = {}, []
         for rowproxy in resultproxy:
             # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
@@ -184,7 +211,7 @@ class CreateUser(Resource):
                         INSERT INTO Passwords (id, password) VALUES ({id}, '{hashed_password}');""")
 
         message = f"User created"
-        data = {'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = {'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Event': message, 'Amount': 0}
         requests.post(f"{api_url}/events/create", json=data)
 
         msg = Message('Hello from appdomainteam3!', recipients=[email])
@@ -236,7 +263,7 @@ class CreateAccount(Resource):
             return Response("SQL Error", status=500, mimetype='application/json')
 
         message = f"Account created"
-        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': accountNumber, 'Amount': 0, 'Event': message }
+        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': accountNumber, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         email = user['email']
@@ -275,7 +302,7 @@ class EditAccount(Resource):
             return Response("SQL Error", status=500, mimetype='application/json')
 
         message = f"Account updated"
-        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': account_number, 'Amount': 0, 'Event': message }
+        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': account_number, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = Helper.CustomResponse(200, 'Account Edited Successfully!')
@@ -310,13 +337,13 @@ class ToggleAccountActiveStatus(Resource):
         if isActive == 'True':
             message = f"Account deactivated"
             custom_response = Helper.CustomResponse(200, message)
-            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Amount': 0, 'Event': message}
+            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Event': message, 'Amount': 0 }
             requests.post(f"{api_url}/events/create", json=data)
             return custom_response
         else:
             message = f"Account activated!"
             custom_response = Helper.CustomResponse(200, message)
-            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Amount': 0, 'Event': message}
+            data = { 'SessionUserID': sessionUserID, 'UserID': response.json()['id'], 'AccountNumber': response.json()['AccountNumber'], 'Event': message, 'Amount': 0 }
             requests.post(f"{api_url}/events/create", json=data)
             return custom_response
 
@@ -345,7 +372,7 @@ class ForgotPassword(Resource):
         engine.execute(f"""UPDATE Users SET hashed_password = '{password}' WHERE id = {id}; INSERT INTO Passwords (id, password) VALUES ({id}, '{password}');""")
 
         message = 'Used forgot password function'
-        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': sessionUserID, 'UserID': id, 'AccountNumber': 0, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         return Response(f"Temporary password sent!", status=200, mimetype='application/json')
@@ -409,7 +436,7 @@ class UpdatePassword(Resource):
         engine.execute(f"""UPDATE Users SET hashed_password = '{newPassword}' WHERE id = {user_id}; INSERT INTO Passwords (id, password) VALUES ({user_id}, '{newPassword}');""")
 
         message = "User Password Updated"
-        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = Helper.CustomResponse(200, 'Password has been updated!')
@@ -442,7 +469,7 @@ class EditUser(Resource):
                            avatarlink = '{avatarlink}', is_active = '{active}', reactivate_user_date = '{reactivateUserDate}' WHERE id = '{user_id}';""")
 
         message = f"User profile updated"
-        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Amount': 0, 'Event': message}
+        data = { 'SessionUserID': sessionUserID, 'UserID': userID, 'AccountNumber': 0, 'Event': message, 'Amount': 0 }
         requests.post(f"{api_url}/events/create", json=data)
 
         response = Response(f"'{username}' updated\n" + json.dumps(args), status=200, mimetype='application/json')
@@ -454,6 +481,7 @@ class CreateEvent(Resource):
         creationDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         eventID = requests.get(f"{api_url}/events/count").json()
         query = f"""INSERT INTO Events VALUES ({eventID}, {content['SessionUserID']}, {content['UserID']}, {content['AccountNumber']}, '{content['Event']}', {content['Amount']}, '{creationDateTime}')"""
+        query = f"""INSERT INTO Events VALUES ({eventID}, {content['SessionUserID']}, {content['UserID']}, {content['AccountNumber']}, '{content['Event']}', '{creationDateTime}', {content['Amount']})"""
         try:
             engine.execute(query)
         except Exception as e:
@@ -516,10 +544,156 @@ class GetEvents(Resource):
             abort(Helper.CustomResponse(404, 'no events found'))
         return a
 
+class CreateJournalEntry(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('form')
+        parser.add_argument('sessionUserID')
+        args = parser.parse_args()
+        formDict = json.loads(args['form'])
+        response1 = requests.get(f"{api_url}/accounts/{formDict['SourceAccountNumber']}")
+        response2 = requests.get(f"{api_url}/accounts/{formDict['DestAccountNumber']}")
+        if response1.status_code == 404:
+            abort(Helper.CustomResponse(404, 'Source Account number does not exist.'))
+        if response2.status_code == 404:
+            abort(Helper.CustomResponse(404, 'Destination Account number does not exist.'))
+        if response1.json()['AccountNumber'] == response2.json()['AccountNumber']:
+            abort(Helper.CustomResponse(400, 'Account numbers cannot be the same.'))
+        response = requests.get(f"{api_url}/journals")
+        if response.status_code == 404:
+            Journal_ID = 0
+        else:
+            Journal_ID = len(requests.get(f"{api_url}/journals").json())
+        RequestorUserID = args['sessionUserID']
+        Status = 'pending'
+        message = formDict['Comment']
+        if (message == ''):
+            message = 'No Message provided'
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        query = f"""INSERT INTO JournalEntries VALUES ({Journal_ID}, {RequestorUserID}, {formDict['SourceAccountNumber']}, {formDict['DestAccountNumber']},
+                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}')"""
+        try:
+            engine.execute(query)
+        except Exception as e:
+            print(e)
+            return Helper.CustomResponse(500, 'SQL Error')
+
+        srcUserID = response1.json()['id']
+        destUserID = response2.json()['id']
+        creditsList = Helper.buildFloatArrayFromCommaDelimitedString(formDict['Credits'])
+        debitsList = Helper.buildFloatArrayFromCommaDelimitedString(formDict['Debits'])
+
+        message = f"Journal Entry Created"
+        data = { 'SessionUserID': RequestorUserID, 'UserID': srcUserID, 'AccountNumber': formDict['SourceAccountNumber'], 'Event': message, 'Amount': -sum(creditsList) }
+        requests.post(f"{api_url}/events/create", json=data)
+
+        message = f"Journal Entry Created"
+        data = { 'SessionUserID': RequestorUserID, 'UserID': destUserID, 'AccountNumber': formDict['DestAccountNumber'], 'Event': message, 'Amount': sum(debitsList) }
+        requests.post(f"{api_url}/events/create", json=data)
+
+        response = requests.get(f"{api_url}/users?usertype=manager")
+        emailDictList = response.json()
+        emails = []
+        for entry in emailDictList:
+            emails.append(entry['email'])
+
+        for email in emails:
+            msg = Message('New Journal Created', recipients=[email])
+            msg.body = f"Hello,\nA new journal entry has been created and is awaiting your approval"
+            mail.send(msg)
+
+        return Helper.CustomResponse(200, 'Entry Submitted!')
+
+class JournalAction(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('action')
+        parser.add_argument('journal_id')
+        parser.add_argument('form')
+        parser.add_argument('sessionUserID')
+        args = parser.parse_args()
+        action = args['action']
+        journal_ID = args['journal_id']
+        formDict = Helper.ParseArgs(args['form'])
+        sessionUserID = args['sessionUserID']
+        query = f"""UPDATE JournalEntries SET Status = '{action}', Message = '{formDict['message']}' WHERE Journal_ID = {journal_ID}"""
+
+        try:
+            engine.execute(query)
+        except Exception as e:
+            print(e)
+            return Helper.CustomResponse(500, 'SQL Error')
+        
+        journalEntryDict = requests.get(f"{api_url}/journals?Journal_ID={journal_ID}").json()
+        srcAccountDict = requests.get(f"{api_url}/accounts/{journalEntryDict[0]['SourceAccountNumber']}").json()
+        destAccountDict = requests.get(f"{api_url}/accounts/{journalEntryDict[0]['DestAccountNumber']}").json()
+        
+        message = f"Journal Entry {action}"
+        data = { 'SessionUserID': sessionUserID, 'UserID': srcAccountDict['id'], 'AccountNumber': srcAccountDict['AccountNumber'], 'Event': message, 'Amount': 0 }
+        requests.post(f"{api_url}/events/create", json=data)
+
+        message = f"Journal Entry {action}"
+        data = { 'SessionUserID': sessionUserID, 'UserID': destAccountDict['id'], 'AccountNumber': destAccountDict['AccountNumber'], 'Event': message, 'Amount': 0 }
+        requests.post(f"{api_url}/events/create", json=data)
+
+        return Helper.CustomResponse(200, f"Journal Entry {action}")
+
+class GetJournals(Resource):
+    @marshal_with(Marshal_Fields.journal_fields)
+    def get(self):
+        ##### optional url query parameters
+        args = {
+            'Journal_ID': request.args.get('Journal_ID'),
+            'RequestorUserID': request.args.get('RequestorUserID'),
+            'SourceAccountNumber': request.args.get('SourceAccountNumber'),
+            'DestAccountNumber': request.args.get('DestAccountNumber'),
+            'Status': request.args.get('Status'),
+            'Credits': request.args.get('Credits'),
+            'Message': request.args.get('Message'),
+            'Timestamp': request.args.get('Timestamp'),
+            'StartDate': request.args.get('StartDate'),
+            'EndDate': request.args.get('EndDate')
+        }
+        
+        startDate = datetime.strptime('2000-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+        endDate = datetime.strptime('2100-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
+        params = 'where '
+        for key, value in args.items():
+            if value != None:
+                if key == 'StartDate':
+                    startDate = value
+                elif key == 'EndDate':
+                    endDate = value
+                else:
+                    params += f"{key} = '{value}' and "
+        params += f"TimeStamp BETWEEN '{startDate}' AND '{endDate}'"
+        if params == 'where ':
+            params = ''
+        #####
+
+        query = f"""select JournalEntries.*, src.AccountName as SourceAccountName, dest.AccountName as DestAccountName
+                    from JournalEntries
+                    inner join Accounts src on JournalEntries.SourceAccountNumber=src.AccountNumber
+                    inner join Accounts dest on JournalEntries.DestAccountNumber=dest.AccountNumber
+                    {params}"""
+
+        resultproxy = engine.execute(query)
+        d, a = {}, []
+        for rowproxy in resultproxy:
+            # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
+            for column, value in rowproxy.items():
+                # build up the dictionary
+                d = {**d, **{column: value}}
+                
+            a.append(d)
+        if not a:
+            abort(Helper.CustomResponse(404, 'no journals found'))
+        return a
+
 # ENDPOINTS -----------------------------------------------------------------
 
 # GET
-api.add_resource(GetAllUsers, "/users")
+api.add_resource(GetUsers, "/users")
 api.add_resource(GetUserByID, "/users/<int:user_id>")
 api.add_resource(GetUserByUsername, "/users/<string:username>")
 api.add_resource(GetUserCount, "/users/count")
@@ -531,6 +705,7 @@ api.add_resource(GetEvents, "/events")
 api.add_resource(GetEventsByAccountNumber, "/events/<int:account_number>")
 api.add_resource(GetBalanceEventsByUserID, "/events/<int:user_id>/balance")
 api.add_resource(GetAllAccounts, "/accounts")
+api.add_resource(GetJournals, "/journals")
 
 # POST
 api.add_resource(CreateUser, "/users/create-user")
@@ -542,6 +717,7 @@ api.add_resource(CreateAccount, "/accounts/create/<string:username>")
 api.add_resource(EditAccount, "/accounts/<int:account_number>/edit")
 api.add_resource(ToggleAccountActiveStatus, "/accounts/<int:account_number>/toggle")
 api.add_resource(CreateEvent, "/events/create")
-
+api.add_resource(CreateJournalEntry, "/journals/create")
+api.add_resource(JournalAction, "/journals/action")
 if (__name__) == "__main__":
     app.run(host='127.0.0.2', debug=True)

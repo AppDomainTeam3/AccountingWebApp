@@ -3,7 +3,7 @@
   {%block title%} {{title}} {%endblock%}
 
     {%block content%}
-
+    {% if events %}
     <div class="container-fluid ml-1 mb-3 mt-3">
         <table class="table table-striped table-bordered mydatatable" style="width: 100%">
             <p><b>NOTE: </b>0 for an Account Number means the event did not involve an account. Same goes with a session user ID of -1.</p>
@@ -20,17 +20,18 @@
             </thead>
 
             <tbody>
-            {% for event in events %}
-                <tr>
-                    <td>{{ event['EventID'] }}</td>
-                    <td>{{ event['SessionUserID'] }}</td>
-                    <td>{{ event['UserID'] }}</td>
-                    <td>{{ event['AccountNumber'] }}</td>
-                    <td>{{ event['Event'] }}</td>
-                    <td>${{ "{:,.2f}".format(event['Amount']) }}</td>
-                    <td>{{ event['Timestamp'] }}</td>
-                </tr>
-            {% endfor %}
+            
+                {% for event in events %}
+                    <tr>
+                        <td>{{ event['EventID'] }}</td>
+                        <td>{{ event['SessionUserID'] }}</td>
+                        <td>{{ event['UserID'] }}</td>
+                        <td>{{ event['AccountNumber'] }}</td>
+                        <td>{{ event['Event'] }}</td>
+                        <td>${{ "{:,.2f}".format(event['Amount']) }}</td>
+                        <td>{{ event['Timestamp'] }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
 
             <tfoot>
@@ -44,6 +45,11 @@
             </tfoot>
         </table>
     </div>
+    {% else %}
+    <div class="container float-left">
+        <h1 class="pt-2">No events to show</h1>
+    </div>
+    {% endif %}
     {%endblock%}
 
     {%block script%}

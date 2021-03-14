@@ -14,6 +14,6 @@ class Account():
         self.comment = comment
         self.isActive = isActive
     def __repr__(self): 
-        return f"""<id: {self.id}, accountName: {self.accountName}, accountDesc: {self.accountDesc}, normalSide: {self.normalSide},
-         category: {self.category}, subcategory: {self.subcategory}, balance: {self.balance}, accountCreationDate: {self.accountCreationDate},
-         accountOrder: {self.accountOrder}, statement: {self.statement}, comment: {self.comment}, isActive: {self.isActive}>"""
+        return f"""{{'id': {self.id}, 'accountNumber': {self.accountNumber}, 'accountName': '{self.accountName}', 'accountDesc': '{self.accountDesc}', 'normalSide': '{self.normalSide}',
+         'category': '{self.category}', 'subcategory': '{self.subcategory}', 'balance': {self.balance}, 'accountCreationDate': '{self.accountCreationDate}',
+         'accountOrder': {self.accountOrder}, 'statement': '{self.statement}', 'comment': '{self.comment}', 'isActive': '{self.isActive}'}}"""
