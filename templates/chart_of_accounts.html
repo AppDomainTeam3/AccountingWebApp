@@ -35,7 +35,10 @@
                 <tr>
                     <td>{{ account.id }}</td>
                     <td><a href="{{ app_url }}/users/{{ account.id }}?AccountNumber={{ account.AccountNumber }}">{{ account.AccountName }}</a></td>
-                    <td><a href="/user-mail?userID={{ account.id }}" <span class="fas fa-envelope" data-placement="right" title="Email User" /></a> {{ account.AccountNumber}}</td>
+                    <td>
+                        <a href="/user-mail?userID={{ account.id }}" <span class="fas fa-envelope" data-placement="right" title="Email User" /></a>
+                        <a href="{{ app_url }}/users/{{ account.id }}?AccountNumber={{ account.AccountNumber }}">{{ account.AccountNumber}}</a>
+                    </td>
                     <td><a href="{{ app_url }}/accounts/{{ account.AccountNumber }}">Events</a></td>
                     <td>{{ account.AccountDesc }}</td>
                     <td>{{ account.NormalSide }}</td>
