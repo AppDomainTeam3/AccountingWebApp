@@ -1,0 +1,75 @@
+{% if canEdit %}
+
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1 class="pt-2">Edit data for {{ user.username }}:</h1>
+            <p><button onclick="location.href = '/users/{{ user.id }}/edit_password';">Edit Password</button></p>
+            {% if accounts %}
+                <p><button onclick="location.href = '/users/{{ user.id }}/accounts/edit';">Edit Accounts</button></p>
+            {% endif %}
+            <form id="UserCreationForm" action="" method="POST">
+                {% if sessionUser.usertype == 'administrator' or sessionUser.usertype == 'manager' %}
+                <p>
+                    {{ form.deactivate.label }}<br>
+                    {{ form.deactivate }}<br>
+                </p>
+                <p>
+                    {{ form.usertype.label }}<br>
+                    {{ form.usertype }}<br>
+                </p>
+                {% endif %}
+                <p>
+                    {{ form.email.label }}<br>
+                    {{ form.email(size=16, value=user.email) }}<br>
+                </p>
+                <p>
+                    {{ form.firstname.label }}<br>
+                    {{ form.firstname(size=16, value=user.firstname) }}<br>
+                </p>
+                <p>
+                    {{ form.lastname.label }}<br>
+                    {{ form.lastname(size=16, value=user.lastname) }}<br>
+                </p>
+                <p>
+                    {{ form.avatarlink.label }}<br>
+                    {{ form.avatarlink(size=16, value=user.avatarlink) }}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+{%endblock%}
+
+    {%block script%}
+        <script id = "UserCreationScript" data-search={{ api }}>
+            var script_tag = document.getElementById("UserCreationScript")
+            var api_url = script_tag.getAttribute("data-search")
+            var usertype = document.getElementById("usertype")
+            usertype.value = "{{ user.usertype }}"
+            $('#UserCreationForm').submit(function(e){
+                e.preventDefault();
+                
+                $.ajax({
+                    url: api_url + '/users/{{ user.id }}/edit',
+                    type: 'post',
+                    data: { 
+                        form: $('#UserCreationForm').serialize(), 
+                        sessionUserID: '{{ sessionUser.id }}',
+                        userID: '{{ user.id }}'
+                    },
+                    success: window.setTimeout(function(){
+                        alert('User updated!')
+                        window.location.href = "{{ url }}/users/{{ user.id }}";
+                    })
+                });
+            });
+        </script>
+    {%endblock%}
+{% else %}
+    <html>You are not authorized to edit this user.</html>
+{% endif %}
+

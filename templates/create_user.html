@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+    <div class= "container float-left">
+        <h1 class="pt-2">Enter new user data:</h1>
+        <form id="UserCreationForm" action="" method="POST">
+            {{ form.hidden_tag() }}
+            
+                {{ form.email.label }}<br>
+                {{ form.email(size=16) }}<br>
+            
+            
+                {{ form.usertype.label }}<br>
+                {{ form.usertype }}<br>
+            
+            
+                {{ form.firstname.label }}<br>
+                {{ form.firstname(size=16) }}<br>
+            
+            
+                {{ form.lastname.label }}<br>
+                {{ form.lastname(size=16) }}<br>
+            
+            
+                {{ form.avatarlink.label }}<br>
+                {{ form.avatarlink(size=16) }}<br>
+            
+            {{ form.submit() }}
+        </form>
+    </div>
+
+{%endblock%}
+
+{%block script%}
+  <!--create user a.k.a. add-user script-->
+  <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script id = "UserCreationScript" data-search={{ api }}>
+      var script_tag = document.getElementById("UserCreationScript")
+      var api_url = script_tag.getAttribute("data-search")
+      $('#UserCreationForm').submit(function(e){
+          e.preventDefault();
+          $.ajax({
+              url: api_url + '/users/create-user',
+              type: 'post',
+              data: {form: $('#UserCreationForm').serialize(), sessionUserID: "{{ sessionUser.id }}"},
+              success: window.setTimeout(function(){
+                  alert('User Created!')
+                  window.location.href = "{{ url }}/users";
+              })
+          })
+      });
+  </script>
+  {%endblock%}

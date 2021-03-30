@@ -1,0 +1,29 @@
+#logo img{
+    position: relative;
+    width: auto; 
+    height: 150px; 
+    image-rendering:crisp-edges; 
+    padding-bottom: 10;
+}
+
+.profilePic img{
+    position: absolute;
+    width: 65px;
+    height: 75px; 
+    right:20;
+    image-rendering:crisp-edges; 
+    border-radius: 50%;
+}
+
+.profilePic a{
+    position: absolute;
+    width: auto; 
+    height: 75px; 
+    right:100;
+    top:30;
+    image-rendering:crisp-edges; 
+    padding-bottom: 10;
+    padding-left: 10;
+}
+
+

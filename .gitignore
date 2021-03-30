@@ -1,2 +1,10 @@
 
 environment/
+
+*.pyc
+
+.vscode/
+
+*.code-workspace
+
+webappenv/

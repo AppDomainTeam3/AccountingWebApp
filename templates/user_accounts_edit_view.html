@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            {% if canEdit %}
+              {% if accounts %}
+                <h1 class="pt-2">Choose an account to edit</h1>
+                {% for account in accounts %}
+                  <p><a href="{{ app }}/accounts/{{ account.accountNumber }}/edit">{{ account.accountName }} | {{ account.category }} | {{ account.accountNumber }}</a>
+                    {% if canEdit %}
+                    <button id="{{ account.accountNumber }}" onclick="ToggleAccountStatus('{{ account.accountNumber }}')">{{ "Deactivate" if account.isActive == "True" else "Activate" }}</button>
+                    {% endif %}</p>
+                {% endfor %}
+              {% else %}
+                <h1 class="pt-2">This user doesn't have any accounts to edit</h1>
+              {% endif %}
+            {% else %}
+              <h1 class="pt-2">You are not authorized to view this page</h1>
+            {% endif %}
+
+        </div>
+    {%endblock%}
+
+    {% block script %}
+    <script>
+      function ToggleAccountStatus(accountNumber) {
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
+        $.ajax({
+          url: '{{ api }}/accounts/' + accountNumber + '/toggle',
+          data: { sessionUserID: "{{ sessionUser.id }}" },
+          type: 'post'
+        })
+        .done(function(response) {
+          alert(response['message'])
+          window.location.href = "{{ url }}/users/{{ accounts[0].id }}/accounts/edit"
+        })
+        .fail(function(response) {
+          errorText.innerHTML = response.responseJSON['message'];
+          errorPopup.click();
+        })
+      }
+    </script>
+    {% endblock %}

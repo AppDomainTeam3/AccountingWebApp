@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1 class="pt-2">Edit Account</h1>
+            <form id="AccountEditForm" action="" method="POST">
+                <p>
+                    {{ form.accountName.label }}<br>
+                    {{ form.accountName(size=16, value=account.accountName) }}<br>
+                </p>
+                <p>
+                    {{ form.accountDesc.label }}<br>
+                    {{ form.accountDesc(size=16, value=account.accountDesc) }}<br>
+                </p>
+                <p>
+                    {{ form.normalSide.label }}<br>
+                    {{ form.normalSide(size=16, value=account.normalSide) }}<br>
+                </p>
+                <p>
+                    {{ form.category.label }}<br>
+                    {{ form.category }}<br>
+                </p>
+                <p>
+                    {{ form.subcategory.label }}<br>
+                    {{ form.subcategory(size=16, value=account.subcategory) }}<br>
+                </p>
+                <p>
+                    {{ form.accountOrder.label }}<br>
+                    {{ form.accountOrder(size=16, value=account.accountOrder) }}<br>
+                </p>
+                <p>
+                    {{ form.comment.label }}<br>
+                    {{ form.comment(size=16, value=account.comment) }}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+    
+<!--open account script-->
+
+{%endblock%}
+
+{%block script%}
+    <!-- Account Creation Script-->
+    <script id = "AccountEditForm">
+        var cateogory = document.getElementById("category")
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
+        category.value = "{{ account.category }}"
+        $('#AccountEditForm').submit(function(e){
+            e.preventDefault();
+            var form_tag = document.getElementById("AccountEditForm")
+            $.ajax({
+                url: '{{ api }}/accounts/{{ account.accountNumber }}/edit',
+                type: 'post',
+                data: { 
+                    form: $('#AccountEditForm').serialize(),
+                    sessionUserID: '{{ sessionUser.id }}',
+                    userID: '{{ account.id }}'
+                }
+            })
+            .done(function(response) {
+                alert(response['message'])
+                window.location.href = "/";
+            })
+            .fail(function(response) {
+                errorText.innerHTML =  JSON.parse(response.responseText)['message'];
+                errorPopup.click();
+            });
+        });
+    </script>
+{%endblock%}
+
+ 
+ 
+ 

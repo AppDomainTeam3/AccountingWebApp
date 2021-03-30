@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+
+        <div class= "container float-left">
+            <h1 class="pt-2">Open Account</h1>
+            <form id="AccountCreationForm" action="" method="POST">
+                {% if canEdit %}
+                <p>
+                    {{ form.accountHolderUsername.label }}<br>
+                    {{ form.accountHolderUsername(size=16, value=sessionUser.username) }}<br>
+                </p>
+                {% else %}
+                <p>
+                    {{ form.accountHolderUsername.label }}<br>
+                    {{ form.accountHolderUsername(size=16, value=sessionUser.username, disabled=True) }}<br>
+                </p>
+                {% endif %}
+                <p>
+                    {{ form.accountName.label }}<br>
+                    {{ form.accountName(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.accountDesc.label }}<br>
+                    {{ form.accountDesc(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.normalSide.label }}<br>
+                    {{ form.normalSide(size=16) }}<br>
+                </p>
+                <p>
+                    {{ form.category.label }}<br>
+                    {{ form.category }}<br>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+    
+<!--open account script-->
+
+{%endblock%}
+
+
+
+{%block script%}
+    <!-- Account Creation Script-->
+    <script id = "AccountCreationForm">
+    $('#AccountCreationForm').submit(function(e){
+        e.preventDefault();
+        var errorPopup = document.getElementById("error-popup");
+        var errorText = document.getElementById("error-text");
+        $(':disabled').each(function(e) {
+            $(this).removeAttr('disabled');
+        })
+        var form_tag = document.getElementById("AccountCreationForm")
+        $.ajax({
+            url: '{{ api }}/accounts/create/{{ sessionUser.username }}',
+            type: 'post',
+            data: { 
+                form: $('#AccountCreationForm').serialize(),
+                sessionUserID: '{{ sessionUser.id }}'
+            }
+        })
+        .done(function(response){
+            alert(response['message'])
+            window.location.href = "/";
+        })
+        .fail(function(response){
+            errorText.innerHTML = JSON.parse(response.responseText)['message'];
+            errorPopup.click();
+        });
+    });
+    </script>
+{%endblock%}
+
+ 
+ 
+ 
