@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+      <div class= "container float-left">
+        <h1 class="pt-2">Trial Balance</h1>
+        <!--Do something with the journal entries-->
+      </div>
+    {%endblock%}
+
+    {%block script%}
+      <script src="../static/js/Helper.js"></script>
+        <script>
+            var userID = getQueryVariable("userID");
+            var accountNumbers = [];
+            var journalEntries = [];
+
+            fetch("{{ api_url }}/users/" + userID + "/accounts").then(function(response) {
+              if (response.ok) {
+                return response.json();
+              } else {
+                return Promise.reject(response);
+              }
+            }).then(function(accountsJson) {
+              let i;
+              for (i = 0; i < accountsJson.length; i++) {
+                accountNumbers.push(accountsJson[i]["AccountNumber"]);
+              }
+            }).then(function() {
+              let i;
+              for (i = 0; i < accountNumbers.length; i++) {
+                fetch("{{ api_url }}/journals?SourceAccountNumber=" + accountNumbers[i]).then(function(response) {
+                  if (response.ok) {
+                    return response.json();
+                  } else {
+                    return Promise.reject(response);
+                  }
+                }).then(function(sourceJournalEntriesJson) {
+                  let j;
+                  for (j = 0; j < sourceJournalEntriesJson.length; j++) {
+                    if (sourceJournalEntriesJson[j]["Status"] == "Approved") {
+                      journalEntries.push(sourceJournalEntriesJson[j]);
+                    }
+                  }
+                });
+
+                fetch("{{ api_url }}/journals?DestAccountNumber=" + accountNumbers[i]).then(function(response) {
+                  if (response.ok) {
+                    return response.json();
+                  } else {
+                    return Promise.reject(response);
+                  }
+                }).then(function(destJournalEntriesJson) {
+                  let j;
+                  for (j = 0; j < destJournalEntriesJson.length; j++) {
+                    if (destJournalEntriesJson[j]["Status"] == "Approved") {
+                      journalEntries.push(destJournalEntriesJson[j]);
+                    }
+                  }
+                });
+              }
+            });
+            console.log(journalEntries);  //Do something with these entries
+        </script>
+    {%endblock%}
