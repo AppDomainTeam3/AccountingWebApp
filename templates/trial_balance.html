@@ -3,64 +3,138 @@
   {%block title%} {{title}} {%endblock%}
 
     {%block content%}
-      <div class= "container float-left">
-        <h1 class="pt-2">Trial Balance</h1>
-        <!--Do something with the journal entries-->
+      <div class="container-fluid">
+        <h1 id="TableHeader" class="pt-2"></h1>
+        <table class="table table-striped table-bordered TrialBalanceDataTable" style="width: 100%">
+          <thead>
+            <tr>
+              <th colspan="1">Category</th>
+              <th colspan="1">Debits</th>
+              <th colspan="1">Credits</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Cash</td>
+              <td id="CashDebits"></td>
+              <td id="CashCredits"></td>
+            </tr>
+            <tr>
+              <td>Accounts Receivable</td>
+              <td id="AccountsReceivableDebits"></td>
+              <td id="AccountsReceivableCredits"></td>
+            </tr>
+            <tr>
+              <td>Land</td>
+              <td id="LandDebits"></td>
+              <td id="LandCredits"></td>
+            </tr>
+            <tr>
+              <td>Notes Payable</td>
+              <td id="NotesPayableDebits"></td>
+              <td id="NotesPayableCredits"></td>
+            </tr>
+            <tr>
+              <td>Capital Stock</td>
+              <td id="CapitalStockDebits"></td>
+              <td id="CapitalStockCredits"></td>
+            </tr>
+            <tr>
+              <td>Service Revenues</td>
+              <td id="ServiceRevenuesDebits"></td>
+              <td id="ServiceRevenuesCredits"></td>
+            </tr>
+            <tr>
+              <td>Advertising Expense</td>
+              <td id="AdvertisingExpenseDebits"></td>
+              <td id="AdvertisingExpenseCredits"></td>
+            </tr>
+            <tr>
+              <td>Utilities Expense</td>
+              <td id="UtilitiesExpenseDebits"></td>
+              <td id="UtilitiesExpenseCredits"></td>
+            </tr>
+          </tbody>
+
+          <tfoot>
+            <th colspan="3"></th>
+          </tfoot>
+        </table>
       </div>
     {%endblock%}
 
     {%block script%}
       <script src="../static/js/Helper.js"></script>
-        <script>
-            var userID = getQueryVariable("userID");
-            var accountNumbers = [];
-            var journalEntries = [];
 
-            fetch("{{ api_url }}/users/" + userID + "/accounts").then(function(response) {
-              if (response.ok) {
-                return response.json();
-              } else {
-                return Promise.reject(response);
-              }
-            }).then(function(accountsJson) {
-              let i;
-              for (i = 0; i < accountsJson.length; i++) {
-                accountNumbers.push(accountsJson[i]["AccountNumber"]);
-              }
-            }).then(function() {
-              let i;
-              for (i = 0; i < accountNumbers.length; i++) {
-                fetch("{{ api_url }}/journals?SourceAccountNumber=" + accountNumbers[i]).then(function(response) {
-                  if (response.ok) {
-                    return response.json();
-                  } else {
-                    return Promise.reject(response);
-                  }
-                }).then(function(sourceJournalEntriesJson) {
-                  let j;
-                  for (j = 0; j < sourceJournalEntriesJson.length; j++) {
-                    if (sourceJournalEntriesJson[j]["Status"] == "Approved") {
-                      journalEntries.push(sourceJournalEntriesJson[j]);
-                    }
-                  }
-                });
+      <script id="TrialBalanceDataTable">
+        $('.TrialBalanceDataTable').DataTable({
+            order: [[3,'desc']],
+            pagingType: 'full_numbers'
+        });
+      </script>
 
-                fetch("{{ api_url }}/journals?DestAccountNumber=" + accountNumbers[i]).then(function(response) {
-                  if (response.ok) {
-                    return response.json();
-                  } else {
-                    return Promise.reject(response);
+      <script id="journalData">
+          var userID = getQueryVariable("userID");
+          var username = "";
+          var accountNumbers = [];
+          var journalEntries = [];
+
+          fetch("{{ api_url }}/users?id=" + userID).then(function(response) { //Get Username
+            if (response.ok) {
+              return response.json();
+            } else {
+              return Promise.reject(response);
+            }
+          }).then(function(userJson) {
+            username = userJson[0]["username"];
+            document.getElementById("TableHeader").innerHTML = username + "'s Trial Balance";
+          });
+
+          fetch("{{ api_url }}/users/" + userID + "/accounts").then(function(response) {  //Get Accounts
+            if (response.ok) {
+              return response.json();
+            } else {
+              return Promise.reject(response);
+            }
+          }).then(function(accountsJson) {
+            let i;
+            for (i = 0; i < accountsJson.length; i++) {
+              accountNumbers.push(accountsJson[i]["AccountNumber"]);
+            }
+          }).then(function() {
+            let i;
+            for (i = 0; i < accountNumbers.length; i++) {
+              fetch("{{ api_url }}/journals?SourceAccountNumber=" + accountNumbers[i]).then(function(response) {  //Get Source entries
+                if (response.ok) {
+                  return response.json();
+                } else {
+                  return Promise.reject(response);
+                }
+              }).then(function(sourceJournalEntriesJson) {
+                let j;
+                for (j = 0; j < sourceJournalEntriesJson.length; j++) {
+                  if (sourceJournalEntriesJson[j]["Status"] == "Approved") {
+                    journalEntries.push(sourceJournalEntriesJson[j]);
                   }
-                }).then(function(destJournalEntriesJson) {
-                  let j;
-                  for (j = 0; j < destJournalEntriesJson.length; j++) {
-                    if (destJournalEntriesJson[j]["Status"] == "Approved") {
-                      journalEntries.push(destJournalEntriesJson[j]);
-                    }
+                }
+              });
+
+              fetch("{{ api_url }}/journals?DestAccountNumber=" + accountNumbers[i]).then(function(response) {  //Get Dest entries
+                if (response.ok) {
+                  return response.json();
+                } else {
+                  return Promise.reject(response);
+                }
+              }).then(function(destJournalEntriesJson) {
+                let j;
+                for (j = 0; j < destJournalEntriesJson.length; j++) {
+                  if (destJournalEntriesJson[j]["Status"] == "Approved") {
+                    journalEntries.push(destJournalEntriesJson[j]);
                   }
-                });
-              }
-            });
-            console.log(journalEntries);  //Do something with these entries
-        </script>
+                }
+              });
+            }
+          });
+      </script>
     {%endblock%}
