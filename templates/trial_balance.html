@@ -4,7 +4,7 @@
 
     {%block content%}
       <div class="container-fluid">
-        <h1 id="TableHeader" class="pt-2"></h1>
+        <h1 id="TableHeader" class="pt-2">Username's Trial Balance</h1>
         <table class="table table-striped table-bordered TrialBalanceDataTable" style="width: 100%">
           <thead>
             <tr>
@@ -69,7 +69,7 @@
 
       <script id="TrialBalanceDataTable">
         $('.TrialBalanceDataTable').DataTable({
-            order: [[3,'desc']],
+            order: [],
             pagingType: 'full_numbers'
         });
       </script>
@@ -80,61 +80,57 @@
           var accountNumbers = [];
           var journalEntries = [];
 
-          fetch("{{ api_url }}/users?id=" + userID).then(function(response) { //Get Username
-            if (response.ok) {
-              return response.json();
-            } else {
-              return Promise.reject(response);
+          async function setUsername() {
+            let response = await fetch("{{ api_url }}/users?id=" + userID);
+            let userJSON = await response.json();
+            
+            username = userJSON[0]["username"];
+          }
+
+          async function setAccountNumbers() {
+            let response = await fetch("{{ api_url }}/users/" + userID + "/accounts");
+            let accountsJSON = await response.json();
+
+            let i;
+            for (i = 0; i < accountsJSON.length; i++) {
+              accountNumbers.push(accountsJSON[i]["AccountNumber"]);
             }
-          }).then(function(userJson) {
-            username = userJson[0]["username"];
+          }
+
+          async function setJournalEntries() {
+            let i;
+            for (i = 0; i < accountNumbers.length; i++) {
+
+              let srcJournalEntriesResponse = await fetch("{{ api_url }}/journals?SourceAccountNumber=" + accountNumbers[i]);
+              let srcJSON = await srcJournalEntriesResponse.json();
+              let j;
+              for (j = 0; j < srcJSON.length; j++) {
+                if (srcJSON[j]["Status"] == "Approved") {
+                  journalEntries.push(srcJSON[j]);   //Push srcJournalEntries to journalEntries
+                }
+              }
+
+              let destJournalEntriesResponse = await fetch("{{ api_url }}/journals?DestAccountNumber=" + accountNumbers[i]);
+              let destJSON = await destJournalEntriesResponse.json();
+              for (j = 0; j < destJSON.length; j++) {
+                if (destJSON[j]["Status"] == "Approved") {
+                  journalEntries.push(destJSON[j]);   //Push destJournalEntries to journalEntries
+                }
+              }
+            }
+          }
+
+          setUsername().then(() => {
+            console.log(username);    //For debugging
             document.getElementById("TableHeader").innerHTML = username + "'s Trial Balance";
           });
 
-          fetch("{{ api_url }}/users/" + userID + "/accounts").then(function(response) {  //Get Accounts
-            if (response.ok) {
-              return response.json();
-            } else {
-              return Promise.reject(response);
-            }
-          }).then(function(accountsJson) {
-            let i;
-            for (i = 0; i < accountsJson.length; i++) {
-              accountNumbers.push(accountsJson[i]["AccountNumber"]);
-            }
-          }).then(function() {
-            let i;
-            for (i = 0; i < accountNumbers.length; i++) {
-              fetch("{{ api_url }}/journals?SourceAccountNumber=" + accountNumbers[i]).then(function(response) {  //Get Source entries
-                if (response.ok) {
-                  return response.json();
-                } else {
-                  return Promise.reject(response);
-                }
-              }).then(function(sourceJournalEntriesJson) {
-                let j;
-                for (j = 0; j < sourceJournalEntriesJson.length; j++) {
-                  if (sourceJournalEntriesJson[j]["Status"] == "Approved") {
-                    journalEntries.push(sourceJournalEntriesJson[j]);
-                  }
-                }
-              });
-
-              fetch("{{ api_url }}/journals?DestAccountNumber=" + accountNumbers[i]).then(function(response) {  //Get Dest entries
-                if (response.ok) {
-                  return response.json();
-                } else {
-                  return Promise.reject(response);
-                }
-              }).then(function(destJournalEntriesJson) {
-                let j;
-                for (j = 0; j < destJournalEntriesJson.length; j++) {
-                  if (destJournalEntriesJson[j]["Status"] == "Approved") {
-                    journalEntries.push(destJournalEntriesJson[j]);
-                  }
-                }
-              });
-            }
+          setAccountNumbers().then(() => {
+            console.log(accountNumbers);    //For debugging
+            setJournalEntries().then(() => {
+              console.log(journalEntries);    //For debugging
+            });
           });
+
       </script>
     {%endblock%}
