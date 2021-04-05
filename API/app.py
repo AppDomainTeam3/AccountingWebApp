@@ -5,7 +5,6 @@ from flask_cors import CORS
 import os, sys, requests, json
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime, timedelta
 from flask_mail import Mail, Message
 from scripts import Helper, Marshal_Fields
 

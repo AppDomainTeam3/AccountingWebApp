@@ -207,6 +207,12 @@ def UserProfile(user_id):
     canEdit = getUserEditStatus(g.user, user_id)
     return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, accountBalances=accountBalances, journalList=journalList, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
+@app.route("/trial_balance")
+def TrialBalance():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('trial_balance.html', sessionUser=g.user, title='Trial Balance', app_url=app_url, api_url=api_url)
+
 @app.route("/accounts")
 def AccountsList():
     if g.user == None:
