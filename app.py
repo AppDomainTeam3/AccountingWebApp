@@ -2,15 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, session, g
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
-import requests
-
+import requests, uuid, os, sys
 import scripts.Helper as Helper
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
+blob_connection_str = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
 
 app_url = 'http://127.0.0.1:5000'
 api_url = 'http://127.0.0.2:5000'
@@ -20,6 +21,51 @@ mail = Mail(app)
 #adds userdata to list for user tracking and authentication
 users = []
 users = updateUserList(users, api_url)
+
+try:
+    print("Azure Blob Storage v" + __version__)
+
+    # Create the BlobServiceClient object which will be used to create a container client
+    blob_service_client = BlobServiceClient.from_connection_string(blob_connection_str)
+
+    # Set container name
+    container_name = 'journalmedia'
+
+    # Set container client
+    container_client = blob_service_client.get_container_client(container_name)
+
+    # Create a local directory to hold blob data
+    local_path = "./BlobData"
+
+    # Create a file in the local data directory to upload and download
+    local_file_name = str(uuid.uuid4()) + ".txt"
+    upload_file_path = os.path.join(local_path, local_file_name)
+
+    # Write text to the file
+    # file = open(upload_file_path, 'w')
+    # file.write("Hello, World!")
+    # file.close()
+
+    # Create a blob client using the local file name as the name for the blob
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+
+    # print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+
+    # Upload the created file
+    # with open(upload_file_path, "rb") as data:
+    #     blob_client.upload_blob(data)
+
+    # print("\nListing blobs...")
+
+    # List the blobs in the container
+    # blob_list = container_client.list_blobs()
+    # for blob in blob_list:
+    #     print("\t" + blob.name)
+
+except Exception as ex:
+    print('Exception: Blob Storage Connection FAILED!')
+    print(ex)
+    sys.exit()
 
 def passwordExEmail(user):
     
