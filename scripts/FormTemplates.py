@@ -24,15 +24,48 @@ class AccountCreationForm(FlaskForm):
     accountName = StringField('Account Name', validators=[DataRequired('field is required.')])
     accountDesc = StringField('Description', validators=[DataRequired('field is required.')])
     normalSide = StringField('Normal Side', validators=[DataRequired('field is required.')])
-    category = SelectField('Category', choices=[('Checking', 'Checking'), ('Savings', 'Savings')], validators=[DataRequired('field is required.')])
+    category = SelectField('Category', choices=[('Asset', 'Asset'), ('Liability', 'Liability'), ('Equity','Equity')], validators=[DataRequired('field is required.')])
+    subcategory = SelectField('Subcategory', 
+        choices=[
+            #assets
+            ('Cash', 'Cash'), 
+            ('Accounts Receivable', 'Accounts Receivable'), 
+            ('Supplies','Supplies'),
+            ('Inventory','Inventory'),
+            ('Prepaid Expenses','Prepaid Expenses'),
+            #liablities
+            ('Accounts Payable','Accounts Payable'),
+            ('Salaries Payable','Salaries Payable'),
+            ('Taxes Payable','Taxes Payable'),
+            ('Accrued Expenses','Accrued Expenses'),
+            #equity
+            ('Owner Equity','Owner Equity'),
+            ('Retained Earnings','Retained Earnings')     
+        ], validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
 class AccountEditForm(FlaskForm):
     accountName = StringField('Account Name', validators=[DataRequired('field is required.')])
     accountDesc = StringField('Description', validators=[DataRequired('field is required.')])
     normalSide = StringField('Normal Side', validators=[DataRequired('field is required.')])
-    category = SelectField('Category', choices=[('Checking', 'Checking'), ('Savings', 'Savings')], validators=[DataRequired('field is required.')])
-    subcategory = StringField('Subcategory', validators=[DataRequired('field is required.')])
+    category = SelectField('Category', choices=[('Asset', 'Asset'), ('Liability', 'Liability'), ('Equity','Equity')], validators=[DataRequired('field is required.')])
+    subcategory = SelectField('Subcategory', 
+        choices=[
+            #assets
+            ('Cash', 'Cash'), 
+            ('Accounts Receivable', 'Accounts Receivable'), 
+            ('Supplies','Supplies'),
+            ('Inventory','Inventory'),
+            ('Prepaid Expenses','Prepaid Expenses'),
+            #liablities
+            ('Accounts Payable','Accounts Payable'),
+            ('Salaries Payable','Salaries Payable'),
+            ('Taxes Payable','Taxes Payable'),
+            ('Accrued Expenses','Accrued Expenses'),
+            #equity
+            ('Owner Equity','Owner Equity'),
+            ('Retained Earnings','Retained Earnings')  
+        ], validators=[DataRequired('field is required.')])
     accountOrder = StringField('Account Order', validators=[DataRequired('field is required.')])
     comment = StringField('Comment', validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')

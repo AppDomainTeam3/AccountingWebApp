@@ -239,7 +239,7 @@ class CreateAccount(Resource):
         accountDesc = formDict['accountDesc']
         normalSide = formDict['normalSide']
         category = formDict['category']
-        subcategory = 'None'
+        subcategory = formDict['subcategory']
         balance = 0
         creationDate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         accountOrder = 1
