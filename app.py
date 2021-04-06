@@ -213,6 +213,12 @@ def TrialBalance():
         return render_template('login.html')
     return render_template('trial_balance.html', sessionUser=g.user, title='Trial Balance', app_url=app_url, api_url=api_url)
 
+@app.route("/balance_sheet")
+def BalanceSheet():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('balance_sheet.html', sessionUser=g.user, title='Balance Sheet', app_url=app_url, api_url=api_url)
+
 @app.route("/accounts")
 def AccountsList():
     if g.user == None:
