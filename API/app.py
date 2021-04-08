@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_mail import Mail, Message
 from scripts import Helper, Marshal_Fields
+from dotenv import load_dotenv
+from dotenv.main import find_dotenv
+
+load_dotenv(find_dotenv())
 
 api_url = 'http://127.0.0.2:5000'
 server = 'AppDomainTeam3.database.windows.net'
@@ -19,8 +23,9 @@ engine = SQLAlchemy.create_engine(SQLAlchemy, connection_string, {})
 
 try:
     connection = engine.connect()
+    print('Database Connection SUCCESS!')
 except Exception as ex:
-    print('Database connection FAILED!:')
+    print('Exception: Database Connection FAILED!:')
     print(ex)
     sys.exit()
 
