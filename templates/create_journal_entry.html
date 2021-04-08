@@ -48,7 +48,7 @@
         const fileInput = document.getElementById("File");
         //Blob Storage parameters
         const accountName = "appdomainblobstorage";
-        const sasString = "ENTER_SAS_HERE / ADD_TO_.ENV";
+        const sasString = "{{ SAS }}".replace(/&amp;/g, "\&");
         const containerName = "journalmedia";
         const containerURL = new azblob.ContainerURL(`https://${accountName}.blob.core.windows.net/${containerName}?${sasString}`,
             azblob.StorageURL.newPipeline(new azblob.AnonymousCredential));
