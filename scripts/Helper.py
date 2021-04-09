@@ -20,6 +20,7 @@ def populateJournalsList(api_url, url_params=""):
                                 Debits=buildFloatArrayFromCommaDelimitedString(journalDict['Debits']),
                                 Credits=buildFloatArrayFromCommaDelimitedString(journalDict['Credits']),
                                 Message=journalDict['Message'],
+                                SourceFile=journalDict['FileURL'],
                                 Timestamp=journalDict['Timestamp']))
     return journals
 

@@ -51,6 +51,7 @@ journal_fields = {
     'Debits': fields.String,
     'Credits': fields.String,
     'Message': fields.String,
+    'FileURL': fields.String,
     'SourceAccountName': fields.String,
     'DestAccountName': fields.String,
     'Timestamp': fields.String
