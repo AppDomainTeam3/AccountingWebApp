@@ -553,6 +553,7 @@ class CreateJournalEntry(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('form')
         parser.add_argument('sessionUserID')
+        parser.add_argument('file')
         args = parser.parse_args()
         formDict = json.loads(args['form'])
         response1 = requests.get(f"{api_url}/accounts/{formDict['SourceAccountNumber']}")
@@ -569,13 +570,16 @@ class CreateJournalEntry(Resource):
         else:
             Journal_ID = len(requests.get(f"{api_url}/journals").json())
         RequestorUserID = args['sessionUserID']
+        fileURL = args['file']
+        if (fileURL == ''):
+            fileURL = None
         Status = 'pending'
         message = formDict['Comment']
         if (message == ''):
             message = 'No Message provided'
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         query = f"""INSERT INTO JournalEntries VALUES ({Journal_ID}, {RequestorUserID}, {formDict['SourceAccountNumber']}, {formDict['DestAccountNumber']},
-                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}')"""
+                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}', '{fileURL}')"""
         try:
             engine.execute(query)
         except Exception as e:

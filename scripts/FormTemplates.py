@@ -43,7 +43,7 @@ class JournalEntryForm(FlaskForm):
     Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Comment = StringField('Comment', render_kw={"placeholder": "optional comment"})
-    File = FileField('File')
+    File = FileField('File', validators=None)
     Submit = SubmitField('Submit')
 
 class UserPasswordChangeForm(FlaskForm):
