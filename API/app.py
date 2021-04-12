@@ -580,8 +580,14 @@ class CreateJournalEntry(Resource):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         query = f"""INSERT INTO JournalEntries VALUES ({Journal_ID}, {RequestorUserID}, {formDict['SourceAccountNumber']}, {formDict['DestAccountNumber']},
                                                 '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}', '{fileURL}')"""
+
+        query2 = f"UPDATE Accounts SET Balance = Balance - {formDict['Credits']} WHERE AccountNumber = {formDict['SourceAccountNumber']};"
+        query3 = f"UPDATE Accounts SET Balance = Balance + {formDict['Debits']} WHERE AccountNumber = {formDict['DestAccountNumber']};"
+
         try:
             engine.execute(query)
+            engine.execute(query2)
+            engine.execute(query3)
         except Exception as e:
             print(e)
             return Helper.CustomResponse(500, 'SQL Error')
