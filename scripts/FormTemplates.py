@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SubmitField
-from wtforms.fields.simple import TextAreaField
+from wtforms.fields.simple import FileField, TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 
@@ -76,6 +76,7 @@ class JournalEntryForm(FlaskForm):
     Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Comment = StringField('Comment', render_kw={"placeholder": "optional comment"})
+    File = FileField('File', validators=None)
     Submit = SubmitField('Submit')
 
 class UserPasswordChangeForm(FlaskForm):

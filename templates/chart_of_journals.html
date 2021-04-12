@@ -51,6 +51,7 @@
                     <th>DestAccountName</th>
                     <th>DestAccountNumber</th>
                     <th>Message</th>
+                    <th>Source File</th>
                     <th>Debits/Credits</th>
                     <th>Timestamp</th>
                 </tr>
@@ -73,6 +74,11 @@
                     <td>{{ journal.DestAccountName }}</td>
                     <td>{{ journal.DestAccountNumber }}</td>
                     <td>{{ journal.Message }}</td>
+                    {% if journal.SourceFile == 'None' %}
+                        <td>{{ journal.SourceFile }}</th>
+                    {% else %}
+                        <td><a href='{{ journal.SourceFile }}'>Download</a></th>
+                    {% endif %}
                     <td>
                         {% for debit in journal.Debits %}
                             ${{ "{:,.2f}".format(debit) }} 
@@ -95,6 +101,7 @@
                 <th>DestAccountName</th>
                 <th>DestAccountNumber</th>
                 <th>Message</th>
+                <th>Source File</th>
                 <th>Debits/Credits</th>
                 <th>Timestamp</th>
             </tfoot>
@@ -156,6 +163,7 @@
                 { "search": params.DestAccountName },
                 { "search": params.DestAccountNumber },
                 { "search": params.Message },
+                null,
                 null,
                 { "search": params.Timestamp }
             ],

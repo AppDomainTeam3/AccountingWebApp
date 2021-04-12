@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_mail import Mail, Message
 from scripts import Helper, Marshal_Fields
+from dotenv import load_dotenv
+from dotenv.main import find_dotenv
+
+load_dotenv(find_dotenv())
 
 api_url = 'http://127.0.0.2:5000'
 server = 'AppDomainTeam3.database.windows.net'
@@ -19,8 +23,9 @@ engine = SQLAlchemy.create_engine(SQLAlchemy, connection_string, {})
 
 try:
     connection = engine.connect()
+    print('Database Connection SUCCESS!')
 except Exception as ex:
-    print('Database connection FAILED!:')
+    print('Exception: Database Connection FAILED!:')
     print(ex)
     sys.exit()
 
@@ -548,6 +553,7 @@ class CreateJournalEntry(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('form')
         parser.add_argument('sessionUserID')
+        parser.add_argument('file')
         args = parser.parse_args()
         formDict = json.loads(args['form'])
         response1 = requests.get(f"{api_url}/accounts/{formDict['SourceAccountNumber']}")
@@ -564,13 +570,16 @@ class CreateJournalEntry(Resource):
         else:
             Journal_ID = len(requests.get(f"{api_url}/journals").json())
         RequestorUserID = args['sessionUserID']
+        fileURL = args['file']
+        if (fileURL == ''):
+            fileURL = None
         Status = 'pending'
         message = formDict['Comment']
         if (message == ''):
             message = 'No Message provided'
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         query = f"""INSERT INTO JournalEntries VALUES ({Journal_ID}, {RequestorUserID}, {formDict['SourceAccountNumber']}, {formDict['DestAccountNumber']},
-                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}')"""
+                                                '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}', '{fileURL}')"""
         try:
             engine.execute(query)
         except Exception as e:

@@ -2,12 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, session, g
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
-import requests
-
+import requests, uuid, os, sys
 import scripts.Helper as Helper
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
+from os.path import join, dirname
+from dotenv import load_dotenv
+from dotenv.main import find_dotenv
+
+load_dotenv(find_dotenv())
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -20,6 +24,7 @@ mail = Mail(app)
 #adds userdata to list for user tracking and authentication
 users = []
 users = updateUserList(users, api_url)
+SAS = os.environ.get('SAS')
 
 def passwordExEmail(user):
     
@@ -348,7 +353,7 @@ def CreateJournalEntry():
     if g.user == None:
         return render_template('login.html')
     form = JournalEntryForm()
-    return render_template('create_journal_entry.html', title='Create Journal Entry', form=form, api=api_url, sessionUser=g.user)
+    return render_template('create_journal_entry.html', title='Create Journal Entry', form=form, api=api_url, SAS=SAS, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
@@ -364,4 +369,4 @@ def unauthorized():
     return render_template('unauthorized.html', sessionUser=g.user)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='127.0.0.1', debug=True)
