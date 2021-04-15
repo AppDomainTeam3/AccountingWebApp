@@ -5,7 +5,7 @@
     {%block content%}
         <div class= "container float-left">
             <h1 class="pt-2">Create Journal Entry</h1>
-            <form id="JournalEntryForm" action="" method="POST">
+            <form id="JournalEntryForm" action="" method="POST" enctype="multipart/form-data">
                 <p>
                     {{ form.SourceAccountNumber.label }}<br>
                     {{ form.SourceAccountNumber(size=16) }}<br>
@@ -26,6 +26,11 @@
                     {{ form.Comment.label }}<br>
                     {{ form.Comment(size=32) }}<br>
                 </p>
+                <p>
+                    {{ form.File.label }}<br>
+                    {{ form.csrf_token }}
+                    {{ form.File }}<br>
+                </p>
                 <p>{{ form.Submit() }} <input type="reset" value="Reset"></p>
             </form>
         </div>
@@ -35,31 +40,77 @@
     {%block script%}
         <script src="../static/js/jquery.magnific-popup.min.js"></script>
         <link rel="stylesheet" href="../static/css/magnific-popup.css">
-        <script id = "JournalEntryForm">
+        <script src="../static/js/azure-storage-blob.js" charset="utf-8"></script>
+        <script src="../static/js/Helper.js"></script>
+
+        <script id="JournalEntryForm">
         var errorPopup = document.getElementById("error-popup");
         var errorText = document.getElementById("error-text");
+        const fileInput = document.getElementById("File");
+        var fileUUID = uuid();
+        var blobURL = "https://appdomainblobstorage.blob.core.windows.net/journalmedia/";
+        
+        //Blob Storage parameters
+        const accountName = "appdomainblobstorage";
+        const sasString = "{{ SAS }}".replace(/&amp;/g, "\&");
+        const containerName = "journalmedia";
+        const containerURL = new azblob.ContainerURL(`https://${accountName}.blob.core.windows.net/${containerName}?${sasString}`,
+            azblob.StorageURL.newPipeline(new azblob.AnonymousCredential));
+
+        const reportStatus = message => {
+            console.log(message);
+        }
+
+        const uploadFiles = async (fileExt) => {   //upload file to blob storage
+            try {
+                reportStatus("Uploading files...");
+                const promises = [];
+                for (const file of fileInput.files) {
+                    const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileUUID + "." + fileExt);
+                    promises.push(azblob.uploadBrowserDataToBlockBlob(
+                        azblob.Aborter.none, file, blockBlobURL));
+                }
+                await Promise.all(promises);
+                reportStatus("Done.");
+                listFiles();
+            } catch (error) {
+                reportStatus(error.body.message);
+            }
+        }
 
         $('#JournalEntryForm').submit(function(e){
-            
             e.preventDefault();
+            var filename = "";
+            var fileExt = "";
+            var fileExists = fileInput.files[0] != null;
             let formData = new FormData(e.target);
             formData = Object.fromEntries(formData.entries());
             formData.Debits = formData.Debits.replace(/ /g, "");
             formData.Credits = formData.Credits.replace(/ /g, "");
+
             if (formData.Debits != formData.Credits) {
                 errorText.innerHTML = "Credits must equal debits.";
                 errorPopup.click();
             } else {
                 formData = JSON.stringify(formData);
+                var fileURL = null;
+                if (fileExists) {
+                    fileExt = fileInput.files[0].name.split(".")[1];
+                    fileURL = blobURL + fileUUID + '.' + fileExt;
+                }
                 $.ajax({
                     url: '{{ api }}/journals/create',
                     type: 'post',
                     data: { 
                         form: formData,
-                        sessionUserID: '{{ sessionUser.id }}'
+                        sessionUserID: '{{ sessionUser.id }}',
+                        file: fileURL
                     }
                 })
                 .done(function(response){
+                    if (fileExists) {
+                        uploadFiles(fileExt);
+                    }
                     alert(response.message);
                     window.location.href = "/journals";
                 })
