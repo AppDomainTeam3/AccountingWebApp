@@ -9,7 +9,7 @@
           </div>
           <div class="row">
               <div class = "col">
-                    <table class="table table-striped table-bordered BalanceSheetDataTable" style="width: 100%">
+                    <table class="table table-striped table-bordered AssetsDataTable" style="width: 100%">
                         <thead>
                             <tr>
                                 <th colspan="1" style="color:navy;">Assets</th>
@@ -17,41 +17,18 @@
                             </tr>
                         </thead>
 
-                        <tbody>
-                            <tr>
-                                <td>Cash</td>
-                                <td id="CashDebits"></td>
-                            </tr>
-                            <tr>
-                                <td>Accounts Receivable</td>
-                                <td id="AccountsReceivableDebits"></td>
-                            </tr>
-                            <tr>
-                                <td>Supplies</td>
-                                <td id="SuppliesDebits"></td>
-                            </tr>
-                            <tr>
-                                <td>Inventory</td>
-                                <td id="InventoryDebits"></td>
-                            </tr>
-                            <tr>
-                                <td>Prepaid Expenses</td>
-                                <td id="PrepaidExpensesDebits"></td>
-                            </tr>
-                            <tr>
-                                <td>Total Assets</td>
-                                <td id="TotalAssets"></td>
-                            </tr>
+                        <tbody id="AssetsTable">
+                            
                         </tbody>
 
                         <tfoot>
-                            <th colspan="3"></th>
+                            <th colspan="2"></th>
                         </tfoot>
                     </table>
                 </div>
                 <div class="col">
                     
-                    <table class="table table-striped table-bordered BalanceSheetLiabilitiesDataTable" style="width: 100%">
+                    <table class="table table-striped table-bordered LiabilitiesDataTable" style="width: 100%">
                         <thead>
                             <tr>
                                 <th colspan="1" style="color:navy;">Liabilities</th>
@@ -59,35 +36,12 @@
                             </tr>
                         </thead>
 
-                        <tbody>
-                            <tr>
-                                <td>Liabilities</td>
-                                <td id="LiabilitiesCredit"></td>
-                            </tr>
-                            <tr>
-                                <td>Accounts Payable</td>
-                                <td id="AccountsPayableCredits"></td>
-                            </tr>
-                            <tr>
-                                <td>Salaries Payable</td>
-                                <td id="SalariesPayableCredits"></td>
-                            </tr>
-                            <tr>
-                                <td>Taxes Payable</td>
-                                <td id="TaxesPayableCredits"></td>
-                            </tr>
-                            <tr>
-                                <td>Accrued Expenses</td>
-                                <td id="AccuredExpensesCredits"></td>
-                            </tr>
-                            <tr>
-                                <td>Total Liabilities</td>
-                                <td id="TotalLiabilities"></td>
-                            </tr>
+                        <tbody id="LiabilitiesTable">
+                            
                         </tbody>
 
                         <tfoot>
-                            <th colspan="3"></th>
+                            <th colspan="2"></th>
                         </tfoot>
                     </table> 
                 </div>
@@ -97,7 +51,7 @@
                 <!--Empty bottom left col-->
                 </div>
                 <div class = "col">
-                    <table class="table table-striped table-bordered BalanceSheetEquityDataTable" style="width: 100%">
+                    <table class="table table-striped table-bordered EquityDataTable" style="width: 100%">
                         <thead>
                             <tr>
                                 <th colspan="1" style="color:navy;">Equity</th>
@@ -105,23 +59,12 @@
                             </tr>
                         </thead>
 
-                        <tbody>
-                            <tr>
-                                <td >Owner's Equity</td>
-                                <td id="OwnersCredits"></td>
-                            </tr>
-                            <tr>
-                                <td>Retained Earnings</td>
-                                <td id="RetainedEarningsCredits"></td>
-                            </tr>
-                            <tr>
-                                <td>Total Equity</td>
-                                <td id="TotalEquity"></td>
-                            </tr>
+                        <tbody id="EquityTable">
+                
                         </tbody>
 
                         <tfoot>
-                            <th colspan="3"></th>
+                            <th colspan="2"></th>
                         </tfoot>
                     </table> 
                 </div>
@@ -132,86 +75,116 @@
     {%block script%}
       <script src="../static/js/Helper.js"></script>
 
-      <script id="BalanceSheetDataTable">
-        $('.BalanceSheetDataTable').DataTable({
-            order: [],
-            pagingType: 'full_numbers'
+      <script id="AssetsDataTable">
+        $('.AssetsDataTable').DataTable({
+            order: []
+            
         });
       </script>
 
-      <script id="BalanceSheetLiabilitiesDataTable">
-        $('.BalanceSheetLiabilitiesDataTable').DataTable({
-            order: [],
-            pagingType: 'full_numbers'
+      <script id="LiabilitiesDataTable">
+        $('.LiabilitiesDataTable').DataTable({
+            order: []
+            
         });
        </script>
 
-       <script id="BalanceSheetEquityDataTable">
-        $('.BalanceSheetEquityDataTable').DataTable({
-            order: [],
-            pagingType: 'full_numbers'
+       <script id="EquityDataTable">
+        $('.EquityDataTable').DataTable({
+            order: []
+           
         });
        </script>
 
-      <script id="journalData">
-          var userID = getQueryVariable("userID");
-          var username = "";
-          var accountNumbers = [];
-          var journalEntries = [];
+        <script id="journalData">
+            var userID = getQueryVariable("userID");
+            var username = "";
+            var accounts = [];
 
-          async function setUsername() {
+            async function setUsername() {
             let response = await fetch("{{ api_url }}/users?id=" + userID);
             let userJSON = await response.json();
             
             username = userJSON[0]["username"];
-          }
+            }
 
-          async function setAccountNumbers() {
+            async function setAccounts() {
             let response = await fetch("{{ api_url }}/users/" + userID + "/accounts");
             let accountsJSON = await response.json();
 
             let i;
             for (i = 0; i < accountsJSON.length; i++) {
-              accountNumbers.push(accountsJSON[i]["AccountNumber"]);
+                accounts.push(accountsJSON[i]);
             }
-          }
-
-          async function setJournalEntries() {
-            let i;
-            for (i = 0; i < accountNumbers.length; i++) {
-
-              let srcJournalEntriesResponse = await fetch("{{ api_url }}/journals?SourceAccountNumber=" + accountNumbers[i]);
-              let srcJSON = await srcJournalEntriesResponse.json();
-              let j;
-              for (j = 0; j < srcJSON.length; j++) {
-                if (srcJSON[j]["Status"] == "Approved") {
-                  journalEntries.push(srcJSON[j]);   //Push srcJournalEntries to journalEntries
-                }
-              }
-
-              let destJournalEntriesResponse = await fetch("{{ api_url }}/journals?DestAccountNumber=" + accountNumbers[i]);
-              let destJSON = await destJournalEntriesResponse.json();
-              for (j = 0; j < destJSON.length; j++) {
-                if (destJSON[j]["Status"] == "Approved") {
-                  journalEntries.push(destJSON[j]);   //Push destJournalEntries to journalEntries
-                }
-              }
             }
-          }
-
-          setUsername().then(() => {
+            
+            setUsername().then(() => {
             console.log(username);    //For debugging
             document.getElementById("TableHeader").innerHTML = username + "'s Balance Sheet";
-            
-          });
-
-          setAccountNumbers().then(() => {
-            console.log(accountNumbers);    //For debugging
-            setJournalEntries().then(() => {
-              console.log(journalEntries);    //For debugging
-              document.getElementById("test").innerHTML = journalEntries[0].Journal_ID;
             });
-          });
-          
-      </script>
+
+            setAccounts().then(() => {
+            console.log(accounts);    //For debugging
+            //Assets Table
+            table = $('.AssetsDataTable').DataTable();
+            let i = 0, amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                
+                if (accounts[i]["Category"] == "Asset") {
+                debits = accounts[i]["Balance"];
+                amount += debits;
+                
+                table.row.add([
+                accounts[i]["Subcategory"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            table.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                
+                ]).draw();
+            //Liabilities Table
+            table2 = $('.LiabilitiesDataTable').DataTable();
+            amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                if (accounts[i]["Category"] == "Liability") {
+                debits = Math.abs(accounts[i]["Balance"]);
+                amount += debits;
+                
+                table2.row.add([
+                accounts[i]["Subcategory"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            table2.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                ]).draw();
+            //Equity Table
+            table3 = $('.EquityDataTable').DataTable();
+            amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                
+                if (accounts[i]["Category"] == "Equity") {
+                debits = Math.abs(accounts[i]["Balance"]);
+                amount += debits;
+                
+                table3.row.add([
+                accounts[i]["Subcategory"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            table3.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                ]).draw();
+            });
+            setAccounts().then(() => {
+            console.log(accounts);    //For debugging
+            });
+        </script>
     {%endblock%}
