@@ -21,9 +21,11 @@ def GenerateAccountNumber(api_url):
 
 def CheckForDuplicateAccountName(userID, accountName, api_url):
     response = requests.get(f"{api_url}/users/{userID}/accounts")
-    for account in response.json():
-        if account['AccountName'] == accountName:
-            return CustomResponse(406, 'This user already has an account with the provided name')
+    print(f"response: {response}")
+    if (response.status_code != 404):
+        for account in response.json():
+            if account['AccountName'] == accountName:
+                return CustomResponse(406, 'This user already has an account with the provided name')
     return CustomResponse(200, 'No duplicate found')
 
 def CustomResponse(status_code, message):
