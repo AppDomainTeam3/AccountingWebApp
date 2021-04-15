@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+      <div class="container-fluid">
+        <h1 id="TableHeader" class="pt-2">Username's Income Statement</h1>
+        <table class="table table-striped table-bordered RevenueTable" style="width: 100%">
+          <thead>
+            <tr>
+              <th colspan="1">Revenue</th>
+              <th colspan="1">Amount</th>
+            </tr>
+          </thead>
+        </table>
+
+        <table class="table table-striped table-bordered ExpenseTable" style="width: 100%">
+          <thead>
+            <tr>
+              <th colspan="1">Expense</th>
+              <th colspan="1">Amount</th>
+            </tr>
+          </thead>
+        </table>
+        <h1 id="net" style="text-align: right"></h1>
+      </div>
+    {%endblock%}
+
+    {%block script%}
+      <script src="../static/js/Helper.js"></script>
+
+      <script>
+        $('.RevenueTable').DataTable({
+            order: [],
+            pagingType: 'full_numbers',
+            "bLengthChange": false,
+            "paging":false
+        });
+
+        $('.ExpenseTable').DataTable({
+            order: [],
+            pagingType: 'full_numbers',
+            "bLengthChange": false,
+            "paging":false
+        });
+      </script>
+
+      <script id="journalData">
+          var userID = getQueryVariable("userID");
+          var username = "";
+          var accounts = [];
+
+          async function setUsername() {
+            let response = await fetch("{{ api_url }}/users?id=" + userID);
+            let userJSON = await response.json();
+            
+            username = userJSON[0]["username"];
+          }
+
+          async function setAccounts() {
+            let response = await fetch("{{ api_url }}/users/" + userID + "/accounts");
+            let accountsJSON = await response.json();
+
+            let i;
+            for (i = 0; i < accountsJSON.length; i++) {
+              accounts.push(accountsJSON[i]);
+            }
+          }
+
+          setUsername().then(() => {
+            console.log(username);    //For debugging
+            document.getElementById("TableHeader").innerHTML = username + "'s Income Statement";
+          });
+
+          setAccounts().then(() => {
+            console.log(accounts);    //For debugging
+            var revenueTable = $('.RevenueTable').DataTable();
+            var expenseTable = $('.ExpenseTable').DataTable();
+
+            let i = 0, debitsTotal = 0, creditsTotal = 0;
+            for (i = 0; i < accounts.length; i++) {
+              var debits = 0;
+              var credits = 0;
+              if (accounts[i]["Category"] == "Asset") {
+                debits = accounts[i]["Balance"];
+                debitsTotal += debits;
+              } else {
+                credits = -accounts[i]["Balance"];
+                creditsTotal += credits;
+              }
+              if (debits != 0) { 
+                revenueTable.row.add([
+                  accounts[i]["Subcategory"],
+                  '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                ]);
+              }
+              if (credits != 0) {
+                expenseTable.row.add([
+                  accounts[i]["Subcategory"],
+                  '$' + Number(credits).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                ]);
+              }
+            }
+            revenueTable.row.add([
+                "",
+                '$' + Number(debitsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })
+              ]).draw();
+            expenseTable.row.add([
+                "",
+                '$' + Number(creditsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })
+              ]).draw();
+            document.getElementById("net").innerHTML = `Net Income = ${'$' + Number(debitsTotal - creditsTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+          });
+
+      </script>
+    {%endblock%}
