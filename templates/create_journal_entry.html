@@ -27,6 +27,10 @@
                     {{ form.Comment(size=32) }}<br>
                 </p>
                 <p>
+                    {{ form.TypeOfAcc.label }}<br>
+                    {{ form.TypeOfAcc(size=2) }}<br>
+                </p>
+                <p>
                     {{ form.File.label }}<br>
                     {{ form.csrf_token }}
                     {{ form.File }}<br>

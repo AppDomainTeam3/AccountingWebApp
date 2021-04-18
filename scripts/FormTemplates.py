@@ -24,7 +24,7 @@ class AccountCreationForm(FlaskForm):
     accountName = StringField('Account Name', validators=[DataRequired('field is required.')])
     accountDesc = StringField('Description', validators=[DataRequired('field is required.')])
     normalSide = StringField('Normal Side', validators=[DataRequired('field is required.')])
-    category = SelectField('Category', choices=[('Asset', 'Asset'), ('Liability', 'Liability'), ('Equity','Equity')], validators=[DataRequired('field is required.')])
+    category = SelectField('Category', choices=[('Asset', 'Asset'), ('Liability', 'Liability'), ('Equity','Equity'), ('Revenue','Revenue'), ('Expense','Expense')], validators=[DataRequired('field is required.')])
     subcategory = SelectField('Subcategory', 
         choices=[
             #assets
@@ -40,7 +40,10 @@ class AccountCreationForm(FlaskForm):
             ('Accrued Expenses','Accrued Expenses'),
             #equity
             ('Owner Equity','Owner Equity'),
-            ('Retained Earnings','Retained Earnings')     
+            ('Retained Earnings','Retained Earnings'),   
+            #revenue/expense
+            ('Revenue','Revenue'),
+            ('Expense','Expense')
         ], validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
@@ -76,6 +79,7 @@ class JournalEntryForm(FlaskForm):
     Debits = StringField('Debits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Credits = StringField('Credits (separated by commas)', validators=[DataRequired('field is required.')], render_kw={"placeholder": "1.00, 2.00, etc."})
     Comment = StringField('Comment', render_kw={"placeholder": "optional comment"})
+    TypeOfAcc = SelectField('Type of Transaction', choices=[('Expense or Revenue', 'Expense or Revenue'), ('Other','Other')], validators=[DataRequired('field is required.')])
     File = FileField('File', validators=None)
     Submit = SubmitField('Submit')
 
