@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+      <div class="container-fluid">
+        <h1 id="TableHeader" class="pt-2">Username's Income Statement</h1>
+        <table class="table table-striped table-bordered RevenueTable" style="width: 100%">
+          <thead>
+            <tr>
+              <th colspan="1">Revenue</th>
+              <th colspan="1">Amount</th>
+            </tr>
+          </thead>
+        </table>
+
+        <table class="table table-striped table-bordered ExpenseTable" style="width: 100%">
+          <thead>
+            <tr>
+              <th colspan="1">Expense</th>
+              <th colspan="1">Amount</th>
+            </tr>
+          </thead>
+        </table>
+
+        <table class="table table-striped table-bordered NetTable" style="width: 100%">
+          <thead>
+            <tr>
+              <th colspan="1">Net Income</th>
+              <th colspan="1">Amount</th>
+            </tr>
+          </thead>
+        </table>
+
+        <h1 id="net" style="text-align: right"></h1>
+      </div>
+    {%endblock%}
+
+    {%block script%}
+      <script src="../static/js/Helper.js"></script>
+
+      <script>
+        $('.RevenueTable').DataTable({
+          "columnDefs": [ { "width": "50%", "targets": 0 }],
+            order: [],
+            pagingType: 'full_numbers',
+            "bLengthChange": false,
+            "paging":false
+        });
+
+        $('.ExpenseTable').DataTable({
+          "columnDefs": [ { "width": "50%", "targets": 0 }],
+            order: [],
+            pagingType: 'full_numbers',
+            "bLengthChange": false,
+            "paging":false
+        });
+
+        $('.NetTable').DataTable({
+          "columnDefs": [ { "width": "50%", "targets": 0 }],
+            order: [],
+            pagingType: 'full_numbers',
+            "bLengthChange": false,
+            "paging":false
+        });
+      </script>
+
+      <script id="journalData">
+          var userID = getQueryVariable("userID");
+          var username = "";
+          var accounts = [];
+
+          async function setUsername() {
+            let response = await fetch("{{ api_url }}/users?id=" + userID);
+            let userJSON = await response.json();
+            
+            username = userJSON[0]["username"];
+          }
+
+          async function setAccounts() {
+            let response = await fetch("{{ api_url }}/users/" + userID + "/accounts");
+            let accountsJSON = await response.json();
+
+            let i;
+            for (i = 0; i < accountsJSON.length; i++) {
+              accounts.push(accountsJSON[i]);
+            }
+          }
+
+          setUsername().then(() => {
+            console.log(username);    //For debugging
+            document.getElementById("TableHeader").innerHTML = username + "'s Income Statement";
+          });
+
+          setAccounts().then(() => {
+            console.log(accounts);    //For debugging
+            var revenueTable = $('.RevenueTable').DataTable();
+            var expenseTable = $('.ExpenseTable').DataTable();
+
+            RevTable = $('.RevenueTable').DataTable();
+            let i = 0, amount = 0, net = 0;
+            for (i = 0; i < accounts.length; i++) {
+                
+                if (accounts[i]["Category"] == "Revenue") {
+                debits = Math.abs(accounts[i]["Balance"]);
+                amount += debits;
+                net += debits;
+                
+                RevTable.row.add([
+                accounts[i]["AccountDesc"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            RevTable.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                
+                ]).draw();
+
+
+            ExpTable = $('.ExpenseTable').DataTable();
+            amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                
+                if (accounts[i]["Category"] == "Expense") {
+                debits = Math.abs(accounts[i]["Balance"]);
+                amount += debits;
+                net -= debits;
+                
+                ExpTable.row.add([
+                accounts[i]["AccountDesc"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            ExpTable.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                
+                ]).draw();
+           
+            NetTable = $('.NetTable').DataTable();
+            amount = 0;
+            
+            NetTable.row.add([
+                "",
+                '$' + Number(net).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                
+                ]).draw();    
+          });
+      </script>
+    {%endblock%}

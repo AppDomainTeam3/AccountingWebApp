@@ -74,15 +74,19 @@
               if (accounts[i]["Category"] == "Asset") {
                 debits = accounts[i]["Balance"];
                 debitsTotal += debits;
-              } else {
+              } else if (accounts[i]["Category"] != "Expense" && accounts[i]["Category"] != "Revenue" ){
                 credits = -accounts[i]["Balance"];
                 creditsTotal += credits;
               }
+              
+              if (accounts[i]["Subcategory"] != 'Expense' && accounts[i]["Subcategory"] != 'Revenue' ) { 
               table.row.add([
                 accounts[i]["Subcategory"],
                 '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
                 '$' + Number(credits).toLocaleString(undefined, { minimumFractionDigits: 2 })
               ]);
+              }
+
             }
             table.row.add([
                 "",

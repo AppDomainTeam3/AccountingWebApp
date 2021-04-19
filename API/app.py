@@ -582,7 +582,16 @@ class CreateJournalEntry(Resource):
                                                 '{Status}', '{formDict['Debits']}', '{formDict['Credits']}', '{message}', '{timestamp}', '{fileURL}')"""
 
         query2 = f"UPDATE Accounts SET Balance = Balance - {formDict['Credits']} WHERE AccountNumber = {formDict['SourceAccountNumber']};"
+        
         query3 = f"UPDATE Accounts SET Balance = Balance + {formDict['Debits']} WHERE AccountNumber = {formDict['DestAccountNumber']};"
+        #expense or revenue transactions will affect the retained earnings account, other types of transactions will be normal
+        if (formDict['TypeOfAcc'] == 'Expense or Revenue'):
+            query4 = f"UPDATE Accounts SET Balance = Balance - {formDict['Credits']} WHERE Subcategory ='Retained Earnings';"
+            try:
+                engine.execute(query4)
+            except Exception as e:
+                print(e)
+                return Helper.CustomResponse(500, 'SQL Error')
 
         try:
             engine.execute(query)
