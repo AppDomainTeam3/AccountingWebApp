@@ -230,6 +230,12 @@ def BalanceSheet():
         return render_template('login.html')
     return render_template('balance_sheet.html', sessionUser=g.user, title='Balance Sheet', app_url=app_url, api_url=api_url)
 
+@app.route("/retained_earnings")
+def RetainedEarnings():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('retained_earnings.html', sessionUser=g.user, title='Retained Earnings', app_url=app_url, api_url=api_url)
+
 @app.route("/accounts")
 def AccountsList():
     if g.user == None:
@@ -260,8 +266,6 @@ def EventLog():
     events = populateEventsListByEndpoint("/events", api_url)
 
     return render_template('eventlog.html', sessionUser=g.user, title = 'Eventlog', events=events)
-
-
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):

@@ -43,7 +43,9 @@ class AccountCreationForm(FlaskForm):
             ('Retained Earnings','Retained Earnings'),   
             #revenue/expense
             ('Revenue','Revenue'),
-            ('Expense','Expense')
+            ('Expense','Expense'),
+            #Dividend
+            ('Cash Dividend','Cash Dividend')
         ], validators=[DataRequired('field is required.')])
     submit = SubmitField('Submit')
 
