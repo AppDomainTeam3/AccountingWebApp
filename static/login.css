@@ -98,3 +98,8 @@ tfoot input {
     box-sizing: border-box;
 }
 
+#printButton:hover {
+
+    color:blue;
+
+}
