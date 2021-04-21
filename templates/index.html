@@ -22,12 +22,12 @@
             {% endwith %}
         </div>
 
-    <div class="jumbotron jumbotron-fluid">
+    <div id="jumboIndex" class="jumbotron jumbotron-fluid">
       <div class="container jumbocontent">
-        <h1 class="display-4">Hello, {{ g.user.username }}!</h1>
-        <p class="lead">Welcome to Finantec Tools, a simple solution to all your complex accounting needs</p>
+        <h1 class="display-4 ml-2">Hello, {{ g.user.username }}!</h1>
+        <p class="lead ml-2">Welcome to Finantec Tools, a simple solution to all your complex accounting needs</p>
         <hr class="my-4">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+        <button type="button" class="btn btn-primary ml-2 mb-2" data-toggle="modal" data-target="#staticBackdrop">
           Launch Calendar
         </button>
       </div>
