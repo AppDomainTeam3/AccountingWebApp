@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+  {%block title%} {{title}} {%endblock%}
+
+    {%block content%}
+        <div class="container-fluid">
+            <div class = "row">
+                <div class = "col">
+                  <h1 id="TableHeader" class="pt-2">Username's Balance Sheet</h1>
+                </div>
+                <div class = "col">
+                  <div  class="pt-4 text-right">
+                    <i id="printButton" onclick="javascript:window.print()" class="fas fa-print fa-2x"> </i>
+                  </div>
+                </div>
+              </div>
+          <div class="row">
+              <div class = "col">
+                    <table class="table table-striped table-bordered AssetsDataTable" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th colspan="1" style="color:navy;">Assets</th>
+                                <th colspan="1"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="AssetsTable">
+                            
+                        </tbody>
+
+                        <tfoot>
+                            <th colspan="2"></th>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="col">
+                    
+                    <table class="table table-striped table-bordered LiabilitiesDataTable" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th colspan="1" style="color:navy;">Liabilities</th>
+                                <th colspan="1"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="LiabilitiesTable">
+                            
+                        </tbody>
+
+                        <tfoot>
+                            <th colspan="2"></th>
+                        </tfoot>
+                    </table> 
+                </div>
+            </div>
+            <div class = "row">
+                <div class = "col">
+                <!--Empty bottom left col-->
+                </div>
+                <div class = "col">
+                    <table class="table table-striped table-bordered EquityDataTable" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th colspan="1" style="color:navy;">Equity</th>
+                                <th colspan="1"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="EquityTable">
+                
+                        </tbody>
+
+                        <tfoot>
+                            <th colspan="2"></th>
+                        </tfoot>
+                    </table> 
+                </div>
+            </div>
+        </div>
+{%endblock%}
+
+    {%block script%}
+      <script src="../static/js/Helper.js"></script>
+
+      <script id="AssetsDataTable">
+        $('.AssetsDataTable').DataTable({
+            order: [],
+            "bLengthChange": false,
+            "pageLength": 10,
+            "paging":false
+        });
+      </script>
+
+      <script id="LiabilitiesDataTable">
+        $('.LiabilitiesDataTable').DataTable({
+            order: [],
+            "bLengthChange": false,
+            "pageLength": 10,
+            "paging":false
+            
+        });
+       </script>
+
+       <script id="EquityDataTable">
+        $('.EquityDataTable').DataTable({
+            order: [],
+            "bLengthChange": false,
+            "pageLength": 10,
+            "paging":false
+           
+        });
+       </script>
+
+        <script id="journalData">
+            var userID = getQueryVariable("userID");
+            var username = "";
+            var accounts = [];
+
+            async function setUsername() {
+            let response = await fetch("{{ api_url }}/users?id=" + userID);
+            let userJSON = await response.json();
+            
+            username = userJSON[0]["username"];
+            }
+
+            async function setAccounts() {
+            let response = await fetch("{{ api_url }}/users/" + userID + "/accounts");
+            let accountsJSON = await response.json();
+
+            let i;
+            for (i = 0; i < accountsJSON.length; i++) {
+                accounts.push(accountsJSON[i]);
+            }
+            }
+            
+            setUsername().then(() => {
+            console.log(username);    //For debugging
+            document.getElementById("TableHeader").innerHTML = username + "'s Balance Sheet";
+            });
+
+            setAccounts().then(() => {
+            console.log(accounts);    //For debugging
+            //Assets Table
+            table = $('.AssetsDataTable').DataTable();
+            let i = 0, amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                
+                if (accounts[i]["Category"] == "Asset") {
+                debits = accounts[i]["Balance"];
+                amount += debits;
+                
+                table.row.add([
+                accounts[i]["Subcategory"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            table.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                
+                ]).draw();
+            //Liabilities Table
+            table2 = $('.LiabilitiesDataTable').DataTable();
+            amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                if (accounts[i]["Category"] == "Liability") {
+                debits = Math.abs(accounts[i]["Balance"]);
+                amount += debits;
+                
+                table2.row.add([
+                accounts[i]["Subcategory"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            table2.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                ]).draw();
+            //Equity Table
+            table3 = $('.EquityDataTable').DataTable();
+            amount = 0;
+            for (i = 0; i < accounts.length; i++) {
+                
+                if (accounts[i]["Category"] == "Equity") {
+                debits = Math.abs(accounts[i]["Balance"]);
+                amount += debits;
+                
+                table3.row.add([
+                accounts[i]["Subcategory"],
+                '$' + Number(debits).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+                ]);
+                }
+            }
+            table3.row.add([
+                "",
+                '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                ]).draw();
+            });
+            setAccounts().then(() => {
+            console.log(accounts);    //For debugging
+            });
+        </script>
+    {%endblock%}

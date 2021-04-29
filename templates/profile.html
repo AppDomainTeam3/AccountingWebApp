@@ -8,7 +8,7 @@
         <div class= "col" style="max-width: fit-content;">
           <h1 class="pt-2">{{ userData.username }}'s Profile</h1> 
           {% if canEdit %}
-            <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a></p>
+            <a href="{{ url }}/users/{{ userData.id }}/edit">Edit Profile</a>
           {% endif %}
           <div id='profileAvatar' style="border-style: solid; border-color:rgb(0, 0, 0); width: fit-content;">
             <img src={{ userData.avatarlink }} height="240">  
@@ -18,9 +18,16 @@
           {% elif userData.isActive.lower() == 'false' %}
             <p>Status: Inactive until {{ userData.reactivateUserDate }}</p>
           {% endif %}
-          <p>{{ userData.firstname }} {{ userData.lastname }} <span>  </span> <a href="/user-mail?userID={{ userData.id }}" <span class="fas fa-envelope" data-toggle="tooltip" data-placement="right" title="Email User"> </span> </a>       </p>
-          <p>{{ userData.email }}</p>
-          <p>{{ userData.usertype }}</p>
+          <p>{{ userData.firstname }} {{ userData.lastname }} <a href="/user-mail?userID={{ userData.id }}" class="fas fa-envelope" data-toggle="tooltip" data-placement="right" title="Email User"></a><br>
+            {{ userData.email }}<br>
+            {{ userData.usertype }}
+          </p>
+          <p>
+            <a href="/trial_balance?userID={{ userData.id }}">Trial Balance</a><br>
+            <a href="/income_statement?userID={{ userData.id }}">Income Statement</a><br>
+            <a href="/balance_sheet?userID={{ userData.id }}">Balance Sheet</a><br>
+            <a href="/retained_earnings?userID={{ userData.id }}">Retained Earnings</a>
+          </p>
         </div>
 
         <div class= "col" style="padding: 15px;">
@@ -136,7 +143,7 @@
       });
       ledger = $('.ledgerDataTable').DataTable({
           order: [[0,'desc']],
-          scrollY: "225px",
+          scrollY: "265px",
           scrollCollapse: true,
           paging: false,
           "columnDefs": [

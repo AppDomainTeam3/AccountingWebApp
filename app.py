@@ -2,12 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, session, g
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash
-import requests
-
+import requests, uuid, os, sys
 import scripts.Helper as Helper
 from scripts.Helper import populateAccountsListByUserID, populateAccountByAccountNumber, updateUserList, populateEventsListByEndpoint, getUserEditStatus
 from scripts.FormTemplates import AccountCreationForm, UserCreationForm, UserPasswordChangeForm, UserPasswordChangeForm
 from scripts.FormTemplates import AdminEmailForm, ForgotPasswordForm, AccountEditForm, JournalEntryForm, JournalActionForm
+from os.path import join, dirname
+from dotenv import load_dotenv
+from dotenv.main import find_dotenv
+
+load_dotenv(find_dotenv())
 
 app = Flask(__name__, static_folder='static')
 app.config.from_object("config.DevelopementConfig")
@@ -20,6 +24,7 @@ mail = Mail(app)
 #adds userdata to list for user tracking and authentication
 users = []
 users = updateUserList(users, api_url)
+SAS = os.environ.get('SAS')
 
 def passwordExEmail(user):
     
@@ -207,6 +212,30 @@ def UserProfile(user_id):
     canEdit = getUserEditStatus(g.user, user_id)
     return render_template('profile.html', title = 'User Profile Page',userData=users[user_id], accounts=accounts, accountBalances=accountBalances, journalList=journalList, url=app_url, api=api_url, canEdit=canEdit, sessionUser=g.user)
 
+@app.route("/trial_balance")
+def TrialBalance():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('trial_balance.html', sessionUser=g.user, title='Trial Balance', app_url=app_url, api_url=api_url)
+
+@app.route("/income_statement")
+def IncomeStatement():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('income_statement.html', sessionUser=g.user, title='Income Statement', app_url=app_url, api_url=api_url)
+
+@app.route("/balance_sheet")
+def BalanceSheet():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('balance_sheet.html', sessionUser=g.user, title='Balance Sheet', app_url=app_url, api_url=api_url)
+
+@app.route("/retained_earnings")
+def RetainedEarnings():
+    if g.user == None:
+        return render_template('login.html')
+    return render_template('retained_earnings.html', sessionUser=g.user, title='Retained Earnings', app_url=app_url, api_url=api_url)
+
 @app.route("/accounts")
 def AccountsList():
     if g.user == None:
@@ -237,8 +266,6 @@ def EventLog():
     events = populateEventsListByEndpoint("/events", api_url)
 
     return render_template('eventlog.html', sessionUser=g.user, title = 'Eventlog', events=events)
-
-
 
 @app.route("/users/<int:user_id>/edit/", methods=['GET', 'POST'])
 def EditUserProfile(user_id):
@@ -336,7 +363,7 @@ def CreateJournalEntry():
     if g.user == None:
         return render_template('login.html')
     form = JournalEntryForm()
-    return render_template('create_journal_entry.html', title='Create Journal Entry', form=form, api=api_url, sessionUser=g.user)
+    return render_template('create_journal_entry.html', title='Create Journal Entry', form=form, api=api_url, SAS=SAS, sessionUser=g.user)
 
 @app.route("/forgot_password/", methods=['GET', 'POST'])
 def ForgotPassword():
@@ -352,4 +379,4 @@ def unauthorized():
     return render_template('unauthorized.html', sessionUser=g.user)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='127.0.0.1', debug=True)
